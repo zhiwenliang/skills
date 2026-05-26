@@ -1,0 +1,61 @@
+{
+  "skill_name": "tech-tutorial",
+  "evals": [
+    {
+      "id": 1,
+      "name": "open-ended-web-framework",
+      "prompt": "我想系统学一个 Python Web 框架，之前只写过简单脚本和几个 Flask 路由。帮我写一份能建立完整心智模型的教程。",
+      "expected_output": "完整教程结构（index.html + 多文件章节 + 概念图）。范围明确（覆盖核心概念但不试图涵盖全框架）。用用户已有的 Flask/脚本经验作为类比起点。包含 self-check + 学习路径 + 下一步建议。",
+      "files": [],
+      "assertions": [
+        "has_entrypoint",
+        "multi_file_structure",
+        "has_concept_map",
+        "uses_existing_background_analogy",
+        "has_self_check",
+        "has_tradeoffs",
+        "has_runnable_code",
+        "has_learning_path",
+        "has_further_reading",
+        "has_next_steps"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "scoped-database-indexes",
+      "prompt": "我准备优化一个查询很慢的业务系统。先帮我系统学一下 PostgreSQL 里和索引、查询计划相关的部分（不用讲完整数据库内核），要能让我读完就能动手排查。",
+      "expected_output": "范围聚焦索引和查询计划，不发散到完整数据库内核；覆盖索引类型、选择性、执行计划、常见误判；有 hello-world + realistic example；讨论组件级权衡；有 pitfalls。",
+      "files": [],
+      "assertions": [
+        "has_entrypoint",
+        "covers_scoped_components",
+        "scope_constrained",
+        "has_hello_world_example",
+        "has_realistic_example",
+        "has_concept_map",
+        "has_tradeoffs",
+        "has_pitfalls",
+        "has_self_check",
+        "has_runnable_code"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "feature-deep-dive",
+      "prompt": "OAuth 2.0 里的 PKCE 我一直没搞懂为什么要存在，看文档只告诉我怎么配，不告诉我为什么。帮我搞清楚。",
+      "expected_output": "重心在 why 而非 API。包含旧方案对比、设计动机（至少 2 项：授权码泄露、防止客户端密钥落到前端、移动端威胁模型）、局限性、不该用的场景、协议流程图。",
+      "files": [],
+      "assertions": [
+        "has_before_feature",
+        "side_by_side_code",
+        "has_design_motivation",
+        "has_tradeoffs",
+        "has_when_not_to_use",
+        "has_protocol_diagram",
+        "has_self_check",
+        "centers_on_why",
+        "has_sources"
+      ]
+    }
+  ]
+}

@@ -19,3 +19,7 @@ Each `SKILL.md` should include YAML frontmatter with a `name` and `description`,
 - Keep `SKILL.md` focused and short.
 - Put longer references, examples, or templates next to the skill file.
 - Use scripts only when they make a repeated workflow more reliable.
+
+## Available Skills
+
+- `tech-tutorial` — builds cognitive-science-aligned HTML tutorials for technical topics.

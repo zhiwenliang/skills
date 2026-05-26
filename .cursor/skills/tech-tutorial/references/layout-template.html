@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<!--
+  ════════════════════════════════════════════════════════════════
+  tech-tutorial · HTML layout template
+  ════════════════════════════════════════════════════════════════
+
+  Aesthetic: editorial scholarly notebook (学者笔记本)
+  Tech stack:
+    - Google Fonts: Noto Serif SC + Noto Sans SC + Spectral + Fraunces + JetBrains Mono
+    - Prism.js (CDN) for syntax highlighting — custom theme overrides palette
+    - Zero CSS framework, zero JS framework, no build step
+
+  How to use:
+    1. Copy this entire file as the starting point for each chapter
+       (index.html, 01-concepts.html, 02-principles.html, etc.)
+    2. Update <title>
+    3. Update the .learning-path breadcrumb (mark current chapter with .current)
+    4. Fill in <article> with chapter content using the reusable HTML
+       snippets defined in references/tutorial_template.md
+    5. Update sticky TOC links (aside.toc-sidebar > ul) to match in-article anchors
+    6. Update prev/next nav at bottom
+
+  Class names you'll use (full reference in tutorial_template.md):
+    .learning-path   .chapter-opener   .schema-panel
+    .one-liner   .rationale   .annotations
+    .code-block (with .header > .filename .lang .copy)
+    .callout (.warning .tip .example .insight)
+    .compare-table (tr.selected)
+    figure > svg > figcaption (figcaption > .fig-num)
+    .predict   details > summary
+    .self-check   .challenge   .references   .chapter-nav
+  ════════════════════════════════════════════════════════════════
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{CHAPTER TITLE}} · {{TECH NAME}} 教程</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@500;700;900&family=Spectral:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+
+<style>
+/* ============================================================
+   tech-tutorial design system v1 (editorial scholarly notebook)
+   ============================================================ */
+
+:root {
+  /* Color — warm paper, deep ink, restrained vermilion */
+  --paper:       #FAF6EE;    /* warm off-white base */
+  --paper-deep:  #F1EADA;    /* code & callout bg */
+  --paper-edge:  #E8DFC8;    /* deeper for code header */
+  --ink:         #1F1B16;    /* primary text — warm near-black */
+  --ink-soft:    #5C544A;    /* secondary text */
+  --ink-faint:   #9A9082;    /* metadata / placeholders */
+  --rule:        #D6CDB9;    /* dividers */
+  --vermilion:   #B73B2F;    /* primary accent — Chinese ink red */
+  --vermilion-soft: rgba(183,59,47,0.08);
+  --sage:        #5F7A5F;    /* tip callout */
+  --amber:       #B5803A;    /* example callout */
+  --slate:       #4A5A6B;    /* insight callout */
+
+  /* Typography */
+  --serif-cn:    'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', '宋体', serif;
+  --serif-en:    'Spectral', 'Source Serif Pro', Georgia, serif;
+  --sans-cn:     'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', sans-serif;
+  --display:     'Fraunces', 'Noto Serif SC', serif;
+  --mono:        'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+
+  /* Rhythm */
+  --measure:     820px;       /* main reading column — 50-55 CJK chars/line */
+  --page-max:    1240px;      /* page outer max */
+  --line-cn:     1.85;
+  --line-en:     1.7;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif-en), var(--serif-cn);
+  font-size: 17px;
+  line-height: var(--line-cn);
+  font-feature-settings: "kern", "liga";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(rgba(31,27,22,0.02) 1px, transparent 1px),
+    radial-gradient(rgba(31,27,22,0.02) 1px, transparent 1px);
+  background-size: 4px 4px, 7px 7px;
+  background-position: 0 0, 2px 3px;
+}
+
+main { position: relative; z-index: 1; }
+
+.progress-bar {
+  position: fixed; top: 0; left: 0; height: 2px;
+  width: 0; background: var(--vermilion);
+  z-index: 100; transition: width 80ms linear;
+}
+
+/* Learning path breadcrumb at top */
+.learning-path {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 24px 56px 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+.learning-path a {
+  color: var(--ink-faint);
+  text-decoration: none;
+  padding: 4px 0; margin: 0 4px;
+}
+.learning-path a:first-child { margin-left: 0; }
+.learning-path .sep { color: var(--ink-faint); margin: 0 2px; user-select: none; }
+.learning-path .current {
+  color: var(--vermilion);
+  font-weight: 700;
+  border-bottom: 1.5px solid var(--vermilion);
+  padding-bottom: 2px;
+}
+
+/* Page layout: article + sticky TOC */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 88px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 32px 56px 120px;
+}
+@media (max-width: 1100px) {
+  .page { grid-template-columns: 1fr; gap: 0; padding: 16px 28px 96px; }
+  .toc-sidebar { display: none; }
+}
+
+article { max-width: var(--measure); min-width: 0; }
+
+/* Chapter opener */
+.chapter-opener {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 36px;
+  align-items: end;
+  padding: 56px 0 24px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 40px;
+}
+.chapter-opener .numeral {
+  font-family: var(--display);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144;
+  font-size: 160px;
+  line-height: 0.85;
+  color: var(--vermilion);
+  letter-spacing: -0.04em;
+}
+.chapter-opener h1 {
+  font-family: var(--sans-cn);
+  font-weight: 900;
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 16px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.chapter-opener .recap {
+  font-family: var(--serif-en), var(--serif-cn);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 640px;
+}
+@media (max-width: 640px) {
+  .chapter-opener { grid-template-columns: 1fr; gap: 16px; padding-top: 28px; }
+  .chapter-opener .numeral { font-size: 96px; }
+  .chapter-opener h1 { font-size: 32px; }
+}
+
+/* Schema panel (what you'll build) */
+.schema-panel {
+  border-left: 3px solid var(--vermilion);
+  padding: 8px 0 8px 24px;
+  margin: 32px 0 56px;
+}
+.schema-panel .label {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--vermilion);
+  margin: 0 0 12px;
+  font-weight: 500;
+}
+.schema-panel ul { list-style: none; padding: 0; margin: 0; }
+.schema-panel li {
+  padding: 6px 0;
+  font-family: var(--serif-cn);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.schema-panel li::before { content: "— "; color: var(--vermilion); font-weight: 700; }
+
+/* Body prose */
+article p, article li {
+  font-family: var(--serif-en), var(--serif-cn);
+  font-size: 17px; line-height: var(--line-cn);
+  color: var(--ink);
+  margin: 1em 0;
+}
+article strong { font-weight: 700; color: var(--ink); }
+article em { font-style: italic; color: var(--ink); }
+
+article :not(pre) > code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  background: var(--paper-deep);
+  padding: 1.5px 6px;
+  border-radius: 2px;
+  color: var(--vermilion);
+  font-weight: 500;
+  border: 1px solid var(--paper-edge);
+}
+
+article a {
+  color: var(--ink);
+  text-decoration: none;
+  background-image: linear-gradient(to right, var(--vermilion) 50%, transparent 50%);
+  background-position: 0 100%;
+  background-size: 200% 1.5px;
+  background-repeat: no-repeat;
+  transition: background-position 250ms ease;
+}
+article a:hover { background-position: -100% 100%; color: var(--vermilion); }
+
+/* Section headings */
+article h2 {
+  font-family: var(--sans-cn);
+  font-weight: 900;
+  font-size: 28px; line-height: 1.3;
+  margin: 72px 0 8px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: baseline;
+}
+article h2 .num {
+  font-family: var(--display);
+  font-weight: 300;
+  font-size: 36px;
+  color: var(--vermilion);
+  font-variation-settings: "opsz" 36;
+}
+
+article h3 {
+  font-family: var(--sans-cn);
+  font-weight: 700;
+  font-size: 18px;
+  margin: 32px 0 12px;
+  color: var(--ink);
+}
+
+/* One-liner definition */
+article .one-liner {
+  font-family: var(--serif-en), var(--serif-cn);
+  font-size: 19px; line-height: 1.6;
+  color: var(--ink);
+  font-weight: 500;
+  font-style: italic;
+  margin: 12px 0 24px;
+  padding-left: 16px;
+  border-left: 2px solid var(--ink-faint);
+}
+
+/* "为什么需要它" rationale block */
+article .rationale {
+  background: var(--vermilion-soft);
+  padding: 18px 24px 18px 28px;
+  border-left: 3px solid var(--vermilion);
+  margin: 24px 0;
+  font-size: 16px;
+}
+article .rationale > .label {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--vermilion);
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+article .rationale p { margin: 4px 0; }
+
+/* Code block — paper-tone with header bar */
+.code-block {
+  margin: 28px 0;
+  border: 1px solid var(--paper-edge);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--paper-deep);
+}
+.code-block .header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--paper-edge);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+.code-block .header .filename { font-weight: 500; }
+.code-block .header .lang { color: var(--vermilion); text-transform: uppercase; font-weight: 700; }
+.code-block .header .copy {
+  border: none; background: transparent;
+  font-family: var(--mono); font-size: 10px;
+  color: var(--ink-soft); cursor: pointer;
+  padding: 4px 8px; letter-spacing: 0.06em; text-transform: uppercase;
+  transition: color 150ms;
+}
+.code-block .header .copy:hover { color: var(--vermilion); }
+.code-block .header .copy.copied { color: var(--sage); }
+.code-block pre {
+  margin: 0; padding: 18px 20px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13.5px; line-height: 1.65;
+  color: var(--ink);
+  background: var(--paper-deep);
+}
+.code-block pre code { background: none; padding: 0; color: inherit; border: none; font-weight: 400; }
+
+/* Prism theme overrides — match palette */
+.token.keyword,
+.token.boolean,
+.token.constant     { color: var(--vermilion); font-weight: 500; }
+.token.string,
+.token.char         { color: var(--sage); }
+.token.number       { color: var(--amber); }
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata        { color: var(--ink-faint); font-style: italic; }
+.token.function     { color: var(--slate); font-weight: 500; }
+.token.class-name   { color: var(--ink); font-weight: 700; }
+.token.operator,
+.token.punctuation  { color: var(--ink-soft); }
+.token.builtin      { color: var(--vermilion); }
+.token.property     { color: var(--ink); }
+.token.tag,
+.token.attr-name    { color: var(--slate); }
+.token.attr-value   { color: var(--sage); }
+
+/* Annotations after code (line-ref pills) */
+.annotations { margin: 16px 0 28px; font-size: 15px; color: var(--ink-soft); }
+.annotations .line-ref {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--paper-deep);
+  border: 1px solid var(--paper-edge);
+  padding: 1px 7px;
+  border-radius: 2px;
+  margin-right: 6px;
+  color: var(--vermilion);
+  font-weight: 500;
+}
+
+/* Predictive question block */
+.predict {
+  margin: 28px 0;
+  padding: 18px 24px;
+  background: var(--paper-deep);
+  border-radius: 3px;
+}
+.predict > .question-label {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--vermilion);
+  font-weight: 500;
+  margin: 0 0 8px;
+  display: block;
+}
+.predict p { font-style: italic; margin: 4px 0; color: var(--ink); }
+
+/* <details> answer reveal */
+details {
+  margin: 12px 0 0;
+  border-top: 1px dashed var(--ink-faint);
+  padding-top: 12px;
+}
+details > summary {
+  cursor: pointer; list-style: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+  padding: 4px 0;
+  transition: color 150ms;
+  user-select: none;
+  display: flex; align-items: center; gap: 8px;
+}
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before {
+  content: "▸";
+  display: inline-block;
+  color: var(--vermilion);
+  transition: transform 200ms;
+  font-size: 10px;
+}
+details[open] > summary::before { transform: rotate(90deg); }
+details > summary:hover { color: var(--vermilion); }
+details > *:not(summary) {
+  margin-top: 12px;
+  padding-left: 20px;
+  border-left: 2px solid var(--vermilion-soft);
+}
+
+/* Callouts: 4 types — left vertical rule + mono label */
+.callout {
+  margin: 28px 0;
+  padding: 16px 22px;
+  border-left: 3px solid;
+  background: rgba(255,255,255,0.4);
+  font-size: 16px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  font-weight: 700;
+  margin: 0 0 6px;
+  display: block;
+}
+.callout p { margin: 6px 0; }
+.callout.warning { border-color: var(--vermilion); }
+.callout.warning .label { color: var(--vermilion); }
+.callout.tip     { border-color: var(--sage); }
+.callout.tip     .label     { color: var(--sage); }
+.callout.example { border-color: var(--amber); }
+.callout.example .label { color: var(--amber); }
+.callout.insight { border-color: var(--slate); }
+.callout.insight .label { color: var(--slate); }
+
+/* Comparison table */
+.compare-table {
+  margin: 32px 0;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.compare-table caption {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 0 0 12px;
+  font-weight: 500;
+}
+.compare-table thead th {
+  text-align: left;
+  font-family: var(--sans-cn);
+  font-weight: 700; font-size: 13px;
+  color: var(--ink);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--ink);
+  letter-spacing: 0.02em;
+}
+.compare-table tbody td {
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+  font-family: var(--serif-cn);
+  line-height: 1.55;
+}
+.compare-table tbody tr.selected { background: var(--vermilion-soft); }
+.compare-table tbody tr.selected td:first-child {
+  font-weight: 700; position: relative;
+}
+.compare-table tbody tr.selected td:first-child::before {
+  content: "▸";
+  position: absolute; left: -2px;
+  color: var(--vermilion);
+  font-size: 11px;
+}
+
+/* Figures (SVG diagrams) */
+figure { margin: 40px 0; }
+figure svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+figcaption {
+  font-family: var(--serif-en), var(--serif-cn);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink-soft);
+  text-align: center;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+figcaption .fig-num {
+  font-family: var(--mono);
+  font-style: normal; font-weight: 700;
+  color: var(--vermilion);
+  margin-right: 8px;
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+/* Self-check block */
+.self-check {
+  margin: 64px 0 32px;
+  border-top: 2px solid var(--ink);
+  padding-top: 28px;
+}
+.self-check h2 { border: none; padding-top: 0; margin-top: 0; font-size: 22px; }
+.self-check ol { font-family: var(--serif-cn); padding-left: 24px; }
+.self-check ol li { margin: 14px 0; padding-left: 8px; }
+.self-check ol li::marker { font-family: var(--mono); color: var(--vermilion); font-weight: 700; }
+
+/* Advanced challenge */
+.challenge {
+  margin: 48px 0;
+  padding: 24px 28px;
+  background: var(--paper-deep);
+  border-radius: 3px;
+  border-top: 3px solid var(--vermilion);
+}
+.challenge .label {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  font-weight: 700;
+  color: var(--vermilion);
+  margin: 0 0 12px;
+  display: block;
+}
+.challenge h3 { margin-top: 0; font-size: 17px; }
+
+/* References + chapter nav */
+.references { margin: 80px 0 24px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.references h3 {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 500;
+  margin: 0 0 12px;
+}
+.references ul { padding-left: 18px; }
+.references li { font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+.references li a { color: var(--ink); }
+
+.chapter-nav {
+  margin-top: 56px; padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+}
+.chapter-nav a {
+  display: block; padding: 16px 20px;
+  border: 1px solid var(--rule);
+  background-image: none;
+  font-family: var(--serif-cn);
+  text-decoration: none; color: var(--ink);
+  transition: all 200ms;
+}
+.chapter-nav a:hover {
+  border-color: var(--vermilion);
+  background: var(--vermilion-soft);
+  color: var(--ink);
+}
+.chapter-nav a.next { text-align: right; }
+.chapter-nav .label {
+  display: block; font-family: var(--mono);
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 4px;
+}
+.chapter-nav .title { font-weight: 500; font-size: 15px; }
+
+/* Sticky TOC sidebar */
+.toc-sidebar {
+  position: sticky; top: 32px;
+  align-self: start;
+  padding-top: 56px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+.toc-sidebar .toc-label {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-faint); font-weight: 500;
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+.toc-sidebar ul { list-style: none; padding: 0; margin: 0; }
+.toc-sidebar li { margin: 4px 0; }
+.toc-sidebar a {
+  display: block; padding: 4px 0 4px 12px;
+  color: var(--ink-soft); text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 150ms;
+  font-size: 12px;
+}
+.toc-sidebar a:hover { color: var(--ink); }
+.toc-sidebar a.active {
+  color: var(--vermilion);
+  border-left-color: var(--vermilion);
+  font-weight: 500;
+}
+
+/* Page-load reveal */
+@media (prefers-reduced-motion: no-preference) {
+  .chapter-opener .numeral { animation: numeral-in 800ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+  .chapter-opener h1, .chapter-opener .recap { animation: text-in 700ms 200ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+  .schema-panel { animation: text-in 700ms 350ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+}
+@keyframes numeral-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes text-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   SVG conventions — utility classes for hand-drawn diagrams
+   (full规约 see references/diagram_guide.md)
+   ============================================================ */
+.diagram-ink       { stroke: var(--ink);       fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.diagram-accent    { stroke: var(--vermilion); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.diagram-soft      { stroke: var(--ink-faint); fill: none; stroke-width: 1.2; stroke-dasharray: 3 3; }
+.node-fill         { fill: var(--paper); }
+.node-fill-accent  { fill: var(--vermilion-soft); }
+.node-label        { font-family: var(--sans-cn); font-size: 13px; font-weight: 500; fill: var(--ink); }
+.node-label-accent { font-family: var(--sans-cn); font-size: 13px; font-weight: 700; fill: var(--vermilion); }
+.edge-label        { font-family: var(--mono); font-size: 11px; fill: var(--ink-soft); paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+.branch-label      { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--vermilion); paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<main>
+  <!--
+    Learning path breadcrumb. Mark the current chapter with class="current".
+    Replace links with relative paths to your tutorial's chapters.
+  -->
+  <nav class="learning-path" aria-label="学习路径">
+    <a href="index.html">00 起点</a><span class="sep">—</span>
+    <a href="01-concepts.html" class="current">01 概念</a><span class="sep">—</span>
+    <a href="02-principles.html">02 原理</a><span class="sep">—</span>
+    <a href="03-practice.html">03 实操</a><span class="sep">—</span>
+    <a href="04-pitfalls.html">04 陷阱</a><span class="sep">—</span>
+    <a href="05-capstone.html">05 综合</a><span class="sep">—</span>
+    <a href="06-self-check.html">06 自测</a>
+  </nav>
+
+  <div class="page">
+    <article>
+
+      <!-- ════════════════════════════════════════════════════════
+           CHAPTER CONTENT GOES HERE
+           Use the reusable snippets in references/tutorial_template.md
+           ════════════════════════════════════════════════════════ -->
+
+    </article>
+
+    <aside class="toc-sidebar" aria-label="本章目录">
+      <p class="toc-label">本章 · TOC</p>
+      <ul>
+        <!-- e.g.: <li><a href="#s11" data-toc-target="s11">1.1 ...</a></li> -->
+      </ul>
+    </aside>
+  </div>
+</main>
+
+<!-- Prism syntax highlighter — autoloader fetches grammar files on demand -->
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+<script>
+/* Three small interactions:
+   1. Scroll progress bar (top, 2px vermilion)
+   2. TOC active-section via IntersectionObserver
+   3. Copy-to-clipboard for code blocks
+*/
+
+// 1. Progress bar
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const h = document.documentElement;
+  const max = h.scrollHeight - h.clientHeight;
+  const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+window.addEventListener('resize', updateProgress);
+updateProgress();
+
+// 2. TOC active section highlight
+const tocLinks = document.querySelectorAll('.toc-sidebar a[data-toc-target]');
+const tocByCid = new Map();
+tocLinks.forEach(a => tocByCid.set(a.dataset.tocTarget, a));
+const sectionEls = Array.from(tocByCid.keys())
+  .map(id => document.getElementById(id))
+  .filter(Boolean);
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const link = tocByCid.get(entry.target.id);
+    if (!link) return;
+    if (entry.isIntersecting) {
+      tocLinks.forEach(a => a.classList.remove('active'));
+      link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+sectionEls.forEach(el => obs.observe(el));
+
+// 3. Copy code button
+document.querySelectorAll('.code-block .copy').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const targetId = btn.dataset.copyTarget;
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    try {
+      await navigator.clipboard.writeText(el.innerText);
+      const original = btn.textContent;
+      btn.textContent = '已复制';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1400);
+    } catch (e) {
+      btn.textContent = '失败';
+      setTimeout(() => { btn.textContent = '复制'; }, 1400);
+    }
+  });
+});
+</script>
+
+</body>
+</html>
