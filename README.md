@@ -7,9 +7,10 @@ Personal and project-ready agent skills.
 Use one directory per skill:
 
 ```text
-skill-name/
-├── SKILL.md
-└── references/
+skills/
+└── skill-name/
+    ├── SKILL.md
+    └── references/
 ```
 
 Each `SKILL.md` should include YAML frontmatter with a `name` and `description`, followed by concise instructions for when and how the agent should use the skill.
@@ -22,4 +23,4 @@ Each `SKILL.md` should include YAML frontmatter with a `name` and `description`,
 
 ## Available Skills
 
-- `tech-tutorial` — builds cognitive-science-aligned HTML tutorials for technical topics.
+- [`tech-tutorial`](./skills/tech-tutorial) — builds cognitive-science-aligned HTML tutorials for technical topics.
