@@ -1,15 +1,15 @@
 # Skills
 
-Personal and project-ready agent skills for Cursor.
+Personal and project-ready agent skills.
 
 ## Structure
 
 Use one directory per skill:
 
 ```text
-.cursor/skills/
-└── skill-name/
-    └── SKILL.md
+skill-name/
+├── SKILL.md
+└── references/
 ```
 
 Each `SKILL.md` should include YAML frontmatter with a `name` and `description`, followed by concise instructions for when and how the agent should use the skill.
