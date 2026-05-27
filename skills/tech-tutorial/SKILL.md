@@ -74,8 +74,8 @@ See [references/diagram_guide.md](references/diagram_guide.md) for the content-t
 
 For each new concept in a novice-targeted chapter, lead with a worked example. The form depends on tutorial mode:
 
-- **Concept-focused (default)**: the worked example is a **scenario walkthrough** in `01-concepts.html` — pick a concrete situation, walk through what happens, name each step's underlying concept. ("Query a Postgres table with no index → sequential scan. Now add a B-tree index → planner switches to index scan; cost drops from 80k to 12.") Retrieval moves to `03-self-check.html` as scenario discrimination questions.
-- **Hands-on**: the full three-step **code progression** lives in `03-practice.html`:
+- **Concept-focused (default)**: worked example = **scenario walkthrough** in `01-concepts.html`. Pick a concrete situation, walk through what happens, name each step's underlying concept. Retrieval moves to `03-self-check.html` as scenario discrimination questions.
+- **Hands-on**: full three-step **code progression** in `03-practice.html`:
   1. **Complete worked example** — fully explained line-by-line.
   2. **Partial example** — structure given, 1-2 *schema-building* decision points blank (not trivial fill-ins).
   3. **Open exercise** — fresh problem, end-to-end.
@@ -189,7 +189,7 @@ The visual identity is fixed: **minimalist monochrome + single vermilion accent*
 |---|---|---|
 | **Fonts** | Google Fonts CDN: Noto Sans SC + JetBrains Mono | One `<link>` tag, all weights needed |
 | **Code highlighting** | Prism.js v1.29 (autoloader) | Drops grammar on demand. Theme overridden in `<style>` block to match palette |
-| **Styling** | Hand-written CSS in `<style>` block | Zero CSS framework. ~360 lines, identical across chapters |
+| **Styling** | Hand-written CSS in `<style>` block | Zero CSS framework. Identical across chapters; the canonical block lives in `references/layout-template.html` |
 | **Diagrams** | Hand-drawn `<svg>` with utility classes (`.diagram-ink`, `.node-fill`, etc.) | No Mermaid, no JS render libs. See `references/diagram_guide.md` |
 | **JS** | ~40 lines inline: progress bar, sticky-TOC active highlight, code copy | No frameworks |
 
@@ -240,16 +240,7 @@ HTML-escape special characters when writing example code: `<` → `&lt;`, `>` �
 
 `index.html` is the entry per web convention. The `<style>` block inside each HTML is the source of truth — no shared `style.css`, no `style/` directory. Each chapter is a standalone artifact.
 
-**Hands-on extension** (when the user explicitly asks for code-progression depth): insert three chapters between principles and self-check, renumbering self-check to `06-self-check.html`:
-
-```
-├── 03-practice.html          # Worked → partial → exercise code progression
-├── 04-pitfalls.html          # Concrete failure modes
-├── 05-capstone.html          # Mixed-concept project
-└── 06-self-check.html
-```
-
-See Phase 1 below for the mode-selection dialog.
+For the hands-on extension structure (adds `03-practice` / `04-pitfalls` / `05-capstone`, renumbers self-check to `06-self-check`) and per-file purposes, see **Phase 4** below. Phase 1's mode-selection dialog determines which structure applies.
 
 ## Tooling Discipline (Environment-Agnostic)
 
@@ -391,7 +382,7 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 - **Density check**: open every chapter and confirm no >300-line stretch of prose without a diagram or worked example.
 - **Retrieval separation check**: open every self-check section and confirm answers are in `<details>` blocks or a separate file, never inline.
 - **Cross-chapter callback check**: every chapter after the first should textually reference at least one earlier concept by name. Grep for the earlier chapter's key terms in the current chapter; they should appear.
-- **Discrimination check**: the tutorial must force the reader to *choose between* approaches from at least 2 prior chapters. In concept-focused mode this lives in `03-self-check.html` as scenario questions ("given scenario X, which concept applies?"); in hands-on mode it lives as the project in `05-capstone.html`. Either way: ≥1 discrimination prompt that touches ≥2 chapters; ideally 3-5 such prompts.
+- **Discrimination check**: ≥1 prompt (ideally 3-5) that forces the reader to *choose between* approaches from ≥2 prior chapters. Lives in `03-self-check.html` (concept-focused) or `05-capstone.html` (hands-on).
 - **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first, then grep. One-liner:
 
   ```bash
