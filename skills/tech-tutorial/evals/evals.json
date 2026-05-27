@@ -5,7 +5,7 @@
       "id": 1,
       "name": "open-ended-web-framework",
       "prompt": "我想系统学一个 Python Web 框架，之前只写过简单脚本和几个 Flask 路由。帮我写一份能建立完整心智模型的教程。",
-      "expected_output": "完整教程结构（index.html + 多文件章节 + 概念图）。范围明确（覆盖核心概念但不试图涵盖全框架）。用用户已有的 Flask/脚本经验作为类比起点。包含 self-check + 学习路径 + 下一步建议。",
+      "expected_output": "Concept-focused 教程（默认 4 章：index + 01-concepts + 02-principles + 03-self-check）。范围明确（覆盖核心概念，不试图涵盖全框架）。01 用 Flask/脚本经验作类比起点，每个概念配场景走查（不要求可运行代码）；02 含备选方案对比表；03-self-check 含 ≥3 道跨 01+02 场景辨别题（capstone 替代）。包含学习路径 breadcrumb + 下一步建议。",
       "files": [],
       "assertions": [
         "has_entrypoint",
@@ -14,7 +14,7 @@
         "uses_existing_background_analogy",
         "has_self_check",
         "has_tradeoffs",
-        "has_runnable_code",
+        "has_discrimination_scenarios",
         "has_learning_path",
         "has_further_reading",
         "has_next_steps"
