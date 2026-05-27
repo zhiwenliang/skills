@@ -11,11 +11,7 @@ The output looks like a careful course, not a Medium post.
 
 ## The premise this skill operates on
 
-A reader's working memory holds about **4 chunks** at any moment. Every word, every diagram, every code block either (a) competes for that space (extraneous load — bad), (b) takes space necessarily (intrinsic load — manage it), or (c) helps the reader build durable structure (germane load — protect it). Most tech tutorials fail because they pile on extraneous load (jargon walls, jumping references, unlabeled diagrams) and skip germane load entirely (no retrieval, no progressive scaffolding, no interleaving).
-
-This skill is the antidote. The principles below are not stylistic preferences — they are translations of empirical findings from cognitive science research (Sweller, Bjork, Mayer, Roediger) into concrete writing rules.
-
-For details on each principle's research basis, see [references/cognitive_principles.md](references/cognitive_principles.md). If the user provides their own learning-theory note or methodology source, cite that source in the tutorial's "Further reading"; never assume a local path exists.
+Working memory holds ~4 chunks. Every word, diagram, and code block either steals that space (extraneous load), takes it necessarily (intrinsic), or builds durable structure (germane). The seven principles below are operational rules for managing those three loads — translations of empirical cognitive-science research (Sweller, Bjork, Mayer, Roediger). For research detail, the four-form Bjork table, the Roediger numbers, the worked-example ratio derivation, and citations, see [references/cognitive_principles.md](references/cognitive_principles.md). When the user provides their own methodology source, cite that instead — never assume a local path exists.
 
 ## When this skill applies
 
@@ -33,130 +29,86 @@ It does **not** apply when:
 
 When in doubt, ask: *"Do you want me to build something, or to teach you something?"*
 
-## How the seven principles fit together (not a flat list)
+## How the seven principles fit together
 
-The seven principles below are not parallel rules. They form an **input × pivot × output** structure. Knowing the shape lets you reason about tradeoffs instead of blindly applying rules — when two principles seem to conflict, you can ask which layer each operates on.
+The seven principles form an **input × pivot × output** structure, not a flat list:
 
 ```
-INPUT-SIDE (how to present material)
-  Principle 1 — Expertise Reversal     → who you are writing for
-  Principle 2 — Schema Anchoring       → give the map before the territory
-  Principle 3 — Dual Coding            → image + word, labels on the image
-
-PIVOT (the unifying mental model)
-  Principle 6 — Desirable Difficulty   → performance ≠ learning
-                                          (the reason the output-side rules exist)
-
-OUTPUT-SIDE (how to make it stick — three forms of desirable difficulty)
-  Principle 4 — Worked → Partial → Open  (scaffolded retrieval)
-  Principle 5 — Force Retrieval           (testing effect)
-  Principle 7 — Interleave & Revisit      (spaced + interleaved)
+INPUT  (1, 2, 3) — present material with zero extraneous load (frictionless on purpose)
+PIVOT  (6)       — desirable difficulty: current performance ≠ durable learning
+OUTPUT (4, 5, 7) — engineer productive friction so the schema sticks
 ```
 
-**The pivot is Principle 6.** The reason 4/5/7 work is that they make the reader *struggle just enough* to encode durably. If you find yourself wanting to "make a chapter feel smoother" by removing self-checks or shortening the scaffold, you are trading long-term learning for short-term fluency — the exact failure mode Bjork named. Don't do it without naming the tradeoff.
+When two principles seem to conflict, name which layer each operates on. If you find yourself softening an output-side rule "to make a chapter feel smoother," you are trading long-term learning for short-term fluency — the failure mode Bjork named. Don't, without naming the tradeoff explicitly.
 
-The input side (1/2/3) has the opposite job: make presentation as frictionless as possible so that all of working memory is free for the productive difficulty on the output side. Reducing extraneous load on the input side is not in tension with desirable difficulty — they are partners. You reduce load on the things that *don't* teach, so the load on the things that *do* teach lands cleanly.
+Input and output sides are partners, not in tension: input reduces load on things that *don't* teach so the load on things that *do* teach lands cleanly. Full motivation, with research citations, is in [references/cognitive_principles.md](references/cognitive_principles.md).
 
 ## The seven design principles (mandatory)
 
-These are derived from the cognitive science foundations. Every tutorial section must be designed against them. The completeness checklist in [references/tutorial_template.md](references/tutorial_template.md) makes them auditable.
+Every tutorial section must be designed against these. The 30-item completeness checklist in [references/tutorial_template.md](references/tutorial_template.md) makes them auditable; the research behind each rule lives in [references/cognitive_principles.md](references/cognitive_principles.md).
 
-### 1. Declare the target reader explicitly (Expertise Reversal)
+### 1. Declare the target reader (Expertise Reversal)
 
-The same teaching style helps novices and bores experts. Tutorials that try to serve both serve neither. Open every tutorial with three explicit lists:
+The same teaching style helps novices and bores experts; trying to serve both serves neither. Open every tutorial with three explicit lists: **适合谁** (required prior knowledge, tooling, versions), **不适合谁** (route elsewhere), **读完之后你能做到什么** (concrete verifiable capabilities). Anyone outside the target is routed away on page one.
 
-- **适合谁**: required prior knowledge, tooling, version assumptions.
-- **不适合谁**: who should read something else first, who should skip this and read something deeper.
-- **读完之后你能做到什么**: concrete, verifiable capabilities.
+### 2. Map before territory (Schema Anchoring)
 
-This is a contract with the reader and a forcing function on you: you cannot write well if you do not know who you are writing for.
+Working memory is empty when the reader opens chapter 1. Give them anchors first:
 
-### 2. Give the map before the territory (reduce initial intrinsic load)
+- A **concept map** showing every major abstraction and how they relate.
+- A **learning-path breadcrumb** showing the chapter sequence.
+- **Re-show the breadcrumb at every chapter opener**, current step highlighted. Doubles as spaced revisit (principle 7).
 
-The reader's working memory is empty when they open the tutorial. Before the first chapter, give them **two diagrams**:
+### 3. Image + labels + reader-draw (Dual Coding + Split-Attention)
 
-- A **concept map** showing every major abstraction and how it relates to the others.
-- A **learning-path breadcrumb** showing the chapter sequence and where they currently are.
+Words and images take separate working-memory channels; together they roughly double retention. Cross-references ("see node A in figure 3.2 above") destroy that gain by forcing the eye to ping-pong.
 
-Re-show the breadcrumb at the start of every chapter with the current step highlighted. This is also spaced revisit (principle 7).
+- **≥1 diagram per major section.** A >300-line prose stretch without one is a Principle-3 failure.
+- **Labels go on the diagram elements**, never in surrounding prose.
+- **Delete decorative images** (brain icons, rocket ships next to "let's launch into…"). Pure load, zero information.
+- **≥1 reader-draw prompt per tutorial** — typically in capstone or self-check ("without scrolling up, draw the architecture from §2.1"). Drawing makes the reader construct the imagery channel themselves; a stronger encoding than passive viewing.
 
-### 3. Image before text — and labels on the image (Dual Coding + Split-Attention)
+See [references/diagram_guide.md](references/diagram_guide.md) for the content-type → diagram-type matrix.
 
-Words and images take separate paths through working memory; together they roughly double retention (Paivio's picture-superiority effect, 1.5-2× on free recall; Mayer's multimedia studies, 50-100% gain on transfer). The skill's [diagram_guide.md](references/diagram_guide.md) defines the content-to-diagram-type mapping you must follow. Rule of thumb: **at least one diagram per major section**; if a section runs >300 lines of prose without a diagram, you have failed dual coding.
+### 4. Worked → Partial → Open (Worked Example Effect)
 
-**Split-Attention rule**: labels go *on the diagram elements*, not "see node A in figure 3.2 above." Cross-referencing forces the reader's eye to ping-pong, exploding extraneous load.
+For each new concept in a novice-targeted chapter, follow the three-step scaffold:
 
-Decorative images (the brain icon next to "learning") increase load without information gain. Delete them.
+1. **Complete worked example** — fully explained line-by-line at "what concept does this line illustrate."
+2. **Partial example** — give the structure, leave 1-2 *schema-building* decision points blank. Not trivial fill-ins.
+3. **Open exercise** — fresh problem, end-to-end.
 
-**Ask the reader to draw, at least once per tutorial.** Drawing forces the reader to construct the imagery channel themselves — a stronger encoding than passively consuming your diagram (the source theory's "手画 > 看现成图"). One good place: a chapter-end challenge that says "Without scrolling up, draw the architecture diagram from §2.1 from memory, then check." Another: ask the reader to draw a *new* diagram (e.g., "Sketch how data flows in your own use case"). This converts dual coding from a one-way input into a retrieval-practice loop.
-
-### 4. Worked example before exercise (Worked Example Effect)
-
-Sweller & Cooper (1985): for novices, a complete worked example **beats** an open exercise on every metric. Open exercises drown the new learner in load before they have a schema to hang the problem on.
-
-For each new concept in a novice-targeted chapter, follow this three-step scaffold:
-
-1. **Complete worked example** — full code, fully explained line-by-line at the level of "what concept does this line illustrate."
-2. **Partial example** — give the structure, leave 1-2 *decision points* blank for the reader. Not trivial fill-ins — the actual schema-building decisions.
-3. **Open exercise** — a fresh problem the reader solves end-to-end.
-
-Ratio of example to exercise depends on reader level: novice = 5:1 worked-example-to-exercise, intermediate = 2:1, expert = 1:3. Pick from the target reader profile.
+Worked-example-to-open-exercise ratio scales with reader level: novice 5:1, intermediate 2:1, expert 1:3.
 
 ### 5. Force retrieval (Testing Effect)
 
-Roediger & Karpicke (2006) — three groups, same total study time on a text passage:
+Passive re-reading retains ~40% at one week; one test pushes that to ~56%; multiple tests to ~61% (Roediger & Karpicke 2006). The marginal effect of the *first* retrieval is largest — always add at least one self-check; more still pays out.
 
-| Group | Activity | 1-week retention |
-|---|---|---|
-| Re-read only | Read 4× | **40%** |
-| Read + 1 test | Read 3× + test 1× | 56% |
-| Test-heavy | Read 1× + test 3× | **61%** |
+Every chapter must end with **2-4 self-check questions** + scattered predictive questions in prose. Hard constraints:
 
-Two things to notice. **First**, even one retrieval attempt buys ~16 points over pure re-reading — the cheapest retrieval intervention has the largest marginal effect, so always add at least *some* self-check. **Second**, more retrieval keeps paying out — chapters that bake in multiple retrieval moments beat chapters that gate it all to one end-of-chapter quiz.
+- **Atomic questions only.** A bundled question ("define X, explain why, give an example") trains 1 retrieval attempt instead of 3 and lets the reader fudge partial answers. Split into 3.
+- **Answers in `<details>` or a separate file**, never inline. "Answer is right below" defeats retrieval and collapses back to re-reading.
+- Predictive questions in prose ("what do you think this will print?") must precede the reveal by at least one paragraph or fold.
 
-Every chapter must end with:
+### 6. Engineer desirable difficulty (Bjork) — the pivot
 
-- **2-4 self-check questions** covering the chapter's core schema.
-- **Answers in a `<details>` block or in a separate section** — never adjacent to the question. Physical separation is required; "answer is right below" defeats retrieval.
+**Current performance ≠ durable learning.** Smoothness is the symptom of fluency illusion, not of good teaching — a tutorial that feels effortless is producing illusion of mastery; the reader will fail on contact with reality. Output-side principles 4/5/7 are three of Bjork's four operational forms (active retrieval, spacing, interleaving). The fourth — **variation of conditions** — is the one tutorials most often skip:
 
-In addition, scatter **predictive questions** through the prose ("what do you think this will print?"). Make the reader stop before revealing the answer.
+- **Show every concept in 2-3 different shapes** (different domains, surrounding code, input scales). Don't teach with only the canonical example.
+- **One "just out of reach" challenge per chapter** — in the reader's zone of proximal development.
+- **Delay the answer reveal** — buy 30 seconds of think-time via `<details>`, fold, or "scroll past this image first."
+- **Anesthetic words are forbidden** — `这很简单 / 显然 / trivially / obviously / just`. They tell the confused reader their confusion is shameful, and they lie (if it really were trivial the tutorial wouldn't need to cover it).
+- **Warn the reader about fluency illusion** in `index.html`. Quote three self-talk labels verbatim so the reader can self-diagnose: `我读得很顺` (familiarity, not learning), `我做题很快` (probably stock problem types), `我没卡壳` (probably not touching the schema).
 
-**Atomic questions only.** A self-check question that bundles 3 sub-questions ("define X, explain why it matters, and give an example") trains 1 retrieval attempt instead of 3, and lets the reader fudge partial answers. Split into 3 separate questions.
+### 7. Interleave and revisit (Spaced + Interleaved Practice)
 
-### 6. Engineer desirable difficulty (Bjork)
+Knowledge becomes durable when re-activated in new contexts. Required structures:
 
-Bjork's core distinction: **current performance ≠ durable learning**. Conditions that make the reader look smoothest *right now* (re-reading, blocked practice, immediate worked-example access) actively *worsen* long-term retention and transfer. A tutorial that feels effortless is producing illusion of mastery — the reader will fail on contact with reality.
+- **Each chapter opens** with one sentence summarizing the prior chapter's contribution to the current one. Forced retrieval, not redundancy.
+- **Examples in chapter N use concepts from chapters 1..N-1**, not just the new one. This is interleaving.
+- **Capstone** — the tutorial ends with a project that requires *discriminating* between approaches from ≥2 prior chapters ("should you use the chapter 3 approach or the chapter 7 approach here?"). Discrimination is what transfer means; without a capstone you've trained recall but not transfer. Not optional for full-depth tutorials.
 
-Bjork names **four forms** of desirable difficulty. Each one degrades short-term performance to buy long-term learning:
-
-| Form | What it costs the reader | What it buys |
-|---|---|---|
-| **Spaced retrieval** (Principle 7) | Concepts feel half-forgotten when revisited | Stronger consolidation per recall |
-| **Interleaving** (Principle 7) | Every problem requires identifying the type first | Discrimination ability — the real-world skill |
-| **Active retrieval** (Principle 5) | Recall is effortful, sometimes painful | The retrieval act *is* the encoding event |
-| **Variation of conditions** | Each example looks different from the last | Transfer to novel contexts, not just the trained one |
-
-The "variation" form is the one tutorials most often skip. The fix:
-
-- **Vary the problem context** — don't teach a concept with only the canonical example. Show it in 2-3 different shapes (different domains, different surrounding code, different input scales).
-- **At least one "just out of reach" challenge per chapter** — in the reader's zone of proximal development.
-- **Delay the answer** — buy 30 seconds of think-time with formatting (a `<details>` block, a "scroll past this image first" beat).
-
-**Anesthetic words are forbidden** — "这很简单", "显然", "trivial", "obviously", "just". They tell the confused reader their confusion is shameful. They also lie: if it really were obvious, the tutorial wouldn't need to cover it. Delete on sight.
-
-**Reader-side fluency illusion warning to surface in the prose**: somewhere in the tutorial (a "how to use this tutorial" note near the top of `index.html` is a good place), explicitly warn the reader that *feeling smooth ≠ learned*. Specifically name the three traps from the source theory: "我读得很顺" (just familiarity), "我做题很快" (probably stock problem types), "我没卡壳" (probably not touching the schema). Giving the reader these labels lets them self-diagnose.
-
-### 7. Interleave and revisit (Spaced Repetition + Interleaved Practice)
-
-Knowledge becomes durable when it is re-activated in new contexts. Cepeda et al. (2006), meta-analysis of 184 studies: spaced practice produces ~2-3× the long-term retention of equivalent massed practice. Required structures:
-
-- **Every chapter opens** with one sentence summarizing the prior chapter's contribution to the current one. This is forced retrieval, not redundancy.
-- **Examples in chapter N use concepts from chapters 1..N-1**, not just the new concept. This is interleaving.
-- **The tutorial ends with a capstone** that requires the reader to *discriminate* between concepts — "should you use the chapter 3 approach or the chapter 7 approach here?" Discrimination is what transfer means. The mechanism: interleaving forces the reader to first *identify* which approach applies before applying it. Blocked practice ("all chapter-3 problems in a row") trains application but skips identification — which is the step real-world use actually requires.
-
-The capstone is not optional for full-depth tutorials. A tutorial without a capstone has trained recall but not transfer.
-
-**Interleaving boundary — when *not* to interleave.** Interleaving trains discrimination, which is what helps when the reader must choose between similar approaches. It hurts when the reader is in the *acquisition* phase of a single new motor / syntactic skill — e.g., first time touching the language's syntax for async, first 30 minutes with a new API surface. There, block first ("write 5 simple async functions before mixing them with sync"), interleave later. Apply this judgment when designing 03-practice: early exercises in a chapter can be blocked, later exercises should mix.
+**Boundary — block first, interleave later.** During acquisition of brand-new syntax (first time touching async, first 30 min with a new API), the reader has nothing to discriminate between yet — interleaving just adds load on top of confusion. In 03-practice: early chapter exercises can be blocked; late-chapter and capstone exercises must mix.
 
 ## Voice and tone
 

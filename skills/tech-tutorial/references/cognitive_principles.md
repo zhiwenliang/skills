@@ -49,9 +49,10 @@ If the reader sees a global structure first, every subsequent detail has a slot 
 Words and images are processed by separate working-memory channels; combining them roughly doubles retention (Paivio, 1971). But if the reader has to mentally bind the diagram to a faraway caption ("see node A in figure 3.2 above"), the cross-reference cost wipes out the dual-coding gain (Sweller & Chandler, 1994).
 
 **Operational rules**:
-- At least one diagram per major section.
+- At least one diagram per major section. A >300-line prose stretch without one counts as a Principle-3 failure.
 - Labels go *on* diagram elements, not in surrounding prose.
 - Decorative images (the brain icon, the rocket ship next to "let's launch into…") are pure extraneous load. Delete on sight.
+- At least one reader-draw prompt per tutorial (typically in the capstone or self-check). Drawing forces the reader to construct the imagery channel themselves — a stronger encoding than passive viewing of the author's diagram. Converts dual coding from a one-way input into a retrieval loop.
 - See [diagram_guide.md](diagram_guide.md) for the content-type → diagram-type mapping.
 
 ## Principle 4 — Worked Example Effect (Sweller & Cooper, 1985)
