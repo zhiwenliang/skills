@@ -19,11 +19,9 @@ The base HTML layout (hand-written CSS + Prism CDN + inline SVG utilities) is de
 <article>
 
   <header class="chapter-opener">
-    <div class="numeral">{{NN}}</div>
-    <div>
-      <h1>{{chapter title}}</h1>
-      <p class="recap">上一章建立了 {{prior schema}}——这章 {{what this chapter does}}。</p>
-    </div>
+    <p class="chapter-label">Chapter {{NN}}</p>
+    <h1>{{chapter title}}</h1>
+    <p class="recap">上一章建立了 {{prior schema}}——这章 {{what this chapter does}}。</p>
   </header>
 
   <section class="schema-panel">

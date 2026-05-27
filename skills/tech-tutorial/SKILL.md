@@ -181,13 +181,13 @@ If the user explicitly asks for a casual tone, honor that — but the default is
 
 Tutorials produced by this skill are **HTML files**, not Markdown. The reason is pedagogical, not aesthetic: HTML's higher visual ceiling (sticky TOC, syntax-highlighted code, styled callouts, hand-drawn SVG figures, native `<details>` with custom styling) directly serves Principle 3 (dual coding) and Principle 5 (retrieval separation) better than Markdown can. If the user or host project explicitly requires Markdown, keep the same cognitive structure and adapt the rendering primitives; otherwise default to standalone HTML.
 
-The visual identity is fixed: **editorial scholarly notebook** — warm paper background, Noto Serif SC body, vermilion accent. Don't redesign per-tutorial; the consistency is part of the brand. Why this aesthetic: it deliberately differentiates from generic Bootstrap / Material / AI-template look that engineers reflexively distrust. See `references/layout-template.html` for the rationale baked into comments.
+The visual identity is fixed: **minimalist monochrome + single vermilion accent** — white background, Noto Sans SC body, neutral grays for hierarchy, a single warm-red accent used sparingly (warning callouts, current breadcrumb, code keywords, selected table row, link hover, predict / challenge labels). Don't redesign per-tutorial; the consistency is part of the brand. Why this aesthetic: it prioritizes information density (more on-screen content per scroll) and tight scanning rhythm, while restraining decoration so the reader's attention lands on prose and diagrams instead of the page itself. See `references/layout-template.html` for the rationale baked into comments.
 
 ### Tech stack (fixed — copy from `references/layout-template.html`)
 
 | Layer | Tool | Notes |
 |---|---|---|
-| **Fonts** | Google Fonts CDN: Noto Serif SC + Noto Sans SC + Spectral + Fraunces + JetBrains Mono | One `<link>` tag, all weights needed |
+| **Fonts** | Google Fonts CDN: Noto Sans SC + JetBrains Mono | One `<link>` tag, all weights needed |
 | **Code highlighting** | Prism.js v1.29 (autoloader) | Drops grammar on demand. Theme overridden in `<style>` block to match palette |
 | **Styling** | Hand-written CSS in `<style>` block | Zero CSS framework. ~360 lines, identical across chapters |
 | **Diagrams** | Hand-drawn `<svg>` with utility classes (`.diagram-ink`, `.node-fill`, etc.) | No Mermaid, no JS render libs. See `references/diagram_guide.md` |

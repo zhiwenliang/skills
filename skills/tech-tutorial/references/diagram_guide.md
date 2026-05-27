@@ -9,7 +9,7 @@ This guide makes diagram choice **deterministic**, not aesthetic.
 Tutorials produced by this skill use **hand-drawn SVG embedded inline in HTML**. No Mermaid, no JS rendering libs, no external image files (with the rare exception of Excalidraw exports for very complex maps).
 
 **Why hand-drawn SVG instead of Mermaid?**
-- Mermaid's default style clashes with the editorial scholarly visual identity defined in `layout-template.html`
+- Mermaid's default style clashes with the minimalist monochrome visual identity defined in `layout-template.html`
 - Mermaid needs JS bootstrap to render — adds a runtime dependency that occasionally breaks
 - Hand-drawn SVG gives full control over layout (avoid the "auto-layout tangle" failure mode for >12 nodes)
 - SVG inlined in HTML is editable by anyone reading the source
@@ -404,7 +404,7 @@ Workflow:
 2. File → Export as SVG → save `concept-map.svg` in the tutorial folder
 3. Embed: `<figure><img src="concept-map.svg" alt="..."> <figcaption>...</figcaption></figure>`
 
-The image inherits no styles from the page CSS, so the Excalidraw export needs to visually match — pick a similar palette (warm paper, vermilion accents) when designing.
+The image inherits no styles from the page CSS, so the Excalidraw export needs to visually match — pick a similar palette (white background, neutral grays, vermilion as the single accent) when designing.
 
 ## The concept map specifically
 
