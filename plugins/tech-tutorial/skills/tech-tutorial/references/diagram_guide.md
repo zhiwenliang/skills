@@ -39,9 +39,9 @@ All SVG drawings use utility classes pre-defined in `layout-template.html`'s `<s
 
 | Class | Stroke | Width | Use for |
 |---|---|---|---|
-| `.diagram-ink` | `var(--ink)` ink black | 1.5px | Primary structure: rectangles, default arrows |
-| `.diagram-accent` | `var(--vermilion)` vermilion | 1.8px | Emphasized edges, central node borders, key relationship arrows |
-| `.diagram-soft` | `var(--ink-faint)` light gray | 1.2px dashed | Secondary / "may also" edges, async/optional flows |
+| `.diagram-ink` | `var(--ink)` ink black | 1.4px | Primary structure: rectangles, default arrows |
+| `.diagram-accent` | `var(--vermilion)` vermilion | 1.6px | Emphasized edges, central node borders, key relationship arrows |
+| `.diagram-soft` | `var(--ink-faint)` light gray | 1.1px dashed | Secondary / "may also" edges, async/optional flows |
 
 All have `stroke-linecap="round" stroke-linejoin="round"` baked in for the hand-drawn feel.
 
@@ -49,8 +49,8 @@ All have `stroke-linecap="round" stroke-linejoin="round"` baked in for the hand-
 
 | Class | Fill | Use for |
 |---|---|---|
-| `.node-fill` | `var(--paper)` paper bg | Default node fill — same as page background, makes node "embedded" |
-| `.node-fill-accent` | `vermilion-soft` (8% vermilion) | Emphasized / "this chapter's protagonist" node |
+| `.node-fill` | `var(--bg)` page bg | Default node fill — same as page background, makes node "embedded" |
+| `.node-fill-accent` | `vermilion-soft` (6% vermilion) | Emphasized / "this chapter's protagonist" node |
 
 ### Text classes
 
@@ -67,7 +67,7 @@ All have `stroke-linecap="round" stroke-linejoin="round"` baked in for the hand-
 <defs>
   <marker id="arrow-ink" viewBox="0 0 10 10" refX="9" refY="5"
           markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-    <path d="M 0 0 L 10 5 L 0 10 z" fill="#1F1B16"/>
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
   </marker>
   <marker id="arrow-vermilion" viewBox="0 0 10 10" refX="9" refY="5"
           markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -75,6 +75,8 @@ All have `stroke-linecap="round" stroke-linejoin="round"` baked in for the hand-
   </marker>
 </defs>
 ```
+
+Hex values mirror the `--ink` / `--vermilion` variables in `layout-template.html`. Update both together if the palette ever changes — SVG marker attributes don't process `var()` reliably across browsers, so the colors are hard-coded here.
 
 Apply with `marker-end="url(#arrow-ink)"` on `<line>` or `<path>`. `refX="9"` means the arrowhead's TIP sits at the line endpoint (important — see "Arrow piercing" rule below).
 
@@ -184,7 +186,7 @@ Walls of prose force linear sequential reading and overload working memory. Requ
 1. **Each chapter has ≥1 `<figure>`** — *hard*, grep-enforced in Phase 5. No exceptions for "pitfalls / question bank / hands-on" chapters (see below).
 2. **Each major H2 section has ≥1 figure or worked example** — figures and code count here. Tables alone don't.
 3. **At most ~300 lines of prose without a visual break** — figures, code blocks, comparison tables all count for this looser breaking rule.
-4. **A full tutorial totals ≥10 figures**, distributed across chapters.
+4. **A full tutorial totals ≥7 figures (concept-focused) or ≥10 figures (hands-on)**, distributed across chapters. Concept-focused has only 4 files so 7 is the realistic ceiling; hands-on has 7 files and can reach 10 comfortably. Per-chapter targets are in `SKILL.md` Phase 5.
 
 **Figures, code blocks, and comparison tables are NOT interchangeable.** Each does a different job:
 
@@ -235,7 +237,7 @@ These five patterns cover ~80% of tutorial diagrams. Adapt coordinates to your c
     <defs>
       <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5"
               markerWidth="7" markerHeight="7" orient="auto">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#5C544A"/>
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#525252"/>
       </marker>
     </defs>
 
@@ -260,9 +262,9 @@ These five patterns cover ~80% of tutorial diagrams. Adapt coordinates to your c
     <text x="380" y="285" text-anchor="middle" class="node-label">concrete impls</text>
 
     <!-- Connector arrows -->
-    <line x1="200" y1="68" x2="200" y2="90" stroke="#5C544A" stroke-width="1.5" marker-end="url(#ar)"/>
-    <line x1="200" y1="148" x2="200" y2="170" stroke="#5C544A" stroke-width="1.5" marker-end="url(#ar)"/>
-    <line x1="560" y1="234" x2="560" y2="256" stroke="#5C544A" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#ar)"/>
+    <line x1="200" y1="68" x2="200" y2="90" stroke="#525252" stroke-width="1.5" marker-end="url(#ar)"/>
+    <line x1="200" y1="148" x2="200" y2="170" stroke="#525252" stroke-width="1.5" marker-end="url(#ar)"/>
+    <line x1="560" y1="234" x2="560" y2="256" stroke="#525252" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#ar)"/>
   </svg>
   <figcaption><span class="fig-num">图 N</span>{{one-line claim}}. <strong>注意</strong>：{{the one thing to notice}}.</figcaption>
 </figure>
@@ -323,7 +325,7 @@ These five patterns cover ~80% of tutorial diagrams. Adapt coordinates to your c
     <defs>
       <marker id="flow" viewBox="0 0 10 10" refX="9" refY="5"
               markerWidth="8" markerHeight="8" orient="auto">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1F1B16"/>
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
       </marker>
     </defs>
 
@@ -356,7 +358,7 @@ These five patterns cover ~80% of tutorial diagrams. Adapt coordinates to your c
     <defs>
       <marker id="dec" viewBox="0 0 10 10" refX="9" refY="5"
               markerWidth="7" markerHeight="7" orient="auto">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1F1B16"/>
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
       </marker>
     </defs>
 

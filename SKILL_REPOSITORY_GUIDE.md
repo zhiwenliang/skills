@@ -12,30 +12,41 @@ Use a skill when the agent needs a repeatable procedure, domain-specific context
 
 ## Recommended Repository Layout
 
-Use one directory per skill:
+This repository is a Claude Code plugin marketplace. Skills live two levels deep, inside a plugin:
 
 ```text
-skills/
-+-- skill-name/
-    +-- SKILL.md
-    +-- references/
-    |   +-- reference.md
-    +-- scripts/
-    |   +-- validate.py
-    +-- assets/
-    |   +-- template.json
-    +-- evals/
-        +-- evals.json
+.claude-plugin/
++-- marketplace.json
+plugins/
++-- plugin-name/
+    +-- .claude-plugin/
+    |   +-- plugin.json
+    +-- skills/
+    |   +-- skill-name/
+    |       +-- SKILL.md
+    |       +-- references/
+    |       |   +-- reference.md
+    |       +-- scripts/
+    |       |   +-- validate.py
+    |       +-- assets/
+    |       |   +-- template.json
+    |       +-- evals/
+    |           +-- evals.json
+    +-- commands/         (optional, slash commands at plugin root)
+    +-- agents/           (optional)
+    +-- hooks/            (optional)
 ```
 
 At the repository root, keep human-facing project documentation:
 
 ```text
 README.md
-SKILL_REPOSITORY_BEST_PRACTICES.md
+SKILL_REPOSITORY_GUIDE.md
 AGENTS.md
 .gitignore
 ```
+
+The per-skill conventions below (`SKILL.md` frontmatter, `references/`, `scripts/`, `evals/`) apply unchanged inside `plugins/<plugin>/skills/<skill>/`. They were originally written for a flat `skills/<skill>/` layout — read them in that spirit and substitute the deeper path.
 
 ### Directory Purposes
 

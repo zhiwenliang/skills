@@ -96,7 +96,7 @@ The base HTML layout (hand-written CSS + Prism CDN + inline SVG utilities) is de
 ```html
 <h2 id="s11"><span class="num">1.1</span><span>{{Concept name}}</span></h2>
 
-<p class="one-liner">{{≤30 字的一句话定义，italic 自动}}</p>
+<p class="one-liner">{{≤30 字的一句话定义。CSS 不强制 italic — 通过 `font-weight: 500` 和左边线区分于普通段落}}</p>
 
 <div class="rationale">
   <span class="label">为什么需要它</span>
@@ -160,7 +160,7 @@ print(parse("5").value)  # 5
     <defs>
       <marker id="arrow-ink" viewBox="0 0 10 10" refX="9" refY="5"
               markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1F1B16"/>
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
       </marker>
     </defs>
     <!-- use .diagram-ink / .diagram-accent / .node-fill / .node-label etc. -->
@@ -246,12 +246,13 @@ Required sections (in order):
 | 头部信息 | `<header>` | 一句话定位、基于版本、阅读时间、代码验证状态 |
 | 适合谁 | `<section>` | 3 条前置知识，具体到能力（"能调试 Python async" not "熟悉 Python"） |
 | 不适合谁 | `<section>` | 给更基础/更资深读者的他山资源链接 |
-| 读完之后你能做到什么 | `<section>` | 3-5 条**可验证**能力（动词开头，不写"理解 X"） |
+| 读完之后你能做到什么 | `<section>` | 一段开头放 **Insight Check 的 USP 句**（来自 SKILL.md Phase 5：5-year engineer 能讲出而文档讲不出的那句话），verbatim 放在这里。后接 3-5 条**可验证**能力（动词开头，不写"理解 X"） |
+| 引力中心 | `<section class="callout insight">` | Phase 3 锁定的 **threshold concept**（一句话），明示给读者"整本教程围绕这一点展开" |
 | 假设说明 | `<section>` | 仅非交互模式生成时填——列出 AI 做的假设 |
 | 流畅感警告 | `.callout warning` | Principle 6：点名"我读得很顺/我做题很快/我没卡壳"三大假象 |
 | 概念地图 | `<figure>` + 手画 SVG | 5-10 节点，边带标签。`<figcaption>` 指出 3 件读者要注意的事。详见 diagram_guide.md 的 Pattern 5 |
-| 学习路径 | `<nav class="learning-path">` 顶部 breadcrumb | 在 v1 设计里学习路径就是顶部 breadcrumb（current 用朱红下划线高亮）——不需要单独 SVG。每章自然展示 |
-| 学习路径建议 | `<ul>` | 至少 3 个分场景路径（"只想理解" / "动手写" / "做选型"） |
+| 学习路径 | `<nav class="learning-path">` 顶部 breadcrumb | 顶部 breadcrumb 即学习路径（current 用朱红色 + bold 高亮，无下划线）。不需要单独 SVG，每章自然展示 |
+| 学习路径建议 | `<ul>` | 至少 3 个分场景路径。**Concept-focused**：`只想理解` / `做选型` / `带读他人代码` 之类不依赖 `03-practice` 的场景。**Hands-on**：可以含 `动手写` 指向 `03-practice.html`。不要承诺当前模式不存在的章节 |
 | 目录 | `<nav><ul>` | `<a href="01-concepts.html">` 链所有章节（concept-focused 3 章；hands-on 6 章）|
 | 学完之后 | `<section>` | 3-5 个下一步主题，每个一句话说明"它在你 schema 上加了什么" |
 | 参考资料 | `<footer>` | 官方文档（必填）+ 2-3 设计文档/RFC + 2-3 高质量博客 |

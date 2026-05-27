@@ -300,7 +300,7 @@ The principle: **maximize concurrency among independent units, never among depen
 
 ### Phase 1 — Scope (mandatory dialogue, never skip)
 
-Lock down four things with the user before researching:
+Lock down five things with the user before researching:
 
 | Question | Why it matters |
 |---|---|
@@ -325,14 +325,14 @@ For any tech with research surface ≥3 angles, **fan out in one message**. Typi
 | **Pitfalls / real-world** | GitHub issues, Stack Overflow top answers, post-mortems | Concrete pitfall list (not "be careful with performance") |
 | **Competitors / alternatives** | Comparison posts, "X vs Y" articles, switcher stories | Discrimination context for the capstone |
 
-Cap each worker at ~400 words of structured findings. **Add to every worker's brief: "Write down what *surprised* you — gaps between your prior model of this tech and what you found."** Surprise is the depth signal; the things that surprised the researcher will surprise the reader, and those are the load-bearing things that pull a tutorial past surface paraphrase.
+Cap each worker at ~400 words of structured findings. **Add to every worker's brief: "Reserve the final 50-80 words for a `## Surprises` section — bullet list, one line each, listing the gaps between your prior model of this tech and what you found. This section is mandatory; if no surprises, say so explicitly."** Surprise is the depth signal; the things that surprised the researcher will surprise the reader. Make the section a separate header so the lead thread can grep it back deterministically — not a free-floating note that gets pruned to fit the 400-word cap.
 
 The lead thread then assembles four artifacts:
 
 - The **concept dependency graph**: which concept must be defined before which?
 - The **why bank**: for each design choice, what alternatives existed and what got sacrificed?
 - The **pitfall list**: concrete things that bite newcomers.
-- The **surprise list**: the things that didn't match prior expectation — candidate threshold-concept material for Phase 3, and "what would surprise the reader" hooks for Phase 4 concept introductions.
+- The **surprise list**: concatenate every worker's `## Surprises` section verbatim into a flat list. Dedup obvious overlaps but keep the framing intact. This becomes the candidate-pool for Phase 3's threshold concept and the "what would surprise the reader" hooks for Phase 4 concept introductions. **If the surprise list ends up empty or pure restatement of the docs, Phase 2 is not done — send workers back to dig deeper.**
 
 If research surface is small (a single feature like a CLI flag or one API method), one combined search is fine — don't manufacture parallelism.
 
@@ -367,7 +367,7 @@ The lead thread then does a coherence merge pass: re-show the learning-path brea
 Chapters that **must stay sequential**: any pair where chapter N's worked example builds on chapter N-1's output, or where N's "上一章" recap names a specific paragraph in N-1.
 
 - **Concept-focused tutorial** (default, 4 files): 01 + 02 parallelizable; `03-self-check` follows everything (needs all chapter content for discrimination scenarios).
-- **Hands-on tutorial** (6 files): 01 + 02 parallelizable; 04 (pitfalls) and 06 (self-check) can fan out from 01-03 once locked; 03 (practice) follows 01-02; 05 (capstone) follows everything.
+- **Hands-on tutorial** (7 files): 01 + 02 parallelizable; 04 (pitfalls) and 06 (self-check) can fan out from 01-03 once locked; 03 (practice) follows 01-02; 05 (capstone) follows everything.
 
 If the tutorial is small (≤3 chapters) or chapters are tightly entangled, draft serially — parallelism overhead exceeds the gain.
 
@@ -406,26 +406,24 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 - **Retrieval separation check**: open every self-check section and confirm answers are in `<details>` blocks or a separate file, never inline.
 - **Cross-chapter callback check**: every chapter after the first should textually reference at least one earlier concept by name. Grep for the earlier chapter's key terms in the current chapter; they should appear.
 - **Discrimination check**: ≥1 prompt (ideally 3-5) that forces the reader to *choose between* approaches from ≥2 prior chapters. Lives in `03-self-check.html` (concept-focused) or `05-capstone.html` (hands-on).
-- **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first, then grep. One-liner:
+- **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first, then grep. The voice grep pattern is kept in sync with the **Forbidden phrases** table at the top of this document — if you add a banned phrase there, update this regex too. One-liner (uses `find` so it's safe under zsh; uses `sys.argv[1]` so filenames with apostrophes don't blow up Python):
 
   ```bash
-  for f in *.html; do
-    python3 -c "import re,sys; t=open('$f').read(); t=re.sub(r'<pre><code.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)"
-  done | grep -nE "我们一起|让我们|咱们|接下来|我们来看|我们来试试|我们将|let'?s|we'?ll|together we'?ll|这很简单|很简单|显然|trivially|obviously|just |可能|也许|兴许|大概|差不多|应该是|踩坑|搞起来|撸代码|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
+  find . -maxdepth 1 -name '*.html' -exec python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" {} \; | grep -nE "我们一起|让我们|咱们|你会发现|接下来|我们来看|我们来试试|下面我们|Now we're going to|you'll discover|together we'll|let's|we'll|这很简单|很简单|显然|trivially|obviously|(^|[^a-zA-Z])just|可能|也许|兴许|大概|差不多|应该是|roughly|kind of|sort of|踩坑|搞起来|撸代码|玩一下|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
   ```
 
   Plus a separate first-person scan over the same stripped text:
 
   ```bash
-  # (same strip loop) | grep -nE "(^|[^a-zA-Z])(我|我们)"
+  find . -maxdepth 1 -name '*.html' -exec python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" {} \; | grep -nE "(^|[^a-zA-Z])(我|我们)"
   ```
 
   Every hit in **stripped prose** needs a fix or a justification (epistemic note / reader-addressed action / mandated fluency-illusion label). Don't ship with raw hits.
-- **Diagram coverage check (hard, run as grep)**: every chapter file must contain ≥1 `<figure>`. From the tutorial dir:
+- **Diagram coverage check (hard, run as grep)**: every chapter file must contain ≥1 `<figure>`. The pattern matches both `<figure>` and `<figure class="...">` / `<figure id="...">`. From the tutorial dir:
 
   ```bash
-  for f in *.html; do
-    n=$(grep -c '<figure>' "$f")
+  find . -maxdepth 1 -name '*.html' | while read -r f; do
+    n=$(grep -cE '<figure[ >]' "$f")
     [ "$n" -lt 1 ] && echo "MISSING figure in: $f"
   done
   ```
@@ -441,13 +439,13 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 - **SVG utility CSS presence check (hard, run as grep)**: every chapter file's `<style>` block must include the SVG utility classes — otherwise `<rect class="diagram-ink node-fill"/>` degrades to **solid black fill** (default SVG `fill` is black) when CSS is missing. From the tutorial dir:
 
   ```bash
-  grep -L '\.diagram-ink' *.html
+  find . -maxdepth 1 -name '*.html' -exec grep -L '\.diagram-ink' {} +
   ```
 
   Output should be empty (every file must include `.diagram-ink`). If a file is listed, paste the canonical SVG utility block (defined at the end of `references/layout-template.html`'s `<style>`) into its `<style>`.
 
   **Failure mode this prevents**: an early-drafted chapter without figures shipped with no SVG utility CSS; later iteration adds figures that pass coordinate math but render as opaque black rectangles in the deployed file. *Seen in real tutorials. Always grep before declaring done.*
-- **Reader-drawing check (hard, not soft)**: at least one explicit "draw it yourself" prompt must exist in the tutorial — typically in the self-check chapter (or the capstone, if hands-on). Run `grep -nE "(自己画|亲手画|手画|画一画|画一张|sketch|Draw the)" *.html` from the tutorial dir. Zero hits means dual coding is still one-way; add the prompt before declaring done.
+- **Reader-drawing check (hard, not soft)**: at least one explicit "draw it yourself" prompt must exist in the tutorial — typically in the self-check chapter (or the capstone, if hands-on). Run `find . -maxdepth 1 -name '*.html' -exec grep -nE "(自己画|亲手画|手画|画一画|画一张|sketch|Draw the)" {} +` from the tutorial dir. Zero hits means dual coding is still one-way; add the prompt before declaring done.
 - **SVG visual self-verify (hard, must render screenshots)**: hand-coded SVG fails in 4 specific ways (text overflow / connector crossings / arrow piercing into nodes / asymmetric stop policy). Mental coordinate math catches obvious cases but misses subtle ones. For each chapter:
   1. `python3 -m http.server 8765` (from the tutorial folder, in background)
   2. Use browser automation, a headless browser, or a manual browser screenshot to open `http://localhost:8765/01-concepts.html`
