@@ -1,27 +1,41 @@
-# Skills
+# zhiwen-skills
 
-Personal and project-ready agent skills.
+A Claude Code plugin marketplace containing personal and project-ready skills.
 
-## Structure
+## Install
 
-Use one directory per skill:
+In Claude Code:
 
-```text
-skills/
-└── skill-name/
-    ├── SKILL.md
-    └── references/
+```
+/plugin marketplace add zhiwenliang/skills
+/plugin install tech-tutorial@zhiwen-skills
 ```
 
-Each `SKILL.md` should include YAML frontmatter with a `name` and `description`, followed by concise instructions for when and how the agent should use the skill.
+`/plugin marketplace update` refreshes after upstream changes.
 
-## Notes
+## Available plugins
 
-- Keep `SKILL.md` focused and short.
-- Put longer references, examples, or templates next to the skill file.
-- Use scripts only when they make a repeated workflow more reliable.
-- See [`SKILL_REPOSITORY_GUIDE.md`](./SKILL_REPOSITORY_GUIDE.md) for the full repository guidance.
+### `tech-tutorial`
 
-## Available Skills
+Builds cognitive-science-aligned HTML tutorials for technical topics. Concept-focused by default (4 chapters: concepts + principles + self-check with discrimination scenarios); hands-on extension adds practice + pitfalls + capstone. Grounded in Sweller / Bjork / Mayer / Roediger (seven encoding principles) and Marton / Bloom / SOLO / Meyer & Land (depth orientation).
 
-- [`tech-tutorial`](./skills/tech-tutorial) — builds cognitive-science-aligned HTML tutorials for technical topics.
+[`plugins/tech-tutorial/`](./plugins/tech-tutorial)
+
+## Repository structure
+
+```
+.
+├── .claude-plugin/
+│   └── marketplace.json       # marketplace catalog
+└── plugins/
+    └── <plugin-name>/
+        ├── .claude-plugin/
+        │   └── plugin.json    # plugin manifest
+        └── skills/
+            └── <skill-name>/
+                └── SKILL.md
+```
+
+## For contributors
+
+Per-skill authoring conventions live in [`SKILL_REPOSITORY_GUIDE.md`](./SKILL_REPOSITORY_GUIDE.md). The top-level layout there is superseded by the marketplace structure above, but the SKILL.md / references / evals conventions inside each skill directory still apply.

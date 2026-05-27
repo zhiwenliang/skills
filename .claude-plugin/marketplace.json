@@ -1,0 +1,21 @@
+{
+  "name": "zhiwen-skills",
+  "description": "Zhiwen's personal Claude Code skills marketplace",
+  "owner": {
+    "name": "Zhiwen Liang"
+  },
+  "plugins": [
+    {
+      "name": "tech-tutorial",
+      "source": "./plugins/tech-tutorial",
+      "description": "Builds cognitive-science-aligned HTML tutorials for technical topics (Marton / Bloom / SOLO / Meyer & Land grounded; concept-focused by default with hands-on extension).",
+      "version": "0.1.0",
+      "author": {
+        "name": "Zhiwen Liang"
+      },
+      "repository": "https://github.com/zhiwenliang/skills",
+      "keywords": ["tutorial", "learning", "cognitive-science", "html", "documentation"],
+      "category": "learning"
+    }
+  ]
+}

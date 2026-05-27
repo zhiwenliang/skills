@@ -1,5 +1,7 @@
 # Skill Repository Best Practices
 
+> **Note**: This repository was converted to a [Claude Code plugin marketplace](./README.md). The top-level layout below (a flat `skills/` directory) is superseded by `plugins/<plugin>/skills/<skill>/`. The per-skill authoring conventions (SKILL.md frontmatter, references/, evals/, scripts/) still apply unchanged inside each skill directory.
+
 This guide describes how to structure, write, review, and maintain a repository of agent skills. It is based on the Cursor Agent Skills documentation, the Agent Skills open standard, Anthropic skill-authoring guidance, and common patterns from popular public skill repositories.
 
 ## Purpose
