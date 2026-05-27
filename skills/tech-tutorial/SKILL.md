@@ -112,6 +112,21 @@ Knowledge becomes durable when re-activated in new contexts. Required structures
 
 **Boundary — block first, interleave later.** During acquisition of brand-new syntax (first time touching async, first 30 min with a new API), the reader has nothing to discriminate between yet — interleaving just adds load on top of confusion. Apply when designing exercises (hands-on `03-practice`) or scenario questions (concept-focused `03-self-check`): early items can be blocked; late items must mix.
 
+## Depth orientation (orthogonal to the seven principles)
+
+The seven principles govern *how* learning encodes. They don't decide *how deep* the content goes. A tutorial can pass every retrieval / diagram / scaffold check and still be a glossy paraphrase of the docs — Marton & Säljö's classic name for that failure: **surface processing** (focus on signs — terminology, syntax), as opposed to **deep processing** (focus on what is signified — mechanism, relationship, transferable structure).
+
+**Don't operationalize depth as a checklist** (count quantitative claims, count Bloom-level questions per chapter). That trains the author to game the count without changing what's underneath — the same trap "X test cases per function" falls into. Instead, carry these four frameworks as **author orientation** before and during writing:
+
+- **Marton & Säljö (1976) — deep vs surface processing.** Every concept sentence either anchors a sign ("X is a Y") or a signified ("X enables / prevents / makes possible Z"). Notice which one you're writing. Surface processors retain ~10-15% at one week; deep processors retain ~50-60%.
+- **Bloom's revised taxonomy (Anderson & Krathwohl 2001).** Every question you ask the reader sits somewhere on Remember → Understand → Apply → Analyze → Evaluate → Create. Surface tutorials cluster at 1-2; deep tutorials weight toward 3-5. Notice where your questions cluster — if 90% are Remember/Understand, you're shipping a recall manual.
+- **SOLO taxonomy (Biggs & Collis 1982).** The reader's mental state after reading is *multistructural* (a bag of unconnected facts) or *relational* (an integrated structure where facts know how they connect). Concept-map edges carry the relational information — if you can't label an edge, you don't have relational understanding of that connection.
+- **Threshold concepts (Meyer & Land 2003).** Every domain has 1-3 concepts that, once internalized, *transform* the reader's view of the field (irreversible, integrative, troublesome). A tutorial without an identified threshold concept lacks a gravity center; it covers ground instead of transforming understanding. Find it explicitly.
+
+The workflow operationalizes these as four lightweight moves: **(1)** Phase 2 workers track *surprises* (gaps between prior model and what they found — depth raw material); **(2)** Phase 3 names the *threshold concept* alongside the outline (one extra line in the existing approval gate, no new round-trip); **(3)** Phase 4 runs a *Feynman test* before writing each concept (agent-internal — 50 words, zero jargon, no audience); **(4)** Phase 5 ends with an *insight check* (one sentence — what does a 5-year engineer leave with that the docs don't give?). Three of the four are agent-internal — they don't multiply user dialog.
+
+Research basis and citations: [references/cognitive_principles.md](references/cognitive_principles.md).
+
 ## Voice and tone
 
 The reader is a working professional, not a child. Treat the tone as a load-bearing engineering decision, not as decoration — casual prose forces the reader to filter out chatter to reach the signal, which costs working memory (extraneous load, principle 3). Professional prose is the cheapest extraneous-load reduction available.
@@ -310,27 +325,35 @@ For any tech with research surface ≥3 angles, **fan out in one message**. Typi
 | **Pitfalls / real-world** | GitHub issues, Stack Overflow top answers, post-mortems | Concrete pitfall list (not "be careful with performance") |
 | **Competitors / alternatives** | Comparison posts, "X vs Y" articles, switcher stories | Discrimination context for the capstone |
 
-Cap each worker at ~400 words of structured findings. The lead thread then assembles three artifacts:
+Cap each worker at ~400 words of structured findings. **Add to every worker's brief: "Write down what *surprised* you — gaps between your prior model of this tech and what you found."** Surprise is the depth signal; the things that surprised the researcher will surprise the reader, and those are the load-bearing things that pull a tutorial past surface paraphrase.
+
+The lead thread then assembles four artifacts:
 
 - The **concept dependency graph**: which concept must be defined before which?
 - The **why bank**: for each design choice, what alternatives existed and what got sacrificed?
 - The **pitfall list**: concrete things that bite newcomers.
+- The **surprise list**: the things that didn't match prior expectation — candidate threshold-concept material for Phase 3, and "what would surprise the reader" hooks for Phase 4 concept introductions.
 
 If research surface is small (a single feature like a CLI flag or one API method), one combined search is fine — don't manufacture parallelism.
 
-### Phase 3 — Outline + concept map + learning path
+### Phase 3 — Outline + concept map + learning path + threshold concept
 
-Produce three artifacts and **show to the user for approval** before drafting prose:
+Produce four artifacts and **show to the user for approval** before drafting prose (single approval pass — not four):
 
 1. **Flat chapter outline**, each chapter with a one-line "what schema this builds."
 2. **Concept map** showing all major abstractions and their relationships.
 3. **Learning-path breadcrumb** showing the chapter sequence (this is what will be re-shown at every chapter opener).
+4. **Threshold concept** — the 1-3 concepts that, once internalized, *transform* the reader's view of the domain (Meyer & Land 2003; see [references/cognitive_principles.md](references/cognitive_principles.md)). Drawn from Phase 2's surprise list. Present as: *"This tutorial's gravity center is `<one-sentence threshold concept>`. Push back if that's not what you wanted."*
+
+A tutorial without an identified threshold concept lacks a gravity center; an unredirected wrong one produces a coherent-looking but off-target tutorial. The user's redirect, if any, happens inside the existing approval pass — no extra round-trip.
 
 Getting alignment here costs minutes and saves hours.
 
 ### Phase 4 — Draft per template (parallelize chapters when independent)
 
 Write per [references/tutorial_template.md](references/tutorial_template.md). The template is a completeness checklist for the seven principles, not a rigid form.
+
+**Feynman test before each concept introduction** (agent-internal — does not interrupt user). Before writing a concept's intro paragraph, draft a 50-word jargon-free explanation in scratch space. If you stall, the gap is what the reader will hit too — go back to Phase 2's surprise list / source material, or do a targeted docs lookup, until you can do it. Then write the chapter's intro. Skipping this is the cheapest way for surface paraphrase to ship.
 
 **Parallelism rule**: once Phase 3's outline is locked and the concept dependency graph is finalized, **chapters that don't reuse each other's worked examples can be drafted in parallel**. Assign one worker per such chapter when parallel workers are available. The shared inputs each worker needs:
 
@@ -435,6 +458,7 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
   See `references/diagram_guide.md` "SVG self-verification rules" for the 4 specific failure modes and how to fix each. This is the ONLY reliable way to catch SVG defects — never declare a tutorial done without rendered screenshot verification of every figure.
 - **Runnability check**: run each code example if a runtime is available; otherwise mark "未在本机验证" at the top.
 - **Citations check**: each chapter footer has a "Further reading" with 2-5 sources. If the user provides an organization-specific methodology note or internal source, link it only after verifying the path or URL exists.
+- **Insight check** (one qualitative self-answer, not a grep): in one sentence, name what a 5-year-experience engineer in this domain would leave with after reading — that they couldn't get from the official docs alone. If you can't write that sentence, the tutorial is still at sign level (Marton's surface processing). Go back: either Phase 2 to surface more surprise material, or Phase 3 to re-pick the threshold concept. Once you can write the sentence, it goes into `index.html`'s "读完之后你能做到什么" section verbatim as the tutorial's USP.
 
 ## Anti-patterns (audit your draft for these)
 

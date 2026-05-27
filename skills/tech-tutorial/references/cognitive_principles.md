@@ -131,6 +131,105 @@ Two distinct findings, both about long-term durability.
 
 **Boundary — when interleaving hurts.** Interleaving trains discrimination, which presupposes the reader can already execute each approach individually. During the *acquisition* phase of a brand-new motor / syntactic skill (first encounter with the language's async syntax, first 30 min with a new API surface), the reader has nothing to discriminate between yet — interleaving just adds load on top of confusion. Block first, interleave later. In tutorial terms: early exercises or scenario questions can be blocked; late items and the final discrimination challenge should be interleaved.
 
+## Depth of processing — orthogonal to the seven principles
+
+The seven principles cover *how* learning encodes (intrinsic / extraneous / germane load, scaffolded retrieval, dual coding, etc.). They do not enforce *what depth* of content the author chose to write at. A tutorial can pass every retrieval / diagram / scaffold check and still be a glossy paraphrase of the docs. Four converging research lines describe the depth dimension. SKILL.md exposes them as *author orientation* (not as audit gates); the research basis lives here.
+
+### Deep vs surface processing (Marton & Säljö, 1976)
+
+The Gothenburg studies asked university students to read a passage on a complex topic, then categorized how they engaged with it:
+
+- **Surface processors** focused on signs — terminology, phrases, "what will the test ask?". They read the text as something to be reproduced.
+- **Deep processors** focused on what was signified — the argument, relationships between ideas, the author's claim. They read the text as evidence to be evaluated.
+
+A week later, surface processors retained ~10-15% of meaning; deep processors retained ~50-60%. **Depth of processing, not time spent, was the dominant retention predictor.**
+
+For tutorial writers: the author's framing forces the reader into one or the other. "X is a Y" triggers surface processing (sign equivalence). "X enables / prevents / makes Z possible" triggers deep processing (signified meaning). Notice which one you wrote in each concept introduction.
+
+### Bloom's revised taxonomy (Anderson & Krathwohl, 2001)
+
+The revised taxonomy orders cognitive demand from least to most demanding. Each level subsumes the prior:
+
+| Level | What it asks of the reader |
+|---|---|
+| Remember | Recognize / recall — "What is X?" |
+| Understand | Explain — "Explain X in your own words" |
+| Apply | Use in a new situation — "Apply X to scenario S" |
+| Analyze | Decompose, find relationships — "Why does Y depend on Z?" |
+| Evaluate | Judge tradeoffs — "Which approach for scenario S, A or B? Defend." |
+| Create | Generate new work — "Design a system that..." (typically capstone-scope) |
+
+A Remember question takes the reader ~10 seconds and trains weak encoding. An Evaluate question takes minutes and trains transfer. Tutorials should weight toward higher levels even though they're more work to design.
+
+This is an **orientation**, not a quota. SKILL.md does *not* require "≥1 Analyze + ≥1 Evaluate per chapter" — that gameable count would train the author to relabel Remember questions, not to think harder. Instead: notice where your questions cluster, and rewrite the cluster if it's at the bottom.
+
+### SOLO taxonomy (Biggs & Collis, 1982)
+
+Structure of Observed Learning Outcomes — describes the *organization* of the learner's mental representation after instruction:
+
+| Level | What the learner has built |
+|---|---|
+| Prestructural | Misses the point |
+| Unistructural | One isolated fact |
+| Multistructural | Multiple facts, unconnected |
+| **Relational** | Facts integrated into a coherent structure |
+| **Extended abstract** | Generalization of the structure to new domains |
+
+A shallow tutorial leaves the reader at multistructural — a bag of unconnected definitions. The Principle-2 concept map is the *mechanism* for moving the reader from multistructural to relational: the edges between concepts (not the concepts themselves) carry the relational information. An unlabeled edge in a concept map shows that things connect without saying *how* — the same SOLO state as no map at all.
+
+Operational consequence: if you can label every edge with a relationship type (`calls` / `depends on` / `alternative to` / `degrades to` / domain-specific), you have relational understanding of that connection. If you can't, you don't — go back to Phase 2 material and dig until you do.
+
+### Threshold concepts (Meyer & Land, 2003)
+
+A *threshold concept* is a portal in a discipline that, once passed through, transforms the learner's perception of the field. Threshold concepts have five empirically-distinguished properties:
+
+- **Transformative** — changes how the learner sees other concepts in the domain.
+- **Irreversible** — once internalized, the learner can't return to the prior view.
+- **Integrative** — reveals previously hidden connections between separately-held ideas.
+- **Bounded** — marks the edges of the discipline.
+- **Troublesome** — often counterintuitive; resists surface absorption.
+
+Every domain has 1-3 such concepts, usually framed as *mechanism*, not vocabulary. Examples:
+
+- SQL: *joins are set operations, not loops*.
+- React: *state belongs where ownership requires, not where the closest UI sits*.
+- TCP: *backpressure lives in the protocol, not in the application*.
+- Git: *commits are immutable snapshots; branches are mutable pointers to them*.
+- Distributed systems: *every "real-time" guarantee is bounded — name the bound or you don't have one*.
+
+A tutorial without an identified threshold concept covers ground rather than transforming understanding. The primary upstream act of the tutorial author is to find which one(s) the tutorial targets, then center the structure on it. SKILL.md surfaces this in Phase 3 alongside the outline approval.
+
+### The Feynman technique (informal, attributed to Richard Feynman)
+
+Not a formal theory; a practiced discipline. Before claiming to understand a concept, write a 50-word explanation in plain language with no jargon, as if explaining to an intelligent non-specialist. The places you stall are precisely the places your understanding is shallow.
+
+For tutorial writers: the agent runs this on itself before writing each concept introduction. Stalls during the Feynman test predict surface-paraphrase prose if you write anyway. Stop, go back to source material, then write — much cheaper than fixing the prose later.
+
+### Why all four frameworks together
+
+Each framework addresses a different facet of depth:
+
+- **Marton & Säljö** — depth of the *reader's mental activity* during reading.
+- **Bloom** — depth of the *cognitive demand* the author places on the reader.
+- **SOLO** — depth of the *resulting mental structure*.
+- **Meyer & Land** — depth of the *target concept* the tutorial centers on.
+- **Feynman** — diagnostic test for whether the *author* has the depth required to produce it.
+
+The author works on all five simultaneously: trigger deep processing (Marton), demand high-Bloom thinking, produce relational structure (SOLO), center on the threshold concept (Meyer & Land), pass the Feynman test before writing (diagnostic).
+
+### Why orientation, not audit
+
+Operationalizing depth as a checklist ("≥3 quantitative claims", "≥1 Evaluate-level question per chapter") trains the author to game the count rather than to think harder. Same trap as "X test cases per function" producing shallow tests. The vocabulary (sign vs signified, Bloom levels, multistructural vs relational, threshold concepts, Feynman stall) belongs *in front of the author before writing*, as a way of noticing — not after writing, as a grep.
+
+### Citations
+
+- Marton, F. & Säljö, R. (1976). "On Qualitative Differences in Learning—I: Outcome and Process." *British Journal of Educational Psychology*, 46, 4-11.
+- Anderson, L. W. & Krathwohl, D. R. (2001). *A Taxonomy for Learning, Teaching, and Assessing: A Revision of Bloom's Taxonomy of Educational Objectives*. Longman.
+- Bloom, B. S. (1956). *Taxonomy of Educational Objectives, Handbook I: Cognitive Domain*. McKay.
+- Biggs, J. B. & Collis, K. F. (1982). *Evaluating the Quality of Learning: The SOLO Taxonomy*. Academic Press.
+- Meyer, J. H. F. & Land, R. (2003). "Threshold Concepts and Troublesome Knowledge: Linkages to Ways of Thinking and Practising within the Disciplines." *Improving Student Learning — Ten Years On*, OCSLD, Oxford.
+- Feynman, R. P. (1985). *Surely You're Joking, Mr. Feynman!* — for the spirit. The "Feynman technique" as a learning method was popularized later (e.g., Gleick 1992, *Genius*).
+
 ## The voice and tone rule (less a principle than a corollary)
 
 Several of the above principles cash out as voice constraints:
