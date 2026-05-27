@@ -223,7 +223,7 @@ Example:
 Before finalizing, run:
 
 ```bash
-python scripts/validate_skill.py skills/my-skill
+python scripts/validate_skill.py plugins/<plugin-name>/skills/my-skill
 ```
 ````
 
@@ -312,15 +312,18 @@ Cursor also supports compatible Claude and Codex skill directories.
 
 ## Maintaining This Repository
 
-When adding a new skill:
+When adding a new skill, place it under an existing plugin (extending its skill set) or scaffold a new plugin:
 
-1. Create `skills/<skill-name>/SKILL.md`.
-2. Write a specific description with trigger phrases.
-3. Keep core instructions in `SKILL.md`.
-4. Move long context into `references/`.
-5. Add scripts only for deterministic repeated work.
-6. Add eval prompts for important behavior.
-7. Update `README.md` with the new skill.
+1. Pick the host plugin. If the skill fits an existing plugin's theme, place it under that plugin's `skills/` directory. Otherwise scaffold a new plugin: `plugins/<plugin-name>/.claude-plugin/plugin.json` and register the plugin in `.claude-plugin/marketplace.json`.
+2. Create `plugins/<plugin-name>/skills/<skill-name>/SKILL.md`.
+3. Write a specific description with trigger phrases.
+4. Keep core instructions in `SKILL.md`.
+5. Move long context into `references/` next to `SKILL.md`.
+6. Add scripts only for deterministic repeated work, in the skill's own `scripts/`.
+7. Add eval prompts in the skill's `evals/` for important behavior.
+8. Update `README.md` (and `marketplace.json` if you scaffolded a new plugin) so users can find the skill.
+
+Reminder: plugins are copied to `~/.claude/plugins/cache/` on install — never reference files outside the plugin directory with `../`; nothing outside `plugins/<plugin-name>/` is shipped to the user.
 8. Run the skill quality checklist.
 
 When updating an existing skill:

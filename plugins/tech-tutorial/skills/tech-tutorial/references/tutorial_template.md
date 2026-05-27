@@ -247,23 +247,25 @@ Required sections (in order):
 | 适合谁 | `<section>` | 3 条前置知识，具体到能力（"能调试 Python async" not "熟悉 Python"） |
 | 不适合谁 | `<section>` | 给更基础/更资深读者的他山资源链接 |
 | 读完之后你能做到什么 | `<section>` | 一段开头放 **Insight Check 的 USP 句**（来自 SKILL.md Phase 5：5-year engineer 能讲出而文档讲不出的那句话），verbatim 放在这里。后接 3-5 条**可验证**能力（动词开头，不写"理解 X"） |
-| 引力中心 | `<section class="callout insight">` | Phase 3 锁定的 **threshold concept**（一句话），明示给读者"整本教程围绕这一点展开" |
+| 引力中心 | `<section class="callout warning">` (overloads 'warning' to gain the v2 vermilion accent — `.callout.insight` renders neutral in v2 and would visually disappear) | Phase 3 锁定的 **threshold concept**（一句话），明示给读者"整本教程围绕这一点展开"。Label 写 `引力中心`，不是 `陷阱` |
 | 假设说明 | `<section>` | 仅非交互模式生成时填——列出 AI 做的假设 |
 | 流畅感警告 | `.callout warning` | Principle 6：点名"我读得很顺/我做题很快/我没卡壳"三大假象 |
 | 概念地图 | `<figure>` + 手画 SVG | 5-10 节点，边带标签。`<figcaption>` 指出 3 件读者要注意的事。详见 diagram_guide.md 的 Pattern 5 |
 | 学习路径 | `<nav class="learning-path">` 顶部 breadcrumb | 顶部 breadcrumb 即学习路径（current 用朱红色 + bold 高亮，无下划线）。不需要单独 SVG，每章自然展示 |
 | 学习路径建议 | `<ul>` | 至少 3 个分场景路径。**Concept-focused**：`只想理解` / `做选型` / `带读他人代码` 之类不依赖 `03-practice` 的场景。**Hands-on**：可以含 `动手写` 指向 `03-practice.html`。不要承诺当前模式不存在的章节 |
-| 目录 | `<nav><ul>` | `<a href="01-concepts.html">` 链所有章节（concept-focused 3 章；hands-on 6 章）|
+| 目录 | `<nav><ul>` | `<a href="01-concepts.html">` 链每个章节文件。**Concept-focused**：3 个链接（01-concepts / 02-principles / 03-self-check；index 本身不在目录里）。**Hands-on**：6 个链接（01..06；同样不含 index）。文件总数 = 链接数 + 1（index）|
 | 学完之后 | `<section>` | 3-5 个下一步主题，每个一句话说明"它在你 schema 上加了什么" |
 | 参考资料 | `<footer>` | 官方文档（必填）+ 2-3 设计文档/RFC + 2-3 高质量博客 |
 
 **index.html 自检**：
 - [ ] 60 秒能判断是否适合自己？
 - [ ] 适合谁 / 不适合谁 / 能做到什么 三段都有？
+- [ ] `读完之后你能做到什么` 段首是 **Insight Check 的 USP 句**（来自 SKILL.md Phase 5）？
+- [ ] **引力中心**段存在，包含 Phase 3 锁定的 threshold concept（一句话）？
 - [ ] 概念地图嵌入了，`<figcaption>` 是导读（不是描述图）？
 - [ ] 学习路径 breadcrumb 嵌入并高亮当前章节？
 - [ ] 流畅感警告嵌入了？
-- [ ] 至少 3 个分场景路径选项？
+- [ ] 至少 3 个分场景路径选项（concept-focused 不含"动手写"）？
 
 ---
 
@@ -533,7 +535,7 @@ Required sections (in order):
 
 **硬性条目**（每条都要 grep 通过，不要"以后再说"）：
 
-- [ ] **每章 ≥1 张 `<figure>`**（含 SVG 或导入图） —— 用 `grep -c '<figure>' *.html` 检查，每个章节文件都要 ≥1。`code-block` 和 `compare-table` 不算 figure —— 它们各自有重要作用，但**承载不了 dual coding 的空间关系编码**。
+- [ ] **每章 ≥1 张 `<figure>`**（含 SVG 或导入图） —— 用 SKILL.md Phase 5 的 `find ... grep -cE '<figure[ >]'` 命令检查（能匹配带 attribute 的 `<figure class="..."> / <figure id="...">`，旧的 `grep -c '<figure>'` 会漏）。`code-block` 和 `compare-table` 不算 figure —— 它们各自有重要作用，但**承载不了 dual coding 的空间关系编码**。
 - [ ] **整本教程总计 ≥7 张 figure（concept-focused）或 ≥10 张（hands-on）**。典型分布：index 1 张概念地图、01 2-3 张、02 2-3 张、self-check 1 张梯度图。Hands-on 额外：03-practice 1-2 张、04-pitfalls 1 张、05-capstone 1-2 张。Quick primer 例外：单文件 ≥3 张。
 - [ ] 时序 / 状态 / 流程 / 关系都配了对应类型的图（参考 diagram_guide.md 的 5 patterns）
 - [ ] 标签直接在图元素上（无"见图 X 中的 A"跨距离引用）
@@ -575,13 +577,17 @@ Required sections (in order):
 - [ ] 没有"参见第 X 章某节"造成的跳跃阅读
 
 ### 语调（grep 命令见 SKILL.md Phase 5；HTML 标签由 grader 自动 strip）
-- [ ] 没有 cheerleader 类（我们一起 / 让我们 / 咱们 / let's / we'll / together we'll）
-- [ ] 没有 filler 过渡（接下来 / 我们来看 / 我们来试试 / 下面我们 / Now we're going to）
-- [ ] 没有 hedging（可能 / 也许 / 兴许 / 大概 / 差不多 / 应该是 / roughly / kind of）
-- [ ] 没有 anesthetic 词（这很简单 / 显然 / trivially / obviously / just）
-- [ ] 没有 colloquial slang（"坑" 在散文中、撸代码、搞起来、玩一下）
-- [ ] 没有 AI 套话（在当今快速发展的技术领域 / 本教程将带你 / 踏上...的旅程）
-- [ ] 第一人称（我 / 我们）只剩三类合法用法：作者认识论说明、对读者发出动作邀请、流畅感警告里的三个标签
+
+本节是阅读 checklist；权威 ban 列表是 SKILL.md 的 **Forbidden phrases** 表 + Phase 5 grep 正则。两者一致由 SKILL.md 表驱动；本 checklist 同步该表的全部分类。
+
+- [ ] 没有 cheerleader 类（`我们一起` / `让我们` / `咱们` / `让我们一起` / `let's` / `we'll` / `together we'll` / `you'll discover` / `你会发现`）
+- [ ] 没有 filler 过渡（`接下来` / `接下来让我们` / `我们来看` / `我们来试试` / `下面我们` / `Now we're going to`）
+- [ ] 没有 hedging（`可能` / `也许` / `兴许` / `大概` / `差不多` / `应该是` / `roughly` / `kind of` / `sort of`）
+- [ ] 没有 anesthetic 词（`这很简单` / `很简单` / `显然` / `trivially` / `obviously` / `just`）
+- [ ] 没有 colloquial slang（`坑` 在散文中、`踩坑`、`搞起来`、`撸代码`、`玩一下`）
+- [ ] 没有 AI 套话（`在当今快速发展的技术领域` / `本教程将带你` / `踏上...的旅程` / `开启...之旅`）
+- [ ] 第一人称（`我` / `我们`）只剩三类合法用法：作者认识论说明、对读者发出动作邀请、流畅感警告里的三个标签
+- [ ] 智能引号注意：Mac 自动把 `'` 替换为 `'`（U+2019）；SKILL.md Phase 5 grep 已用字符类 `[''']` 兼容，但人工 review 时也要看这两个变体
 
 ### 完整性
 - [ ] 每章都有"参考资料 / Further reading"

@@ -186,7 +186,7 @@ Walls of prose force linear sequential reading and overload working memory. Requ
 1. **Each chapter has ≥1 `<figure>`** — *hard*, grep-enforced in Phase 5. No exceptions for "pitfalls / question bank / hands-on" chapters (see below).
 2. **Each major H2 section has ≥1 figure or worked example** — figures and code count here. Tables alone don't.
 3. **At most ~300 lines of prose without a visual break** — figures, code blocks, comparison tables all count for this looser breaking rule.
-4. **A full tutorial totals ≥7 figures (concept-focused) or ≥10 figures (hands-on)**, distributed across chapters. Concept-focused has only 4 files so 7 is the realistic ceiling; hands-on has 7 files and can reach 10 comfortably. Per-chapter targets are in `SKILL.md` Phase 5.
+4. **A full tutorial totals ≥7 figures (concept-focused) or ≥10 figures (hands-on)**, distributed across chapters. These are floors, not ceilings — the per-chapter targets in `SKILL.md` Phase 5 give concept-focused a 7-8 range (index 1 + 01 2-3 + 02 2-3 + self-check 1) and hands-on a 10-12 range. Aim for the middle of the range; only fall back to the floor when a chapter genuinely has nothing structural to diagram.
 
 **Figures, code blocks, and comparison tables are NOT interchangeable.** Each does a different job:
 
@@ -424,7 +424,7 @@ The concept map is the most important diagram in any tutorial. Reader hangs ever
 
 Smaller than the concept map — shows the linear chapter sequence, not concept relationships.
 
-In v1 design the learning path lives in the top breadcrumb `<nav class="learning-path">`, not as an SVG figure. Each chapter marks the current step with `<span class="current">` (vermilion underline). No separate SVG needed.
+The learning path lives in the top breadcrumb `<nav class="learning-path">`, not as an SVG figure. Each chapter marks the current step with `<span class="current">` rendered as vermilion color + bold (no underline, per the v2 minimalist CSS). No separate SVG needed.
 
 This **is** still forced retrieval (re-encountering the chapter list every page) and orientation (reader always knows where they are) — just rendered as text breadcrumb instead of SVG.
 

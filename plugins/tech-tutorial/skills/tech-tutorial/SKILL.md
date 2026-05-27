@@ -234,7 +234,7 @@ The `<style>` block is identical across chapters. **Don't try to "improve" it pe
 | Markdown table | `<table class="compare-table">` (with optional `<tr class="selected">` for current choice) |
 | Markdown callout / admonition | `<div class="callout warning">` / `tip` / `example` / `insight` |
 | `<details><summary>...</summary>` | Same syntax; styled by the template |
-| One-line definition | `<p class="one-liner">italic definition...</p>` |
+| One-line definition | `<p class="one-liner">definition...</p>` (renders with `font-weight: 500` + left border; not italic in v2) |
 | 为什么需要它 paragraph | `<div class="rationale"><span class="label">…</span><p>…</p></div>` |
 | Predictive question | `<div class="predict"><span class="question-label">想一想</span><p>...</p><details>...</details></div>` |
 | `[[wiki-link]]` | **Forbidden** — use plain `<a href="...html">` (HTML doesn't render wiki syntax) |
@@ -332,7 +332,7 @@ The lead thread then assembles four artifacts:
 - The **concept dependency graph**: which concept must be defined before which?
 - The **why bank**: for each design choice, what alternatives existed and what got sacrificed?
 - The **pitfall list**: concrete things that bite newcomers.
-- The **surprise list**: concatenate every worker's `## Surprises` section verbatim into a flat list. Dedup obvious overlaps but keep the framing intact. This becomes the candidate-pool for Phase 3's threshold concept and the "what would surprise the reader" hooks for Phase 4 concept introductions. **If the surprise list ends up empty or pure restatement of the docs, Phase 2 is not done — send workers back to dig deeper.**
+- The **surprise list**: from each worker's output, locate the line matching `^## Surprises\b` (regex `^## Surprises`, case-sensitive) and extract every bullet line that follows until the next heading or end-of-output. Concatenate the extracted bullets verbatim into a flat list, prefixed with the worker name (e.g., `[official-docs] no implicit await on the close call`). Dedup obvious overlaps but keep the original framing intact. This becomes the candidate-pool for Phase 3's threshold concept and the "what would surprise the reader" hooks for Phase 4 concept introductions. **If a worker omits the `## Surprises` header, treat its surprise contribution as missing and re-prompt that worker. If the assembled list ends up empty or pure restatement of the docs, Phase 2 is not done — send workers back to dig deeper.**
 
 If research surface is small (a single feature like a CLI flag or one API method), one combined search is fine — don't manufacture parallelism.
 
@@ -346,6 +346,8 @@ Produce four artifacts and **show to the user for approval** before drafting pro
 4. **Threshold concept** — the 1-3 concepts that, once internalized, *transform* the reader's view of the domain (Meyer & Land 2003; see [references/cognitive_principles.md](references/cognitive_principles.md)). Drawn from Phase 2's surprise list. Present as: *"This tutorial's gravity center is `<one-sentence threshold concept>`. Push back if that's not what you wanted."*
 
 A tutorial without an identified threshold concept lacks a gravity center; an unredirected wrong one produces a coherent-looking but off-target tutorial. The user's redirect, if any, happens inside the existing approval pass — no extra round-trip.
+
+Once approved, the threshold concept must be rendered into `index.html` as a dedicated `引力中心` section (see the index.html spec in [references/tutorial_template.md](references/tutorial_template.md)) — the section is mandatory in Phase 4 output, and Phase 5's `index.html 自检` audits its presence.
 
 Getting alignment here costs minutes and saves hours.
 
@@ -406,16 +408,20 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 - **Retrieval separation check**: open every self-check section and confirm answers are in `<details>` blocks or a separate file, never inline.
 - **Cross-chapter callback check**: every chapter after the first should textually reference at least one earlier concept by name. Grep for the earlier chapter's key terms in the current chapter; they should appear.
 - **Discrimination check**: ≥1 prompt (ideally 3-5) that forces the reader to *choose between* approaches from ≥2 prior chapters. Lives in `03-self-check.html` (concept-focused) or `05-capstone.html` (hands-on).
-- **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first, then grep. The voice grep pattern is kept in sync with the **Forbidden phrases** table at the top of this document — if you add a banned phrase there, update this regex too. One-liner (uses `find` so it's safe under zsh; uses `sys.argv[1]` so filenames with apostrophes don't blow up Python):
+- **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first, then grep. The voice grep pattern is kept in sync with the **Forbidden phrases** table at the top of this document — if you add a banned phrase there, update this regex too. The per-file loop prefixes each line with the filename so grep hits are actionable. One-liner uses `find` (zsh-safe), passes the file via `sys.argv[1]` (apostrophe-in-filename safe), runs `grep -inE` (case-insensitive: catches `Let's` / `We'll` / `Roughly`), and uses `[''`]` character classes so smart quotes (`'` U+2019, the macOS autocorrect default) match alongside straight ASCII `'`:
 
   ```bash
-  find . -maxdepth 1 -name '*.html' -exec python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" {} \; | grep -nE "我们一起|让我们|咱们|你会发现|接下来|我们来看|我们来试试|下面我们|Now we're going to|you'll discover|together we'll|let's|we'll|这很简单|很简单|显然|trivially|obviously|(^|[^a-zA-Z])just|可能|也许|兴许|大概|差不多|应该是|roughly|kind of|sort of|踩坑|搞起来|撸代码|玩一下|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
+  find . -maxdepth 1 -name '*.html' | while read -r f; do
+    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | grep -inHE --label="$f" "我们一起|让我们|咱们|你会发现|接下来|我们来看|我们来试试|下面我们|Now we[']re going to|you[']ll discover|together we[']ll|let[']s|we[']ll|这很简单|很简单|显然|trivially|obviously|(^|[^a-zA-Z])just|可能|也许|兴许|大概|差不多|应该是|(^|[^a-zA-Z])roughly|(^|[^a-zA-Z])kind of|(^|[^a-zA-Z])sort of|踩坑|搞起来|撸代码|玩一下|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
+  done
   ```
 
   Plus a separate first-person scan over the same stripped text:
 
   ```bash
-  find . -maxdepth 1 -name '*.html' -exec python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" {} \; | grep -nE "(^|[^a-zA-Z])(我|我们)"
+  find . -maxdepth 1 -name '*.html' | while read -r f; do
+    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | grep -nHE --label="$f" "(^|[^a-zA-Z])(我|我们)"
+  done
   ```
 
   Every hit in **stripped prose** needs a fix or a justification (epistemic note / reader-addressed action / mandated fluency-illusion label). Don't ship with raw hits.
