@@ -72,13 +72,15 @@ See [references/diagram_guide.md](references/diagram_guide.md) for the content-t
 
 ### 4. Worked → Partial → Open (Worked Example Effect)
 
-For each new concept in a novice-targeted chapter, follow the three-step scaffold:
+For each new concept in a novice-targeted chapter, lead with a worked example. The form depends on tutorial mode:
 
-1. **Complete worked example** — fully explained line-by-line at "what concept does this line illustrate."
-2. **Partial example** — give the structure, leave 1-2 *schema-building* decision points blank. Not trivial fill-ins.
-3. **Open exercise** — fresh problem, end-to-end.
+- **Concept-focused (default)**: the worked example is a **scenario walkthrough** in `01-concepts.html` — pick a concrete situation, walk through what happens, name each step's underlying concept. ("Query a Postgres table with no index → sequential scan. Now add a B-tree index → planner switches to index scan; cost drops from 80k to 12.") Retrieval moves to `03-self-check.html` as scenario discrimination questions.
+- **Hands-on**: the full three-step **code progression** lives in `03-practice.html`:
+  1. **Complete worked example** — fully explained line-by-line.
+  2. **Partial example** — structure given, 1-2 *schema-building* decision points blank (not trivial fill-ins).
+  3. **Open exercise** — fresh problem, end-to-end.
 
-Worked-example-to-open-exercise ratio scales with reader level: novice 5:1, intermediate 2:1, expert 1:3.
+  Worked-example-to-exercise ratio scales with reader level: novice 5:1, intermediate 2:1, expert 1:3.
 
 ### 5. Force retrieval (Testing Effect)
 
@@ -106,9 +108,9 @@ Knowledge becomes durable when re-activated in new contexts. Required structures
 
 - **Each chapter opens** with one sentence summarizing the prior chapter's contribution to the current one. Forced retrieval, not redundancy.
 - **Examples in chapter N use concepts from chapters 1..N-1**, not just the new one. This is interleaving.
-- **Capstone** — the tutorial ends with a project that requires *discriminating* between approaches from ≥2 prior chapters ("should you use the chapter 3 approach or the chapter 7 approach here?"). Discrimination is what transfer means; without a capstone you've trained recall but not transfer. Not optional for full-depth tutorials.
+- **Discrimination at the end** — the tutorial ends with a forced choice between approaches from ≥2 prior chapters ("should you use the chapter 1 approach or the chapter 2 approach here?"). Form depends on mode: in concept-focused tutorials, this lives as **scenario discrimination questions** inside `03-self-check.html` (typically 3-5 scenarios, each tagging which chapters' concepts apply); in hands-on tutorials, it lives as a **capstone project** in `05-capstone.html`. Either form trains transfer, not just recall — not optional for full tutorials.
 
-**Boundary — block first, interleave later.** During acquisition of brand-new syntax (first time touching async, first 30 min with a new API), the reader has nothing to discriminate between yet — interleaving just adds load on top of confusion. In 03-practice: early chapter exercises can be blocked; late-chapter and capstone exercises must mix.
+**Boundary — block first, interleave later.** During acquisition of brand-new syntax (first time touching async, first 30 min with a new API), the reader has nothing to discriminate between yet — interleaving just adds load on top of confusion. Apply when designing exercises (hands-on `03-practice`) or scenario questions (concept-focused `03-self-check`): early items can be blocked; late items must mix.
 
 ## Voice and tone
 
@@ -229,17 +231,25 @@ HTML-escape special characters when writing example code: `<` → `&lt;`, `>` �
 ### File structure
 
 ```
-<tech-name>/
-├── index.html          # entry page
+<tech-name>/                  # default: concept-focused (4 files)
+├── index.html                # entry page
 ├── 01-concepts.html
 ├── 02-principles.html
-├── 03-practice.html
-├── 04-pitfalls.html
-├── 05-capstone.html
+└── 03-self-check.html        # includes cross-chapter discrimination scenarios
+```
+
+`index.html` is the entry per web convention. The `<style>` block inside each HTML is the source of truth — no shared `style.css`, no `style/` directory. Each chapter is a standalone artifact.
+
+**Hands-on extension** (when the user explicitly asks for code-progression depth): insert three chapters between principles and self-check, renumbering self-check to `06-self-check.html`:
+
+```
+├── 03-practice.html          # Worked → partial → exercise code progression
+├── 04-pitfalls.html          # Concrete failure modes
+├── 05-capstone.html          # Mixed-concept project
 └── 06-self-check.html
 ```
 
-`index.html` is the entry per web convention. The `<style>` block inside each HTML is the source of truth — no shared `style.css`, no `style/` directory. This keeps each chapter a standalone artifact.
+See Phase 1 below for the mode-selection dialog.
 
 ## Tooling Discipline (Environment-Agnostic)
 
@@ -291,6 +301,7 @@ Lock down four things with the user before researching:
 | **What exactly?** Whole framework, or specific area? | Scope determines depth and structure. |
 | **Why now?** Evaluating, building, or curious? | Evaluators need decision criteria; builders need runnable code; curious readers need narrative. |
 | **What's their existing background?** | Drives expertise-reversal calibration and analogies. |
+| **Concept-focused or hands-on?** | Default is concept-focused (4 chapters: concepts + principles + self-check with discrimination scenarios) for building mental models. Choose hands-on (adds practice + pitfalls + capstone) only when the user explicitly needs runnable code progression. |
 | **How deep?** Primer (30 min), full (2 hr), deep-dive (half day)? | Determines file structure and example-to-exercise ratio. |
 
 If the conversation is non-interactive (no user available), make defensible assumptions and **document them near the top of `index.html`** in an "Assumptions" block so the reader can spot misfits.
@@ -339,21 +350,30 @@ Write per [references/tutorial_template.md](references/tutorial_template.md). Th
 
 The lead thread then does a coherence merge pass: re-show the learning-path breadcrumb at each chapter opener with current chapter highlighted, verify cross-chapter callbacks land on actual prose in earlier chapters, deduplicate any concept that got accidentally redefined in two chapters.
 
-Chapters that **must stay sequential**: any pair where chapter N's worked example builds on chapter N-1's output, or where N's "上一章" recap names a specific paragraph in N-1. For a typical 6-chapter full tutorial, parallelizable: 01 + 02 (independent foundations), 04 (pitfalls) and 06 (self-check bank) can fan out from 01-03 once locked. Sequential: 03 (practice) follows 01-02; 05 (capstone) follows everything.
+Chapters that **must stay sequential**: any pair where chapter N's worked example builds on chapter N-1's output, or where N's "上一章" recap names a specific paragraph in N-1.
+
+- **Concept-focused tutorial** (default, 4 files): 01 + 02 parallelizable; `03-self-check` follows everything (needs all chapter content for discrimination scenarios).
+- **Hands-on tutorial** (6 files): 01 + 02 parallelizable; 04 (pitfalls) and 06 (self-check) can fan out from 01-03 once locked; 03 (practice) follows 01-02; 05 (capstone) follows everything.
 
 If the tutorial is small (≤3 chapters) or chapters are tightly entangled, draft serially — parallelism overhead exceeds the gain.
 
-Default file structure for a full tutorial (all HTML — see "Output format" section above for the required layout template each file must use):
+Default file structure for a full **concept-focused** tutorial (all HTML — see "Output format" section above for the required layout template):
 
 ```
 <tech-name>/
 ├── index.html            # Target reader, motivation, concept map, learning-path breadcrumb, TOC
-├── 01-concepts.html      # Core abstractions; each concept has worked example
+├── 01-concepts.html      # Core abstractions; each concept anchored with a scenario walkthrough
 ├── 02-principles.html    # How it works + design tradeoffs (备选方案 tables required)
-├── 03-practice.html      # Hands-on: worked → partial → exercise progression
+└── 03-self-check.html    # Self-test bank + cross-chapter discrimination scenarios (capstone surrogate)
+```
+
+For **hands-on tutorials**, extend with three chapters between principles and self-check (self-check renumbers to 06):
+
+```
+├── 03-practice.html      # Worked → partial → exercise code progression
 ├── 04-pitfalls.html      # Concrete pitfalls (not "pay attention to performance")
 ├── 05-capstone.html      # Mixed-concept project requiring discrimination
-└── 06-self-check.html    # Bank of self-test questions with answers in <details>
+└── 06-self-check.html    # Question bank, answers in <details>
 ```
 
 For **quick primers**: collapse to a single `index.html` with all sections as `<h2>`.
@@ -364,14 +384,14 @@ For **quick primers**: collapse to a single `index.html` with all sections as `<
 
 **Parallel audit pattern**: the verification dimensions below are independent and read-only. If the platform supports parallel workers, assign one dimension to each worker — each gets the tutorial directory path and the one audit it owns. The lead thread collects findings and fixes. A serial single-thread audit takes 5-10× the wall time and is more likely to miss things because the auditor's attention dilutes across dimensions.
 
-Suggested fan-out: voice / density / retrieval-separation / cross-chapter callbacks / capstone discrimination / citations. Each worker prompt is small ("scan these files for this one thing, report violations").
+Suggested fan-out: voice / density / retrieval-separation / cross-chapter callbacks / discrimination coverage / citations. Each worker prompt is small ("scan these files for this one thing, report violations").
 
 Before declaring done, audit against the checklist in [references/tutorial_template.md](references/tutorial_template.md). Specifically:
 
 - **Density check**: open every chapter and confirm no >300-line stretch of prose without a diagram or worked example.
 - **Retrieval separation check**: open every self-check section and confirm answers are in `<details>` blocks or a separate file, never inline.
 - **Cross-chapter callback check**: every chapter after the first should textually reference at least one earlier concept by name. Grep for the earlier chapter's key terms in the current chapter; they should appear.
-- **Capstone check**: the capstone project requires the reader to *choose between* approaches from at least 2 prior chapters.
+- **Discrimination check**: the tutorial must force the reader to *choose between* approaches from at least 2 prior chapters. In concept-focused mode this lives in `03-self-check.html` as scenario questions ("given scenario X, which concept applies?"); in hands-on mode it lives as the project in `05-capstone.html`. Either way: ≥1 discrimination prompt that touches ≥2 chapters; ideally 3-5 such prompts.
 - **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first, then grep. One-liner:
 
   ```bash
@@ -398,7 +418,9 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 
   Output should be empty. **`code-block` and `compare-table` do NOT count as figures** — they are sequential text and structured text; neither carries the spatial / parallel relationship that dual coding (Principle 3) is buying. All three (figures + code blocks + tables) coexist; figures are not optional just because other visual elements are present.
 
-  Per-chapter targets: index 1 (concept map), 01 2-3, 02 2-3, 03 1-2 (e.g. data type flow + training progression), 04 1 (e.g. pitfall taxonomy), 05 1-2 (architecture + decision tree), 06 1 (e.g. gradient pyramid). Total ≥10 for a full tutorial.
+  Per-chapter targets:
+  - **Concept-focused (default)**: index 1 (concept map), 01 2-3, 02 2-3, 03-self-check 1 (e.g. gradient pyramid or discrimination scenario map). Total ≥7 for a full concept tutorial.
+  - **Hands-on**: index 1, 01 2-3, 02 2-3, 03-practice 1-2 (e.g. data type flow + training progression), 04-pitfalls 1 (e.g. pitfall taxonomy), 05-capstone 1-2 (architecture + decision tree), 06-self-check 1 (e.g. gradient pyramid). Total ≥10 for a full hands-on tutorial.
 
   **Common rationalization to refuse**: "this chapter is pitfalls / question bank / hands-on, doesn't need diagrams." False — pitfalls can show causal links between failure modes; question banks can show difficulty gradient and chapter mapping; hands-on can show type flow and scaffold progression. *Every chapter has a figure-worthy shape; if you can't find one, the chapter outline isn't clear yet.*
 
@@ -411,7 +433,7 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
   Output should be empty (every file must include `.diagram-ink`). If a file is listed, paste the canonical SVG utility block (defined at the end of `references/layout-template.html`'s `<style>`) into its `<style>`.
 
   **Failure mode this prevents**: an early-drafted chapter without figures shipped with no SVG utility CSS; later iteration adds figures that pass coordinate math but render as opaque black rectangles in the deployed file. *Seen in real tutorials. Always grep before declaring done.*
-- **Reader-drawing check (hard, not soft)**: at least one explicit "draw it yourself" prompt must exist in the tutorial — typically in the capstone or 06-self-check. Run `grep -nE "(自己画|亲手画|手画|画一画|画一张|sketch|Draw the)" *.html` from the tutorial dir. Zero hits means dual coding is still one-way; add the prompt before declaring done.
+- **Reader-drawing check (hard, not soft)**: at least one explicit "draw it yourself" prompt must exist in the tutorial — typically in the self-check chapter (or the capstone, if hands-on). Run `grep -nE "(自己画|亲手画|手画|画一画|画一张|sketch|Draw the)" *.html` from the tutorial dir. Zero hits means dual coding is still one-way; add the prompt before declaring done.
 - **SVG visual self-verify (hard, must render screenshots)**: hand-coded SVG fails in 4 specific ways (text overflow / connector crossings / arrow piercing into nodes / asymmetric stop policy). Mental coordinate math catches obvious cases but misses subtle ones. For each chapter:
   1. `python3 -m http.server 8765` (from the tutorial folder, in background)
   2. Use browser automation, a headless browser, or a manual browser screenshot to open `http://localhost:8765/01-concepts.html`
@@ -434,7 +456,7 @@ Drawn directly from the cognitive-science anti-pattern list. If your draft does 
 | "See node A in figure 3.2 above" | Split-attention destroys working memory | Move label onto the diagram element |
 | Open exercise before worked example | Cognitive load disaster for novices | Show complete example first |
 | One tutorial for everyone | Expertise reversal — helps no one | Pick a target reader, declare it |
-| Final chapter = harder version of chapter N | Blocked practice, no transfer | Build a capstone that interleaves |
+| Final chapter = harder version of chapter N | Blocked practice, no transfer | End with discrimination — scenario questions that mix concepts from ≥2 chapters |
 | "这很简单" / "显然" / "just" | Tells the confused reader they're dumb | Delete |
 | Jumping ahead, undefined terms | Working memory overflow | Define on first use or link back |
 | Answer right under the question | No retrieval — re-reading in disguise | Wrap answer in `<details>` |

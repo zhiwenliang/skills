@@ -201,7 +201,7 @@ When in doubt: **if you can imagine the content as a hand-drawn whiteboard sketc
 - *"Pitfalls is a list, doesn't need a figure"* → No. Draw the **causal links** between failure modes (which pitfall makes which other pitfall more likely), or a 2D categorization (axis 1: where in the stack, axis 2: severity). Both are figure-worthy.
 - *"Question bank is just questions"* → No. Draw the **difficulty gradient** (pyramid: recall → understand → discriminate) or the **chapter mapping** (which question tests which chapter). Both reinforce the schema the questions probe.
 - *"Hands-on is code"* → No. Draw the **data type flow** through the worked chain (`raw input → parsed object → validated request → response`), or the **scaffold-decrease progression** across the worked → partial → open sequence. The reader's eye finds these spatial patterns the code itself can't show in linear text.
-- *"Capstone is decisions, just use a table"* → No. The capstone gets two figures: **overall architecture** (where each decision point lives in the system) and **decision tree** (the discrimination path the reader walks). The table lists choices; the figures show structure.
+- *"Discrimination is decisions, just use a table"* → No. The discrimination challenge (whether in `03-self-check` for concept-focused, or `05-capstone` for hands-on) gets two figures: **overall map** (where each decision point lives relative to the chapters' concepts) and **decision tree** (the discrimination path the reader walks). The table lists choices; the figures show structure.
 
 If a section ends up text-heavy:
 1. Add a diagram that the prose was implicitly describing
@@ -459,7 +459,7 @@ At least once per tutorial, prompt the reader to draw. Two patterns:
 **Pattern B — extension draw** (transfer):
 > 把数据流套到你自己的应用上画一遍。这一章的哪些组件对应到你已有的系统？哪些是新加的？
 
-Put these at chapter boundaries, in the capstone, or in `06-self-check` — places where the reader is already in active mode.
+Put these at chapter boundaries or in the final self-check / capstone chapter — places where the reader is already in active mode.
 
 ## Anti-patterns (delete on sight)
 

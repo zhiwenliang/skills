@@ -104,7 +104,7 @@ Bjork names four operational forms of desirable difficulty:
 | Form | Mechanism | Skill operationalization |
 |---|---|---|
 | **Spaced retrieval** | Re-encoding at lengthened intervals | Principle 7 (chapter-opener summaries, cross-chapter callbacks) |
-| **Interleaving** | Forces discrimination across types | Principle 7 (mixed examples in late chapters, capstone) |
+| **Interleaving** | Forces discrimination across types | Principle 7 (mixed examples in late chapters; discrimination challenge at end) |
 | **Active retrieval** | Retrieval itself is the encoding event | Principle 5 (self-check, predictive Qs, atomic questions) |
 | **Variation of conditions** | Generalizes the schema beyond the trained shape | Principle 6's own surface rule: 2-3 different shapes per concept |
 
@@ -126,10 +126,10 @@ Two distinct findings, both about long-term durability.
 **Operational rules**:
 - Each chapter opens with a one-sentence summary of the prior chapter's contribution. This is forced retrieval, not redundancy.
 - Examples in chapter N use concepts from chapters 1..N-1, not just N's new concept.
-- The tutorial ends with a **capstone** that requires the reader to discriminate between approaches from multiple prior chapters. "Should you use the chapter 3 approach or the chapter 7 approach here?"
-- A tutorial without a capstone has trained recall but not transfer.
+- The tutorial ends with a **discrimination challenge** — the reader must choose between approaches from multiple prior chapters. "Should you use the chapter 1 approach or the chapter 2 approach here?" In a concept-focused tutorial this lives as scenario questions in `03-self-check.html`; in a hands-on tutorial it lives as a project in `05-capstone.html`. Either form is acceptable; the discrimination *function* is what matters.
+- A tutorial without a discrimination challenge has trained recall but not transfer.
 
-**Boundary — when interleaving hurts.** Interleaving trains discrimination, which presupposes the reader can already execute each approach individually. During the *acquisition* phase of a brand-new motor / syntactic skill (first encounter with the language's async syntax, first 30 min with a new API surface), the reader has nothing to discriminate between yet — interleaving just adds load on top of confusion. Block first, interleave later. In tutorial terms: early exercises in a chapter can be blocked; late-chapter exercises and the capstone should be interleaved.
+**Boundary — when interleaving hurts.** Interleaving trains discrimination, which presupposes the reader can already execute each approach individually. During the *acquisition* phase of a brand-new motor / syntactic skill (first encounter with the language's async syntax, first 30 min with a new API surface), the reader has nothing to discriminate between yet — interleaving just adds load on top of confusion. Block first, interleave later. In tutorial terms: early exercises or scenario questions can be blocked; late items and the final discrimination challenge should be interleaved.
 
 ## The voice and tone rule (less a principle than a corollary)
 
@@ -149,7 +149,7 @@ The principles map onto a writing workflow:
 1. **Reader modeling** (principle 1) — write the target reader profile before anything else.
 2. **Dependency decomposition** (principles 2, 4) — concept graph, then chapter sequence that obeys it.
 3. **Unit design** (principles 3, 4, 5, 6) — per-chapter, scaffold examples + diagrams + self-checks.
-4. **Verification** (principle 7 + cross-cutting) — capstone, density check, retrieval-separation check, voice check.
+4. **Verification** (principle 7 + cross-cutting) — discrimination challenge, density check, retrieval-separation check, voice check.
 
 ## When you want to break a rule
 

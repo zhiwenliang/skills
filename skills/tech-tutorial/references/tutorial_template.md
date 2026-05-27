@@ -4,9 +4,10 @@ This template operationalizes the seven design principles in SKILL.md. Each sect
 
 The base HTML layout (hand-written CSS + Prism CDN + inline SVG utilities) is defined once in **`references/layout-template.html`**. Copy it into every chapter file. This template document focuses on per-chapter **content structure**, not boilerplate.
 
-- **Full tutorials** (≈2 hr read): use the 7-file structure below.
-- **Quick primers** (≈30 min): collapse to a single `index.html` with `<h2>` per section.
-- **Deep dives**: split chapters further (e.g., `01-concepts-core-model.html`, `01-concepts-data-flow.html`).
+- **Concept-focused tutorial** (default, ≈2 hr read): 4 files — `index.html` + `01-concepts.html` + `02-principles.html` + `03-self-check.html` (with mandatory cross-chapter discrimination scenarios — capstone surrogate). Use the unlabeled chapter sections + the self-check chapter section.
+- **Hands-on tutorial** (extension, ≈2-3 hr read): 7 files — adds `03-practice.html`, `04-pitfalls.html`, `05-capstone.html` between principles and self-check; self-check renumbers to `06-self-check.html`. Use the sections labeled "(hands-on extension)".
+- **Quick primer** (≈30 min): collapse to a single `index.html` with `<h2>` per section.
+- **Deep dive**: split chapters further (e.g., `01-concepts-core-model.html`, `01-concepts-data-flow.html`).
 
 ---
 
@@ -232,7 +233,7 @@ Verify visually with rendered screenshots — mental verification misses subtle 
 </div>
 ```
 
-Typical placement: end of capstone or at a key point in `06-self-check`.
+Typical placement: at a key point in the final self-check chapter (`03-self-check` for concept-focused, `06-self-check` for hands-on); or in the capstone (hands-on only).
 
 ---
 
@@ -253,7 +254,7 @@ Required sections (in order):
 | 概念地图 | `<figure>` + 手画 SVG | 5-10 节点，边带标签。`<figcaption>` 指出 3 件读者要注意的事。详见 diagram_guide.md 的 Pattern 5 |
 | 学习路径 | `<nav class="learning-path">` 顶部 breadcrumb | 在 v1 设计里学习路径就是顶部 breadcrumb（current 用朱红下划线高亮）——不需要单独 SVG。每章自然展示 |
 | 学习路径建议 | `<ul>` | 至少 3 个分场景路径（"只想理解" / "动手写" / "做选型"） |
-| 目录 | `<nav><ul>` | `<a href="01-concepts.html">` 链 6 章 |
+| 目录 | `<nav><ul>` | `<a href="01-concepts.html">` 链所有章节（concept-focused 3 章；hands-on 6 章）|
 | 学完之后 | `<section>` | 3-5 个下一步主题，每个一句话说明"它在你 schema 上加了什么" |
 | 参考资料 | `<footer>` | 官方文档（必填）+ 2-3 设计文档/RFC + 2-3 高质量博客 |
 
@@ -347,7 +348,9 @@ Required sections (in order):
 
 ---
 
-## 03-practice.html — 上手实操
+## 03-practice.html — 上手实操（hands-on extension only）
+
+> Skip in concept-focused mode. In concept-focused tutorials, worked examples already live in `01-concepts.html` as scenario walkthroughs; the practice scaffold below is only for tutorials that the user has explicitly asked to be code-progression-heavy.
 
 **目的**（principle 4 — worked example scaffold）：worked → partial → exercise 三阶。
 
@@ -369,7 +372,9 @@ Required sections (in order):
 
 ---
 
-## 04-pitfalls.html — 常见陷阱与最佳实践
+## 04-pitfalls.html — 常见陷阱与最佳实践（hands-on extension only）
+
+> Skip in concept-focused mode. Concept-focused tutorials surface common misconceptions inline (within `01-concepts.html` and `02-principles.html`) rather than in a dedicated chapter.
 
 **注意**：文件名可以叫 04-pitfalls（结构性标签），但**散文里用「陷阱 / 失败模式 / 常见错误」**，不要用「坑 / 踩坑」（voice 规则）。
 
@@ -391,7 +396,9 @@ Required sections (in order):
 
 ---
 
-## 05-capstone.html — 综合项目（mandatory，principle 7）
+## 05-capstone.html — 综合项目（hands-on extension only）
+
+> Skip in concept-focused mode. The principle-7 discrimination requirement is satisfied by the scenario questions in `03-self-check.html` (see below) — that is the capstone surrogate. **Only write this file** when the tutorial is hands-on; for hands-on tutorials it is mandatory.
 
 **目的**：interleaving + discrimination。读者必须**判别**：这里该用第 1 章的 X 还是第 2 章的 Y？
 
@@ -444,12 +451,19 @@ Required sections (in order):
 
 ---
 
-## 06-self-check.html — 自测题库
+## 自测题库（教程最后一章）
+
+**文件名**：concept-focused 默认是 `03-self-check.html`；hands-on 是 `06-self-check.html`。
+
+**目的**（principle 5 testing effect + principle 7 transfer）：教程的最后一章，无论哪种模式。两种模式下自测的"重心"不同：
+
+- **Concept-focused**: 应用判别层（跨 01 + 02 章的场景题）**承担 capstone 的 discrimination 职责**，必须 ≥3 道，否则没有 transfer 训练。
+- **Hands-on**: 重 discrimination 已经由 `05-capstone.html` 承担，本章应用判别层 ≥1-2 道做强化即可，重心在 recall。
 
 ```html
 <article>
-  <header><h1>06 - 自测题库</h1>
-    <p>总题目数：~20。三层梯度。</p></header>
+  <header><h1>{{NN}} - 自测题库</h1>
+    <p>总题目数：~15-20。三层梯度。</p></header>
 
   <section>
     <h2>概念层（对应 01 章）</h2>
@@ -464,11 +478,21 @@ Required sections (in order):
   </section>
 
   <section>
-    <h2>应用判别层（综合 03 + 04 + 05）</h2>
+    <h2>应用判别层
+      <small>concept-focused: 综合 01 + 02 ≥3 道；hands-on: 综合 03 + 04 + 05 ≥1-2 道</small>
+    </h2>
     <ol>
       <li>在 {{场景 X}} 下，你应该用 {{方案 Y}} 还是 {{方案 Z}}？为什么？</li>
+      <li>...</li>
     </ol>
   </section>
+
+  <!-- Concept-focused 模式：本章是 reader-drawing prompt 的唯一着陆点（hands-on 模式也可放 capstone）-->
+  <div class="callout example">
+    <span class="label">亲手画一张图</span>
+    <p>合上教程，在纸上画 {{key structure}}。
+       画完回到 §X 对照——你画的图里有没有 {{key thing}}？</p>
+  </div>
 
   <details>
     <summary>答案（先做完再展开）</summary>
@@ -483,6 +507,13 @@ Required sections (in order):
 ```
 
 所有答案集中在文末一个 `<details>` 里。读者克制住"瞄一眼"的冲动才有意义。
+
+**自测章自检**：
+- [ ] 三层梯度都有：概念层 / 原理层 / 应用判别层？
+- [ ] Concept-focused: 应用判别层 ≥3 道跨 01+02 场景题（capstone 替代，硬约束）？
+- [ ] Hands-on: 应用判别层 ≥1-2 道（主 discrimination 在 capstone）？
+- [ ] Concept-focused: 含 ≥1 处读者绘图提示（本章是唯一着陆点）？
+- [ ] 所有答案集中在文末 `<details>` 内？
 
 ---
 
@@ -504,11 +535,11 @@ Required sections (in order):
 **硬性条目**（每条都要 grep 通过，不要"以后再说"）：
 
 - [ ] **每章 ≥1 张 `<figure>`**（含 SVG 或导入图） —— 用 `grep -c '<figure>' *.html` 检查，每个章节文件都要 ≥1。`code-block` 和 `compare-table` 不算 figure —— 它们各自有重要作用，但**承载不了 dual coding 的空间关系编码**。
-- [ ] **整本教程总计 ≥10 张 figure**（典型分布：index 1 张概念地图、01-05 各 1-3 张、06 至少 1 张梯度/题目分布图）。Quick primer 例外：单文件 ≥3 张。
+- [ ] **整本教程总计 ≥7 张 figure（concept-focused）或 ≥10 张（hands-on）**。典型分布：index 1 张概念地图、01 2-3 张、02 2-3 张、self-check 1 张梯度图。Hands-on 额外：03-practice 1-2 张、04-pitfalls 1 张、05-capstone 1-2 张。Quick primer 例外：单文件 ≥3 张。
 - [ ] 时序 / 状态 / 流程 / 关系都配了对应类型的图（参考 diagram_guide.md 的 5 patterns）
 - [ ] 标签直接在图元素上（无"见图 X 中的 A"跨距离引用）
 - [ ] 没有装饰性图（每张图都有信息增量）
-- [ ] **至少 1 处让读者亲手画图**（典型位置：capstone 或 06-self-check）
+- [ ] **至少 1 处让读者亲手画图**（concept-focused: 在 `03-self-check`；hands-on: 在 capstone 或 `06-self-check`）
 
 **反陷阱**（AI writer 最常用的逃避路径）：
 
@@ -517,16 +548,16 @@ Required sections (in order):
 - ❌ "概念地图 + 学习路径已经有图了，就够了" —— 错。这两个是 index 章的图；其他每章还需要本章专属的图。
 
 ### 例题（principle 4）
-- [ ] 01 每个概念有 worked example
-- [ ] 03 有完整 worked → partial → 开放 三阶
-- [ ] partial example 的留白是关键决策点
-- [ ] 例题:练习比例匹配目标读者水平
+- [ ] 01 每个概念有 worked example（concept-focused: 场景走查；hands-on: 完整可运行代码）
+- [ ] *Hands-on only*: 03-practice 有完整 worked → partial → 开放 三阶
+- [ ] *Hands-on only*: partial example 的留白是关键决策点
+- [ ] *Hands-on only*: 例题:练习比例匹配目标读者水平
 
 ### 主动回忆（principle 5）
 - [ ] 每章末有 self-check（`<details>` 包答案）
 - [ ] 答案在 `<details>` 块或独立段落（不在题目正下方）
 - [ ] 全文至少 3 处预测式提问
-- [ ] 06-self-check 题库存在
+- [ ] 最终自测章题库存在（`03-self-check` 或 `06-self-check`）
 
 ### 难度（principle 6）
 - [ ] 每章末有"刚好够不着"的进阶挑战
@@ -535,8 +566,8 @@ Required sections (in order):
 
 ### 长程（principle 7）
 - [ ] 后续章节例子复用了前面的概念
-- [ ] 05-capstone 包含至少 3 个跨章判别决策点
-- [ ] 06-self-check 应用判别层强制多章综合
+- [ ] **Discrimination challenge 存在**（concept-focused: `03-self-check` 应用判别层 ≥3 道跨 01+02 场景题 — capstone 替代；hands-on: `05-capstone` 含 ≥3 个跨章判别决策点）
+- [ ] 自测章应用判别层（两种模式都要，concept-focused 是主战场，hands-on 是强化）
 
 ### 外在负荷（principle 3 + extraneous load）
 - [ ] 术语首次出现就地解释
