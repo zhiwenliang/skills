@@ -85,7 +85,14 @@ For a real tutorial, spawn 3-4 research workers in parallel when worker/task too
 - **Worker C**: Web search for pitfalls and real-world experience. Goal: find 3-5 specific gotchas to address in chapter 04.
 - **Worker D**: Web search for adjacent tech and comparisons. Goal: know what to compare against.
 
-**Every worker brief must include (mandatory)**: the worker reserves the final 50-80 words of its ~400-word output for a literal `## Surprises` markdown section — a bullet list of gaps between the worker's prior model of this tech and what the worker actually found in the sources. If the worker found no surprises, it says so explicitly (`## Surprises\n- none worth noting`). This is the depth-orientation channel that feeds Phase 3's threshold-concept identification; without it, Phase 3 has nothing to derive from. See SKILL.md Phase 2 for the full surprise-list extraction protocol the lead thread uses to consume these sections.
+**Every worker brief must include (mandatory)**: the worker reserves the final 50-80 words of its ~400-word output for a literal `## Surprises` markdown section — a bullet list of gaps between the worker's prior model of this tech and what the worker actually found in the sources. The section header is on its own line; bullets follow on subsequent lines. Empty case (no surprises) is written as two real lines:
+
+```
+## Surprises
+- none worth noting
+```
+
+This is the depth-orientation channel that feeds Phase 3's threshold-concept identification; without it, Phase 3 has nothing to derive from. See SKILL.md Phase 2 for the full surprise-list extraction protocol the lead thread uses to consume these sections.
 
 When workers return, **synthesize** before drafting. Don't write chapter 1 with only Worker A's results, then realize in chapter 2 that Worker B contradicts something.
 

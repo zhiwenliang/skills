@@ -347,7 +347,7 @@ Produce four artifacts and **show to the user for approval** before drafting pro
 
 A tutorial without an identified threshold concept lacks a gravity center; an unredirected wrong one produces a coherent-looking but off-target tutorial. The user's redirect, if any, happens inside the existing approval pass — no extra round-trip.
 
-Once approved, the threshold concept must be rendered into `index.html` as a dedicated `引力中心` section (see the index.html spec in [references/tutorial_template.md](references/tutorial_template.md)) — the section is mandatory in Phase 4 output, and Phase 5's `index.html 自检` audits its presence.
+Once approved, the threshold concept must be rendered into `index.html` as a dedicated `引力中心` section (see the index.html spec in [references/tutorial_template.md](references/tutorial_template.md)) — the section is mandatory in Phase 4 output, and Phase 5 audits its presence via the `index.html 自检` checklist that lives in `tutorial_template.md` (Phase 5 transitively runs every checklist in that file).
 
 Getting alignment here costs minutes and saves hours.
 
@@ -412,7 +412,7 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 
   ```bash
   find . -maxdepth 1 -name '*.html' | while read -r f; do
-    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | grep -inHE --label="$f" "我们一起|让我们|咱们|你会发现|接下来|我们来看|我们来试试|下面我们|Now we[']re going to|you[']ll discover|together we[']ll|let[']s|we[']ll|这很简单|很简单|显然|trivially|obviously|(^|[^a-zA-Z])just|可能|也许|兴许|大概|差不多|应该是|(^|[^a-zA-Z])roughly|(^|[^a-zA-Z])kind of|(^|[^a-zA-Z])sort of|踩坑|搞起来|撸代码|玩一下|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
+    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | grep -inHE --label="$f" "我们一起|让我们|咱们|你会发现|接下来|我们来看|我们来试试|下面我们|Now we('|’)re going to|you('|’)ll discover|together we('|’)ll|let('|’)s|we('|’)ll|这很简单|很简单|显然|trivially|obviously|(^|[^a-zA-Z])just|可能|也许|兴许|大概|差不多|应该是|(^|[^a-zA-Z])roughly|(^|[^a-zA-Z])kind of|(^|[^a-zA-Z])sort of|踩坑|搞起来|撸代码|玩一下|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
   done
   ```
 
@@ -422,6 +422,8 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
   find . -maxdepth 1 -name '*.html' | while read -r f; do
     python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | grep -nHE --label="$f" "(^|[^a-zA-Z])(我|我们)"
   done
+
+  Both greps require the shell locale to be UTF-8 (default on macOS / most Linux). If you ever run them with `LC_ALL=C`, the curly-apostrophe and Chinese-character alternations stop matching as expected — the regexes assume codepoint-level alternation, not byte-level.
   ```
 
   Every hit in **stripped prose** needs a fix or a justification (epistemic note / reader-addressed action / mandated fluency-illusion label). Don't ship with raw hits.

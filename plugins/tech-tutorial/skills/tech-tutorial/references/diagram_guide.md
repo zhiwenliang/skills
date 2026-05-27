@@ -186,7 +186,7 @@ Walls of prose force linear sequential reading and overload working memory. Requ
 1. **Each chapter has ≥1 `<figure>`** — *hard*, grep-enforced in Phase 5. No exceptions for "pitfalls / question bank / hands-on" chapters (see below).
 2. **Each major H2 section has ≥1 figure or worked example** — figures and code count here. Tables alone don't.
 3. **At most ~300 lines of prose without a visual break** — figures, code blocks, comparison tables all count for this looser breaking rule.
-4. **A full tutorial totals ≥7 figures (concept-focused) or ≥10 figures (hands-on)**, distributed across chapters. These are floors, not ceilings — the per-chapter targets in `SKILL.md` Phase 5 give concept-focused a 7-8 range (index 1 + 01 2-3 + 02 2-3 + self-check 1) and hands-on a 10-12 range. Aim for the middle of the range; only fall back to the floor when a chapter genuinely has nothing structural to diagram.
+4. **A full tutorial totals ≥7 figures (concept-focused) or ≥10 figures (hands-on)**, distributed across chapters. These are floors, not ceilings — the per-chapter targets in `SKILL.md` Phase 5 give concept-focused a 7-8 range (index 1 + 01 2-3 + 02 2-3 + self-check 1) and hands-on a 10-13 range (index 1 + 01 2-3 + 02 2-3 + 03-practice 1-2 + 04-pitfalls 1 + 05-capstone 1-2 + 06-self-check 1). Aim for the middle of the range; only fall back to the floor when a chapter genuinely has nothing structural to diagram.
 
 **Figures, code blocks, and comparison tables are NOT interchangeable.** Each does a different job:
 

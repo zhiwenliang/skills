@@ -318,7 +318,7 @@ When adding a new skill, place it under an existing plugin (extending its skill 
 2. Create `plugins/<plugin-name>/skills/<skill-name>/SKILL.md`.
 3. Write a specific description with trigger phrases.
 4. Keep core instructions in `SKILL.md`.
-5. Move long context into `references/` next to `SKILL.md`.
+5. Move long context into the skill's own `references/` directory (sibling of its `SKILL.md`, inside `plugins/<plugin-name>/skills/<skill-name>/`). Do **not** create a shared `references/` at repo root — plugin caching only ships the plugin directory.
 6. Add scripts only for deterministic repeated work, in the skill's own `scripts/`.
 7. Add eval prompts in the skill's `evals/` for important behavior.
 8. Update `README.md` (and `marketplace.json` if you scaffolded a new plugin) so users can find the skill.
