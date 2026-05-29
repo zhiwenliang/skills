@@ -56,6 +56,23 @@
         "centers_on_why",
         "has_sources"
       ]
+    },
+    {
+      "id": 4,
+      "name": "no-invented-terminology",
+      "prompt": "帮我从原理上搞懂 JavaScript 的事件循环（event loop）、微任务和宏任务，要能建立一个可以预测执行顺序的心智模型。我写过几年 JS，但一直没真正理解调度。",
+      "expected_output": "Concept-focused 教程。全程使用社区真实术语：event loop / 事件循环、microtask / 微任务、macrotask / 宏任务、call stack / 调用栈、task queue —— 保留英文或采用通用译名，不自造名词（不出现「任务泵」「事件漏斗」「三态调度模型」这类生造标签或硬译）。一句话本质是用真实术语写成的一句话主张（例如：同步代码执行完→清空所有微任务→取一个宏任务，循环往复），不是自创名词。面向读者的正文不出现认知科学黑话（认知负荷 / 门槛概念 / 双重编码 / desirable difficulty）。概念配执行顺序图，含 ≥3 道预测执行顺序的辨别题。",
+      "files": [],
+      "assertions": [
+        "has_entrypoint",
+        "uses_standard_terminology",
+        "no_invented_concept_labels",
+        "no_pedagogy_jargon_in_prose",
+        "has_concept_map",
+        "has_self_check",
+        "has_discrimination_scenarios",
+        "has_further_reading"
+      ]
     }
   ]
 }

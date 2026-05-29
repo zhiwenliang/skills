@@ -9,7 +9,7 @@
       "name": "tech-tutorial",
       "source": "./plugins/tech-tutorial",
       "description": "Builds cognitive-science-aligned HTML tutorials for technical topics (Marton / Bloom / SOLO / Meyer & Land grounded; concept-focused by default with hands-on extension).",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "Zhiwen Liang"
       },

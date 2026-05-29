@@ -137,6 +137,31 @@ The reader is a working professional, not a child. Treat the tone as a load-bear
 - **One concept per sentence.** Long sentences with multiple clauses blow working memory.
 - **Specific numbers, names, versions** beat hedges. "Default timeout is 30 seconds" beats "the timeout has a reasonable default."
 
+### Terminology discipline — name precisely, explain plainly
+
+"通俗 + 专业化" is not a tension; the two halves do different jobs. **Naming** is where you are precise and standard (专业化). **Explaining** is where you are plain and concrete (通俗). The failure mode is the inverse of both: an invented label nobody else uses, wrapped in literary framing.
+
+Four coinage failures, all banned:
+
+| Failure | Looks like | Fix |
+|---|---|---|
+| **Invented concept label** | Promoting a self-coined name to a term: `这就是它的引力中心` `所谓执行漏斗` `三态收敛模型` | Use the name the field actually uses. If no standard name exists, describe the thing in plain words — don't crown a noun. |
+| **Non-standard translation** | Hard-translating an established term into a novel Chinese word: `closure → 闭合器` `idempotent → 幂同性` `backpressure → 逆压` | Use the community's actual term. When practitioners keep the English (closure, idempotent, async/await, backpressure), keep the English; gloss it once in plain language on first use. 专业化 means matching the field's usage, not maximizing Chinese coverage. |
+| **Pedagogy jargon in reader prose** | The cognitive scaffolding leaking out: `先降低你的认知负荷` `这是本教程的门槛概念` `利用双重编码` | That vocabulary (cognitive load / 认知负荷, desirable difficulty / 期望难度, schema, threshold concept / 门槛概念, dual coding / 双重编码) is the **author's** design tool. It never appears in the tutorial body. Exception: the mandated fluency-illusion self-talk labels in Principle 6 (`我读得很顺` etc.) — plain reader speech, not jargon. Second exception: when the tutorial's *subject* genuinely is one of these terms (e.g. a tutorial about cognitive load theory), it is subject matter, not leak. |
+| **Literary / marketing flourish** | `踏上 X 的蜕变之旅` `带你打通任督二脉` `一朝顿悟` | Already half-covered by the AI-intros ban; the sharper test here: delete any phrase whose job is to sound profound rather than to carry a mechanism. |
+
+**The one test that catches all four:** for every concept name in bold or quotes, and every section/figure title, ask — *would a working practitioner in this field recognize this as the real term, or did I make it up?* If made up: replace with the real term, or demote it to a clearly-marked analogy (`可以类比成…，但它真正的名字是 X`). An analogy is a teaching aid, never a term you then reuse as if it were established; drop it once the real concept is in place.
+
+This rule is **not** in the Forbidden-phrases table below and **not** in the Phase 5 voice grep — a coined word is novel by definition, so grep cannot find it. It is enforced by the Phase 5 *Terminology check* (qualitative) plus the *pedagogy-jargon leak* grep (which catches only the third row's fixed vocabulary).
+
+Before / after (coined → standard + plain):
+
+| Before (coined) | After (standard term + plain explanation) |
+|---|---|
+| 理解这个执行漏斗是关键 | 理解调用栈（call stack）如何逐层压入、弹出是关键。 |
+| 我们把它叫做闭合器，它能记住变量 | 这是闭包（closure）：函数连同它定义时所在的作用域一起被保留下来。 |
+| 这一节帮你建立对响应式的认知锚点 | 这一节给出响应式渲染的最小心智模型：state 改变，依赖它的视图自动重新计算。 |
+
 ### Forbidden phrases (delete on sight, no exceptions)
 
 | Category | Banned | Why it costs working memory |
@@ -320,7 +345,7 @@ For any tech with research surface ≥3 angles, **fan out in one message**. Typi
 
 | Worker | Sources | Output it returns |
 |---|---|---|
-| **Official-docs** | Current docs lookup → official docs → API reference | Concept list, version notes, official examples |
+| **Official-docs** | Current docs lookup → official docs → API reference | Concept list, version notes, official examples, **the canonical term for each concept (and which terms the community keeps in English)** |
 | **Design-rationale** | Vendor blog posts, conference talks, design RFCs, GitHub discussions | Why-bank entries: alternatives considered, tradeoffs taken |
 | **Pitfalls / real-world** | GitHub issues, Stack Overflow top answers, post-mortems | Concrete pitfall list (not "be careful with performance") |
 | **Competitors / alternatives** | Comparison posts, "X vs Y" articles, switcher stories | Discrimination context for the capstone |
@@ -334,6 +359,8 @@ The lead thread then assembles four artifacts:
 - The **pitfall list**: concrete things that bite newcomers.
 - The **surprise list**: from each worker's output, locate the line matching `^## Surprises\b` (regex `^## Surprises`, case-sensitive) and extract every bullet line that follows until the next heading or end-of-output. Concatenate the extracted bullets verbatim into a flat list, prefixed with the worker name (e.g., `[official-docs] no implicit await on the close call`). Dedup obvious overlaps but keep the original framing intact. This becomes the candidate-pool for Phase 3's threshold concept and the "what would surprise the reader" hooks for Phase 4 concept introductions. **If a worker omits the `## Surprises` header, treat its surprise contribution as missing and re-prompt that worker. If the assembled list ends up empty or pure restatement of the docs, Phase 2 is not done — send workers back to dig deeper.**
 
+Carry each concept's **canonical term** (from the official-docs worker) into Phase 4 — drafting names concepts with these real terms, not freshly-coined labels (see Terminology discipline). Coinage usually happens because the author lacks the real word at hand; this list is the supply that prevents it.
+
 If research surface is small (a single feature like a CLI flag or one API method), one combined search is fine — don't manufacture parallelism.
 
 ### Phase 3 — Outline + concept map + learning path + threshold concept
@@ -343,7 +370,7 @@ Produce four artifacts and **show to the user for approval** before drafting pro
 1. **Flat chapter outline**, each chapter with a one-line "what schema this builds."
 2. **Concept map** showing all major abstractions and their relationships.
 3. **Learning-path breadcrumb** showing the chapter sequence (this is what will be re-shown at every chapter opener).
-4. **Threshold concept** — the 1-3 concepts that, once internalized, *transform* the reader's view of the domain (Meyer & Land 2003; see [references/cognitive_principles.md](references/cognitive_principles.md)). Drawn from Phase 2's surprise list. Present as: *"This tutorial's core idea is `<one-sentence threshold concept>`. Push back if that's not what you wanted."*
+4. **Threshold concept** — the 1-3 concepts that, once internalized, *transform* the reader's view of the domain (Meyer & Land 2003; see [references/cognitive_principles.md](references/cognitive_principles.md)). Drawn from Phase 2's surprise list. Present as: *"This tutorial's core idea is `<one-sentence threshold concept>`. Push back if that's not what you wanted."* State it as a **plain-language claim built from the field's real terms** — a sentence about how the thing works, not a coined noun. `React 的核心：UI 是 state 的纯函数` qualifies; a label like `响应式渲染漏斗` does not (see Terminology discipline). This is the step that most invites coinage — keep the name standard.
 
 A tutorial without an identified threshold concept lacks a core idea; an unredirected wrong one produces a coherent-looking but off-target tutorial. The user's redirect, if any, happens inside the existing approval pass — no extra round-trip.
 
@@ -400,7 +427,7 @@ For **quick primers**: collapse to a single `index.html` with all sections as `<
 
 **Parallel audit pattern**: the verification dimensions below are independent and read-only. If the platform supports parallel workers, assign one dimension to each worker — each gets the tutorial directory path and the one audit it owns. The lead thread collects findings and fixes. A serial single-thread audit takes 5-10× the wall time and is more likely to miss things because the auditor's attention dilutes across dimensions.
 
-Suggested fan-out: voice / density / retrieval-separation / cross-chapter callbacks / discrimination coverage / citations. Each worker prompt is small ("scan these files for this one thing, report violations").
+Suggested fan-out: voice / density / retrieval-separation / cross-chapter callbacks / discrimination coverage / citations / terminology. Each worker prompt is small ("scan these files for this one thing, report violations").
 
 Before declaring done, audit against the checklist in [references/tutorial_template.md](references/tutorial_template.md). Specifically:
 
@@ -427,6 +454,15 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
   ```
 
   Every hit in **stripped prose** needs a fix or a justification (epistemic note / reader-addressed action / mandated fluency-illusion label). Don't ship with raw hits.
+- **Pedagogy-jargon leak check (hard, run as grep)**: the cognitive-framework vocabulary is the author's design tool and must not surface in reader prose (Terminology discipline, row 3). Over HTML-stripped prose, from the tutorial dir:
+
+  ```bash
+  find . -maxdepth 1 -name '*.html' | while read -r f; do
+    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | grep -inHE --label="$f" "认知负荷|认知负载|cognitive load|内在负荷|外在负荷|相关负荷|germane load|intrinsic load|extraneous load|期望难度|合意困难|desirable difficulty|门槛概念|阈限概念|threshold concept|双重编码|dual coding|提取练习|retrieval practice"
+  done
+  ```
+
+  Hits in reader prose are leaks — rename to the subject's own terms or delete. The list is **deliberately narrow**: it omits `schema` (legit subject term — DB / JSON / GraphQL schema; left to the qualitative Terminology check) and `流畅性错觉 / fluency illusion` (Principle 6 *mandates* a fluency-illusion warning in `index.html`). The seven-principle vocabulary is stable, so this list rarely changes. This grep is **separate from the forbidden-phrases voice grep** and does not touch the grep↔table 1:1 sync.
 - **Diagram coverage check (hard, run as grep)**: every chapter file must contain ≥1 `<figure>`. The pattern matches both `<figure>` and `<figure class="...">` / `<figure id="...">`. From the tutorial dir:
 
   ```bash
@@ -464,6 +500,7 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
   See `references/diagram_guide.md` "SVG self-verification rules" for the 4 specific failure modes and how to fix each. This is the ONLY reliable way to catch SVG defects — never declare a tutorial done without rendered screenshot verification of every figure.
 - **Runnability check**: run each code example if a runtime is available; otherwise mark "未在本机验证" at the top.
 - **Citations check**: each chapter footer has a "Further reading" with 2-5 sources. If the user provides an organization-specific methodology note or internal source, link it only after verifying the path or URL exists.
+- **Terminology check** (qualitative, not grep — the audit for Terminology discipline rows 1-2): collect every concept name you put in bold or quotes, plus every section/figure title. For each, answer in one phrase: *standard term, or coined?* Coined labels get the real term, or a clearly-marked analogy. Non-standard translations get the community's actual term (keep English where the community keeps English). Grep can't find a word that didn't exist before you wrote it, so this self-check is the only gate for invented labels and bad translations — run it even when the prose reads fine.
 - **Insight check** (one qualitative self-answer, not a grep): in one sentence, name what a 5-year-experience engineer in this domain would leave with after reading — that they couldn't get from the official docs alone. If you can't write that sentence, the tutorial is still at sign level (Marton's surface processing). Go back: either Phase 2 to surface more surprise material, or Phase 3 to re-pick the threshold concept. Once you can write the sentence, it goes into `index.html`'s "读完之后你能做到什么" section verbatim as the tutorial's USP.
 
 ## Anti-patterns (audit your draft for these)
