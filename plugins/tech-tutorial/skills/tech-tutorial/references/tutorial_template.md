@@ -247,7 +247,7 @@ Required sections (in order):
 | 适合谁 | `<section>` | 3 条前置知识，具体到能力（"能调试 Python async" not "熟悉 Python"） |
 | 不适合谁 | `<section>` | 给更基础/更资深读者的他山资源链接 |
 | 读完之后你能做到什么 | `<section>` | 一段开头放 **Insight Check 的 USP 句**（来自 SKILL.md Phase 5：5-year engineer 能讲出而文档讲不出的那句话），verbatim 放在这里。后接 3-5 条**可验证**能力（动词开头，不写"理解 X"） |
-| 引力中心 | `<section class="schema-panel">` with `<p class="label">引力中心</p>` + `<p>{{threshold concept sentence}}</p>` | Phase 3 锁定的 **threshold concept**（一句话）。Uses `.schema-panel` (thick black left border + mono uppercase label) — visually distinct from `.callout warning` (used by 流畅感警告) and the neutral `.callout` variants, so the gravity center reads as a structural anchor rather than a tip-style aside |
+| 一句话本质 | `<section class="schema-panel">` with `<p class="label">一句话本质</p>` + `<p>{{threshold concept sentence}}</p>` | Phase 3 锁定的 **threshold concept**（一句话）。Uses `.schema-panel` (thick black left border + mono uppercase label) — visually distinct from `.callout warning` (used by 流畅感警告) and the neutral `.callout` variants, so the core idea reads as a structural anchor rather than a tip-style aside |
 | 假设说明 | `<section>` | 仅非交互模式生成时填——列出 AI 做的假设 |
 | 流畅感警告 | `.callout warning` | Principle 6：点名"我读得很顺/我做题很快/我没卡壳"三大假象 |
 | 概念地图 | `<figure>` + 手画 SVG | 5-10 节点，边带标签。`<figcaption>` 指出 3 件读者要注意的事。详见 diagram_guide.md 的 Pattern 5 |
@@ -261,7 +261,7 @@ Required sections (in order):
 - [ ] 60 秒能判断是否适合自己？
 - [ ] 适合谁 / 不适合谁 / 能做到什么 三段都有？
 - [ ] `读完之后你能做到什么` 段首是 **Insight Check 的 USP 句**（来自 SKILL.md Phase 5）？
-- [ ] **引力中心**段存在，包含 Phase 3 锁定的 threshold concept（一句话）？
+- [ ] **一句话本质**段存在，包含 Phase 3 锁定的 threshold concept（一句话）？
 - [ ] 概念地图嵌入了，`<figcaption>` 是导读（不是描述图）？
 - [ ] 学习路径 breadcrumb 嵌入并高亮当前章节？
 - [ ] 流畅感警告嵌入了？
