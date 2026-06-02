@@ -73,6 +73,24 @@
         "has_discrimination_scenarios",
         "has_further_reading"
       ]
+    },
+    {
+      "id": 5,
+      "name": "depth-and-frontier-fast-moving",
+      "prompt": "我想系统搞懂 LLM 推理优化——KV cache、PagedAttention、continuous batching、投机解码这些。我能调 vLLM 参数，但不理解底层，想懂到能判断什么场景该用哪种、以及现在最新的做法是什么。",
+      "expected_output": "Concept-focused 深入教程。重点验证两件事：(1) 深度——每个核心概念讲到『比文档深一层』的机制，例如 PagedAttention 如何像操作系统虚拟内存分页那样管理 KV cache、为什么减少碎片就能提升吞吐，而不是复述『它能提升吞吐』；(2) 时效——index.html 含带日期的『现状速览』，点明什么已稳定、什么在最近 6-12 月快速变化（如投机解码、PD 分离等）、什么被取代；Further reading 含近期一手来源（vLLM/SGLang release notes、近 12 个月的论文/技术博客），而非只有旧综述。另含 ≥3 道『该用哪种』的跨概念辨别题、概念地图、self-check。",
+      "files": [],
+      "assertions": [
+        "has_entrypoint",
+        "has_concept_map",
+        "explains_mechanism_below_docs",
+        "marks_current_vs_emerging_dated",
+        "recent_primary_sources",
+        "has_tradeoffs",
+        "has_discrimination_scenarios",
+        "has_self_check",
+        "has_further_reading"
+      ]
     }
   ]
 }

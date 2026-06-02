@@ -248,6 +248,7 @@ Required sections (in order):
 | 不适合谁 | `<section>` | 给更基础/更资深读者的他山资源链接 |
 | 读完之后你能做到什么 | `<section>` | 一段开头放 **Insight Check 的 USP 句**（来自 SKILL.md Phase 5：5-year engineer 能讲出而文档讲不出的那句话），verbatim 放在这里。后接 3-5 条**可验证**能力（动词开头，不写"理解 X"） |
 | 一句话本质 | `<section class="schema-panel">` with `<p class="label">一句话本质</p>` + `<p>{{threshold concept sentence}}</p>` | Phase 3 锁定的 **threshold concept**（一句话）。Uses `.schema-panel` (thick black left border + mono uppercase label) — visually distinct from `.callout warning` (used by 流畅感警告) and the neutral `.callout` variants, so the core idea reads as a structural anchor rather than a tip-style aside |
+| 现状速览（截至 <date>） | `<div class="callout">` 或短 `<section>` | Phase 3 的 frontier framing：一句话点明什么稳定、什么在快速变化、什么已被取代，**带日期**。让读者知道哪些是定论、哪些还在动，避免学到已被取代的旧做法。主题确实冻结时写一句"成熟稳定、近年无重大变化"——把"无变化"作为一个结论写出来，而不是省略。快速演进的主题（框架 / AI·ML / 年轻协议）尤其不能省 |
 | 假设说明 | `<section>` | 仅非交互模式生成时填——列出 AI 做的假设 |
 | 流畅感警告 | `.callout warning` | Principle 6：点名"我读得很顺/我做题很快/我没卡壳"三大假象 |
 | 概念地图 | `<figure>` + 手画 SVG | 5-10 节点，边带标签。`<figcaption>` 指出 3 件读者要注意的事。详见 diagram_guide.md 的 Pattern 5 |
@@ -262,6 +263,7 @@ Required sections (in order):
 - [ ] 适合谁 / 不适合谁 / 能做到什么 三段都有？
 - [ ] `读完之后你能做到什么` 段首是 **Insight Check 的 USP 句**（来自 SKILL.md Phase 5）？
 - [ ] **一句话本质**段存在，包含 Phase 3 锁定的 threshold concept（一句话）？
+- [ ] **现状速览**段存在并带日期（主题确实冻结则写明"成熟稳定、近年无重大变化"，不留空）？
 - [ ] 概念地图嵌入了，`<figcaption>` 是导读（不是描述图）？
 - [ ] 学习路径 breadcrumb 嵌入并高亮当前章节？
 - [ ] 流畅感警告嵌入了？
@@ -280,6 +282,7 @@ Required sections (in order):
   <h2>概念 1：{{name}}</h2>
   <p><strong>一句话定义</strong>（≤30 字）：{{minimal form}}</p>
   <p><strong>为什么需要它</strong>：{{the specific problem it solves; what manual work without it}}</p>
+  <p><strong>底层机制（比文档深一层）</strong>：{{how it works one level below where the docs stop — 例如"X 通过 Z 实现 Y，所以代价是 W、在 V 时失效"，而不是复述文档的"X 做 Y"。这是 depth lens 的落点}}</p>
   <p><strong>类比</strong>：{{X 像 Y，但... — must indicate where analogy breaks}}</p>
 
   <h3>Worked example（完整可运行）</h3>
@@ -304,6 +307,7 @@ Required sections (in order):
 - [ ] 概念数量 ≤ 8？
 - [ ] 每个概念都有 worked example？
 - [ ] 每个 worked example 都有"逐行 → 概念"的映射？
+- [ ] 每个核心概念都讲到"比文档深一层"的机制（how/why），而不是复述文档定义（depth lens；详见 SKILL.md Phase 5 Mechanism-depth check）？
 - [ ] 至少 2 处预测式提问（`<details>` 内）？
 - [ ] 概念依赖顺序：后面的概念只引用前面定义过的？
 - [ ] 章末 self-check 答案在 `<details>` 里？
@@ -596,3 +600,8 @@ Required sections (in order):
 - [ ] 每个 .html 文件都包含 SKILL.md 定义的 layout（Google Fonts + Prism CDN + `<style>` 块）
 - [ ] **每个 .html 文件的 `<style>` 块都包含 SVG utility CSS 全套** —— `.diagram-ink`、`.diagram-accent`、`.diagram-soft`、`.node-fill`、`.node-fill-accent`、`.node-label`、`.node-label-accent`、`.edge-label`、`.branch-label`、`figure` + `figcaption` + `figcaption .fig-num`。<br/>失败模式：早期写的"无图"章节漏了这些 class；后期加图时所有 `<rect class="diagram-ink node-fill"/>` 都退化成纯黑填充。<br/>**grep 验证**：`grep -L '\.diagram-ink' *.html` —— 输出应为空（每个文件都要含）。
 - [ ] 如果用户提供了方法论来源或内部学习理论文档，`Further reading` 链接了已验证存在的路径或 URL；没有用户提供来源时不要虚构本地路径
+
+### 深度与时效（depth + currency）
+- [ ] 每个核心概念都"比文档深一层"——讲了机制（how / why、代价、何时失效），不是复述文档的"是什么"（Marton 的 surface vs deep；SKILL.md Phase 5 Mechanism-depth check）
+- [ ] index.html 有 **现状速览** 且带日期；快速演进的主题（框架 / AI·ML / 年轻协议）写明了什么稳定、什么在变、什么已被取代（SKILL.md Phase 5 Currency check）
+- [ ] 对快速演进的主题，承重来源是近期的（>2 年的来源已剔除，除非生态成熟稳定）；正文在该标注时点出了"截至 <date>"

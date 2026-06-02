@@ -14,9 +14,12 @@ Question type                          → First source
 "How do I install Z?"                  → current docs lookup
 "What changed in version 4.0?"         → current docs lookup (changelog) or web (announcement post)
 "Why was X designed this way?"         → web (design docs, blog posts, conf talks)
+"How does X actually work inside?"     → source / RFCs / deep-dive talks (the depth lens — one level below docs)
 "What are alternatives to X?"          → web (comparison articles)
 "What are the common pitfalls?"        → web (community posts, Stack Overflow trends)
 "Is library X still maintained?"       → web (GitHub activity, recent releases)
+"What's the newest viable way to X?"   → web (release notes, changelogs, recent talks, arXiv) — the frontier
+"What's deprecated / superseded?"      → web (migration guides, "X vs <newer>" posts)
 "Real-world case study"                → web (engineering blogs)
 ```
 
@@ -51,6 +54,9 @@ Prompt patterns that work:
 | Pitfalls | `"<tech>" "lessons learned"` OR `"<tech>" gotchas` | Engineers post lessons after pain |
 | Comparisons | `"<tech>" vs "<main alternative>" 2026` | Year qualifier filters stale comparisons |
 | Recent state | `"<tech>" 2026 release` | For "is this still relevant" |
+| Mechanism / internals | `how does "<tech>" work internally`, `"<tech>" internals`, or read the source | The depth lens — gets you one level below the API surface |
+| What's new / frontier | `"<tech>" release notes <year>`, `what's new in "<tech>" <year>`, project roadmap / RFCs | Recent shipped changes the stable docs often lag |
+| Deprecated / superseded | `"<tech>" deprecated`, `"<old approach>" vs "<new approach>" <year>`, migration guides | So the tutorial doesn't teach the way the field already left |
 
 **Bad queries** (will return SEO sludge):
 - `"<tech> tutorial"` — endless AI-generated reposts
@@ -81,9 +87,10 @@ If something feels off — a claim that's repeated without source, a snippet tha
 For a real tutorial, spawn 3-4 research workers in parallel when worker/task tools are available; otherwise do them sequentially but keep each pass tight. Here, **lead thread** means the main orchestration context, and **worker** means any parallel task unit.
 
 - **Worker A**: current docs lookup — pull the official docs for the topic. Goal: get current API surface.
-- **Worker B**: Web search for design rationale. Goal: find 2-3 high-quality "why" sources.
+- **Worker B**: Web search for design rationale **and mechanism**. Goal: 2-3 high-quality "why" sources, plus how each core concept works *one level below the API surface* (source, RFCs, deep-dive talks) — this is the depth lens.
 - **Worker C**: Web search for pitfalls and real-world experience. Goal: find 3-5 specific gotchas to address in chapter 04.
 - **Worker D**: Web search for adjacent tech and comparisons. Goal: know what to compare against.
+- **Worker E** (frontier — for any topic that isn't frozen): release notes, changelogs, roadmap / RFCs, recent conference talks, arXiv for AI/ML. Goal: what shipped in roughly the last 6–12 months, what's emerging or experimental, what's been superseded — **each dated**. This is the currency lens. Fold into Worker D for a small or genuinely frozen topic; give it its own worker for anything fast-moving (frameworks, AI/ML, young protocols).
 
 **Every worker brief must include (mandatory)**: the worker reserves the final 50-80 words of its ~400-word output for a literal `## Surprises` markdown section — a bullet list of gaps between the worker's prior model of this tech and what the worker actually found in the sources. The section header is on its own line; bullets follow on subsequent lines. Empty case (no surprises) is written as two real lines:
 
@@ -114,7 +121,9 @@ This makes the "Further reading" sections at the end of each chapter writable in
 You're ready to write when:
 - You can explain the technology to someone in 5 minutes without checking notes.
 - You can name the 4-8 core concepts and define each in one sentence.
+- For each core concept, you can explain the mechanism *one level below the docs* — how it works, not just what it does (the depth lens).
 - You can name at least 2 design tradeoffs with their alternatives.
 - You have at least 3 specific pitfalls you'd warn a junior engineer about.
+- You can say where the topic is now: what's stable, what changed in roughly the last 6–12 months, what's been superseded — or confirm it's genuinely frozen (the currency lens).
 
 If you can't do any of these, more research. If you can do all of these, **stop researching and start drafting** — perfectionist research is procrastination.
