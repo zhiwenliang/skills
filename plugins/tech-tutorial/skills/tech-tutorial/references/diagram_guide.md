@@ -90,22 +90,21 @@ Apply with `marker-end="url(#arrow-ink)"` on `<line>` or `<path>`. `refX="9"` me
 
 Center text inside boxes with `text-anchor="middle"` and a y-coordinate at box-vertical-center + 5 (visual centering for typical fonts).
 
+**Size the box to the text, not the text to the box.** The default sizes above are starting points, not constraints. Choose the label and font-size first, then set the box width to **at least the rendered text width + 24px** (≈12px padding each side). Cramming a long label into a 140px box is the single biggest source of overflow. Rough budget at the default 13px node-label, for sizing intuition only (the overflow script is the real gate): a 140px box holds ~8 CJK chars or ~16 ASCII; a 200px box ~13 CJK; each extra CJK char ≈ 13px, each ASCII ≈ 7px. When a label won't fit, in order of preference: **split to a second line** (a 13px name line + an 11px `.edge-label` sublabel — a 140×60 box beats a 260px one-liner that collides with neighbors), shorten it, widen the box, or drop to font-size 12. Mixed CJK + Latin + digits make hand-estimates unreliable — when unsure, widen and let the script confirm.
+
 ## SVG self-verification rules (mandatory before declaring a diagram done)
 
 Three failure modes appear repeatedly when an author hand-codes SVG. Catch them before shipping.
 
 ### Rule 1 — Text-overflow check
 
-A text label rendered inside or near a node can exceed the node's box (or even the SVG viewBox) if it's too long for its font size.
+A text label can exceed its node's box, or the SVG viewBox, when it's too long for its font-size. This is the **most common** hand-coded-SVG defect and the hardest to catch by eye — a label spilling 5px past a border reads as "almost fine" in a quick glance, then ships.
 
-**Mental check**: for a centered label of `N` characters at font-size `S`, the rendered width is approximately `N × S × 0.55` for ASCII / `N × S` for CJK. Compare to the available width (node width, or `viewBox-width × 0.85` for free-floating text).
+**Do not rely on a mental width estimate.** Character-counting works for pure ASCII or pure CJK, but real labels mix Han (~1em), Latin (~0.55em), digits (~0.6em), spaces (~0.25em) and punctuation — the estimate is wrong often enough that overflow keeps slipping through. Use it only as a coarse pre-check (CJK ≈ font-size px/char, ASCII ≈ 0.55×); the **measurement script is the actual gate** — `scripts/svg_overflow_check.js` reads each label's real rendered width via `getComputedTextLength()` and reports exactly which labels spill where (see "Self-verify" below).
 
-If `text_width > available_width`:
-- Shorten the label (drop secondary terms)
-- Split into 2 `<text>` lines with `y` offset
-- Or widen the node
+**Prevent it at authoring time** (cheaper than the fix loop): size the box to the text (see Node sizing conventions above), and split anything long into a 13px name line + an 11px sublabel line rather than one wide line.
 
-**Common trap**: long horizontal lists like `| · A · B · C · D · E · F` exceed boxes when rendered. Trim or truncate with `...`.
+When the script flags a label, fix that specific one — shorten, split to a second line, widen the box, or drop to font-size 12 — then **re-run the script** (a fix can introduce a new overflow). **Common trap**: long horizontal lists like `A · B · C · D · E · F`, and free-floating annotations placed near the viewBox edge; trim, or move the annotation inward.
 
 ### Rule 2 — Connector-crossing check
 
@@ -158,7 +157,9 @@ Inspect the screenshot. Common issues spotted via screenshot but missed in menta
 - Asymmetric stop-policy
 - viewBox cropped too tight (some content cut off)
 
-**Phase 5 verify mandates this for every SVG in the tutorial** — see SKILL.md.
+**Deterministic overflow check — run this; it is the gate, not the eyeball.** The screenshot catches gross issues, but the eye misses a label 5px past a border. With the chapter loaded in the browser, evaluate `scripts/svg_overflow_check.js` against the page via your browser-eval tool (Playwright `browser_evaluate`, headless `page.evaluate`, or the DevTools console). It measures every `<text>`'s real rendered width and returns `"OK: no SVG text overflow"` or a list of offenders — each with its figure, the text, and whether it spills past the viewBox or past a box border. Fix each, reload, re-run until OK. This converts "looks fine" into a measured fact and is what makes 文字溢出框线 stop recurring. The screenshot pass still owns crossings / arrow-piercing / stop-policy (Rules 2-4), which the script does not check.
+
+**Phase 5 verify mandates both the screenshot pass and the overflow script for every SVG in the tutorial** — see SKILL.md.
 
 ## Content-type → diagram-type matrix (mandatory)
 
@@ -477,7 +478,7 @@ For every SVG in every chapter, before publishing:
 
 ### Self-check (mental + math)
 - [ ] viewBox dimensions match content extent (no cropping, no excess whitespace > 30%)
-- [ ] All text labels fit inside their nodes (Rule 1: `chars × font-size × 0.55 < node-width`)
+- [ ] **`scripts/svg_overflow_check.js` returns OK** for every chapter (Rule 1 — deterministic, measures real rendered width; do NOT rely on the character-count estimate). Run after rendering; fix + re-run until clean.
 - [ ] No connector crosses another connector except at a shared node edge (Rule 2)
 - [ ] No arrow endpoint is inside a target box (Rule 3: `(x2, y2)` on EDGE or CORNER, never interior)
 - [ ] Multi-arrow diagrams have consistent stop policy (Rule 4: all touch edges, or all leave consistent gap)
