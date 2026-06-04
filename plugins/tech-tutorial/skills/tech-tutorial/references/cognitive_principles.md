@@ -16,7 +16,7 @@ When you find yourself wanting to soften an output-side rule because "it makes t
 
 ## The cognitive load model
 
-Sweller's Cognitive Load Theory (1988, refined through the 2010s) divides mental effort during learning into three categories:
+Sweller's Cognitive Load Theory (Sweller 1988; current canonical review: Sweller, van Merriënboer & Paas 2019) divides mental effort during learning into three categories:
 
 | Type | Source | What the tutorial author should do |
 |---|---|---|
@@ -34,7 +34,7 @@ The author has three responsibilities, in priority order:
 
 ## Principle 1 — Expertise Reversal (Kalyuga, 2003)
 
-Detailed worked examples accelerate novices but actively slow experts (who experience the verbose explanation as extraneous load). A single tutorial cannot optimize for both. Therefore: declare your target reader and accept the cost of not serving everyone.
+Detailed worked examples accelerate novices but can burden advanced readers, who experience the verbose explanation as extraneous load (the effect is strongest for high-element-interactivity material and weaker on simple tasks). A single tutorial cannot optimize for both equally. Therefore: declare your target reader, calibrate scaffolding density to their level (see the worked:open ratio table under Principle 4), and accept the cost of not serving everyone at once.
 
 **Operational rule**: every tutorial opens with explicit "适合谁 / 不适合谁 / 读完之后你能做到什么" sections. Anyone outside the target profile is routed elsewhere on page one.
 
@@ -46,7 +46,7 @@ If the reader sees a global structure first, every subsequent detail has a slot 
 
 ## Principle 3 — Dual Coding (Paivio) + Split-Attention (Sweller, Chandler)
 
-Words and images are processed by separate working-memory channels; combining them roughly doubles retention (Paivio, 1971). But if the reader has to mentally bind the diagram to a faraway caption ("see node A in figure 3.2 above"), the cross-reference cost wipes out the dual-coding gain (Sweller & Chandler, 1994).
+Words and images are processed by separate working-memory channels; combining them substantially increases retention (Paivio, 1971; magnitude varies by task and design — see Mayer, 2009). But if the reader has to mentally bind the diagram to a faraway caption ("see node A in figure 3.2 above"), the cross-reference cost wipes out the dual-coding gain (Sweller & Chandler, 1994).
 
 **Operational rules**:
 - At least one diagram per major section. A >300-line prose stretch without one counts as a Principle-3 failure.
@@ -73,7 +73,7 @@ Ratio of example to exercise scales with reader level:
 | Intermediate | 2 : 1 |
 | Expert | 1 : 3 |
 
-This is calibrated from Kirschner, Sweller & Clark (2006), which famously demolished the case for unguided "discovery learning" with novices.
+These are starting ratios, not constants — they operationalize the Expertise Reversal axis (Principle 1) and trace to Sweller & Cooper (1985) and Kirschner, Sweller & Clark (2006), which demolished the case for unguided "discovery learning" with novices. The optimal ratio also rises with task/example complexity: intricate domains (proof, protocol design) need more worked examples per exercise than procedural tasks.
 
 ## Principle 5 — Testing Effect (Roediger & Karpicke, 2006)
 
@@ -92,6 +92,8 @@ The shape matters. Even one retrieval attempt captures most of the gain — ther
 - Answers go in a `<details>` block, an appendix, or a separate file. Never inline directly under the question. Physical separation is the entire point — answer-in-view collapses retrieval back to re-reading.
 - Scatter predictive questions through the prose ("what do you think this will print?"). Each predictive question must precede the reveal by at least a paragraph or fold.
 - **Atomic questions only.** A bundled question ("define X, explain why it matters, give an example") trains 1 retrieval attempt instead of 3 and lets the reader fudge partial answers. Split them.
+
+**The five prompt properties (Matuschak).** Effective retrieval prompts satisfy five properties — *focused* (one detail), *precise* (unambiguous about what it asks), *consistent* (same answer at each retrieval, not "it depends"), *tractable* (almost always answerable correctly), *effortful* (genuine retrieval, not inference from the prompt's own wording). This is why broad-scope questions fail: they lose a focused target, give imprecise/inconsistent answers, and become intractable (Matuschak, "How to write good prompts," andymatuschak.org/prompts). Note the boundary against Principle 6: the "just out of reach" challenge is deliberately *not* tractable — it lives in the separate challenge block, never in the self-check, whose questions should be answerable. Caveat for an LLM author: auto-generated prompts are prone to "garbage in, garbage out" and over-decomposition (atomizing past the point of meaning) — generate, then prune to the few that carry the schema.
 
 ## Principle 6 — Desirable Difficulty (Bjork, 1994)
 
@@ -142,7 +144,7 @@ The Gothenburg studies asked university students to read a passage on a complex 
 - **Surface processors** focused on signs — terminology, phrases, "what will the test ask?". They read the text as something to be reproduced.
 - **Deep processors** focused on what was signified — the argument, relationships between ideas, the author's claim. They read the text as evidence to be evaluated.
 
-A week later, surface processors retained ~10-15% of meaning; deep processors retained ~50-60%. **Depth of processing, not time spent, was the dominant retention predictor.**
+A week later, surface processors retained ~10-15% of meaning; deep processors retained ~50-60%. The *gap* (the depth-of-processing effect) replicates robustly; the absolute percentages are specific to that one-week-delay single-passage task. **Depth of processing, not time spent, was the dominant retention predictor.**
 
 For tutorial writers: the author's framing forces the reader into one or the other. "X is a Y" triggers surface processing (sign equivalence). "X enables / prevents / makes Z possible" triggers deep processing (signified meaning). Notice which one you wrote in each concept introduction.
 
@@ -267,10 +269,12 @@ Examples of *illegitimate* adaptation (cargo-cult shortcuts):
 ## Further reading (research sources)
 
 - Sweller, J. (1988). "Cognitive load during problem solving: Effects on learning." *Cognitive Science*.
+- Sweller, J., van Merriënboer, J. & Paas, F. (2019). "Cognitive Architecture and Instructional Design: 20 Years Later." *Educational Psychology Review*, 31, 261-292. (current canonical CLT review by the theory's originators)
 - Sweller, J. & Cooper, G. (1985). "The use of worked examples as a substitute for problem solving in learning algebra." *Cognition and Instruction*.
 - Kirschner, P., Sweller, J. & Clark, R. (2006). "Why minimal guidance during instruction does not work." *Educational Psychologist*.
 - Kalyuga, S. (2003). "Expertise reversal effect." *Educational Psychologist*.
 - Roediger, H. & Karpicke, J. (2006). "Test-enhanced learning." *Psychological Science*.
+- Matuschak, A. "How to write good prompts: using spaced repetition to create understanding." andymatuschak.org/prompts. (the five prompt properties; note: a practitioner essay, partly outside the peer-reviewed literature)
 - Bjork, R. (1994). "Memory and metamemory considerations in the training of human beings." In *Metacognition: Knowing about Knowing*.
 - Rohrer, D. & Taylor, K. (2007). "The shuffling of mathematics problems improves learning." *Instructional Science*.
 - Paivio, A. (1971). *Imagery and Verbal Processes*.
