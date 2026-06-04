@@ -1,6 +1,6 @@
 ---
 name: tech-tutorial
-description: Use when the user wants to learn, understand, or build a durable knowledge system around a technology, framework, library, protocol, tool, or technical concept. Triggers include "教我 X", "我想学 X", "帮我搞懂 X", "X 入门", "X 怎么用", "写一篇关于 X 的教程", "整理成系统笔记", "I want to learn X", "help me understand X", "give me a primer", or pasted docs/links that should become a tutorial.
+description: Use when the user wants to learn, understand, or build a systematic knowledge base around a technology, framework, library, protocol, tool, or technical concept. Triggers include "教我 X", "我想学 X", "帮我搞懂 X", "X 入门", "X 怎么用", "写一篇关于 X 的教程", "整理成系统笔记", "I want to learn X", "help me understand X", "give me a primer", or when the user asks to turn pasted docs/links into a tutorial.
 ---
 
 # Tech Tutorial Writer
@@ -29,6 +29,8 @@ It does **not** apply when:
 
 When in doubt, ask: *"Do you want me to build something, or to teach you something?"*
 
+**Why these boundaries (Diátaxis).** The four-mode documentation framework (Diátaxis: *tutorial* / *how-to* / *reference* / *explanation*) names what this gate is doing. This skill owns the two **study-oriented** modes — *explanation* (the why/mechanism, = the concept-focused default) and *tutorial* (learning-by-doing, = hands-on mode) — and routes away the two **work-oriented** modes: *how-to* (debugging, "accomplish task X") and *reference* (one-shot "what is this API"). Use the vocabulary as a **diagnostic to classify intent**, not as a rule to emit four separate files: a single learning artifact legitimately blends explanation + tutorial (and a little reference) because it is one learning *journey*, not a documentation *system*. (Diátaxis, [diataxis.fr](https://diataxis.fr) — a widely-adopted taxonomy; its mode-separation is a design heuristic, not an empirically-measured learning gain.)
+
 ## How the seven principles fit together
 
 The seven principles form an **input × pivot × output** structure, not a flat list:
@@ -45,7 +47,7 @@ Input and output sides are partners, not in tension: input reduces load on thing
 
 ## The seven design principles (mandatory)
 
-Every tutorial section must be designed against these. The 30-item completeness checklist in [references/tutorial_template.md](references/tutorial_template.md) makes them auditable; the research behind each rule lives in [references/cognitive_principles.md](references/cognitive_principles.md).
+Every tutorial section must be designed against these. The completeness checklist in [references/tutorial_template.md](references/tutorial_template.md) makes them auditable; the research behind each rule lives in [references/cognitive_principles.md](references/cognitive_principles.md).
 
 ### 1. Declare the target reader (Expertise Reversal)
 
@@ -80,7 +82,7 @@ For each new concept in a novice-targeted chapter, lead with a worked example. T
   2. **Partial example** — structure given, 1-2 *schema-building* decision points blank (not trivial fill-ins).
   3. **Open exercise** — fresh problem, end-to-end.
 
-  Worked-example-to-exercise ratio scales with reader level: novice 5:1, intermediate 2:1, expert 1:3.
+  Worked-example-to-exercise ratio scales with reader level: roughly novice 5:1, intermediate 2:1, expert 1:3 — adjust up for higher-complexity material.
 
 ### 5. Force retrieval (Testing Effect)
 
@@ -89,6 +91,7 @@ Passive re-reading retains ~40% at one week; one test pushes that to ~56%; multi
 Every chapter must end with **2-4 self-check questions** + scattered predictive questions in prose. Hard constraints:
 
 - **Atomic questions only.** A bundled question ("define X, explain why, give an example") trains 1 retrieval attempt instead of 3 and lets the reader fudge partial answers. Split into 3.
+- **Each question meets five properties** (Matuschak's prompt-writing spec): *focused* (one fact — same as atomic above), *precise* (unambiguous about what it asks), *consistent* (same answer every time, not "it depends"), *tractable* (the reader can almost always answer it — keep "just out of reach" for the separate challenge block, **not** the self-check), *effortful* (requires genuine retrieval, not a trivial inference from the question's own wording). A question failing *precise* or *consistent* trains a fuzzy schema; one failing *tractable* demoralizes instead of teaching. Research basis + the AI-generated-question caveat: [references/cognitive_principles.md](references/cognitive_principles.md).
 - **Answers in `<details>` or a separate file**, never inline. "Answer is right below" defeats retrieval and collapses back to re-reading.
 - Predictive questions in prose ("what do you think this will print?") must precede the reveal by at least one paragraph or fold.
 
@@ -333,9 +336,9 @@ The principle: **maximize concurrency among independent units, never among depen
 
 ## The workflow
 
-### Phase 1 — Scope (mandatory dialogue, never skip)
+### Phase 1 — Scope (ask only what the prompt hasn't already answered)
 
-Lock down five things with the user before researching:
+Lock down five things before researching — but **ask only what the prompt hasn't already answered.** First extract any of the five the prompt already gives; ask only about the genuinely-missing ones. A rich prompt may need zero questions; a bare "教我 X" / "give me a primer on X" may need one. Never turn a one-shot request into a five-question interview.
 
 | Question | Why it matters |
 |---|---|
@@ -345,7 +348,7 @@ Lock down five things with the user before researching:
 | **Concept-focused or hands-on?** | The content-mode axis. Default concept-focused (scenario walkthroughs for mental-model building; discrimination lives in self-check). Choose hands-on (adds a worked→partial→open code progression, pitfalls, and a capstone) only when the user explicitly needs runnable code. Decides content *kind*, not chapter *count*. |
 | **How deep / how broad?** Primer (30 min), full (2 hr), deep-dive (half day)? | Sets depth and breadth, which feeds how many topical chapters the Phase 3 dependency graph yields (primer ≈ 3, full ≈ 5–6, deep-dive ≈ 7–8) and the example-to-exercise ratio. Don't promise a fixed file count here — the concept map decides it. |
 
-If the conversation is non-interactive (no user available), make defensible assumptions and **document them near the top of `index.html`** in an "Assumptions" block so the reader can spot misfits.
+If the conversation is non-interactive (no user available), **or the user gave a minimal one-shot prompt** (e.g. "给我一份关于 X 的入门" / "give me a primer on X") and plainly isn't expecting an interview, make defensible assumptions (default: primer depth ≈ 3 chapters, concept-focused, infer background from the prompt) and **document them near the top of `index.html`** in an "Assumptions" block so the reader can spot misfits.
 
 ### Phase 2 — Research (parallelize aggressively)
 
@@ -456,13 +459,14 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 - **Retrieval separation check**: open every self-check section and confirm answers are in `<details>` blocks or a separate file, never inline.
 - **Cross-chapter callback check**: every chapter after the first should textually reference at least one earlier concept by name. Grep for the earlier chapter's key terms in the current chapter; they should appear.
 - **Discrimination check**: ≥1 prompt (ideally 3-5) that forces the reader to *choose between* approaches from ≥2 prior chapters. Lives in the trailing `*-self-check.html` (concept-focused) or `*-capstone.html` (hands-on) — the chapter number varies with how many topical chapters precede it, so locate it by the `-self-check` / `-capstone` **suffix**, not a fixed number.
+- **Structural gates — run the bundled script (replaces hand-running the next five greps)**: `bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh" <tutorial-dir>` (or `bash scripts/verify_structure.sh <dir>` from the skill dir). One run covers **self-check naming, audience-fit pair, figure coverage, SVG-utility-CSS presence, and the reader-drawing prompt** — it exits non-zero and prints which gate failed. The five bullets below stay the authoritative spec + rationale (why each gate exists, the failure stories); once the script passes you don't also hand-run their commands. It does **not** cover voice / pedagogy-jargon (kept inline below, table-coupled) or SVG overflow (needs a browser).
 - **Self-check naming check (hard)**: the last chapter must be named `*-self-check.html`. Run `ls *-self-check.html` in the tutorial dir — exactly one match. A tutorial that ships its question bank as `05-discrimination.html` or similar is missing the convention the other checks key on (seen in real use); rename it.
 - **Audience-fit pair check (hard, run as grep)**: `index.html` must contain BOTH 适合谁 and 不适合谁 — the pair silently degrades to one half (seen in real tutorials shipped with only one). Because `适合谁` is a substring of `不适合谁`, count occurrences: `pos=$(grep -o 适合谁 index.html | wc -l); neg=$(grep -o 不适合谁 index.html | wc -l); [ "$neg" -ge 1 ] && [ "$pos" -gt "$neg" ] || echo "AUDIENCE-FIT incomplete"`. `pos > neg` guarantees a standalone 适合谁 section beyond the 不适合谁 ones. Also confirm 读完之后你能做到什么 is present.
 - **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first, then grep. The voice grep pattern is kept in sync with the **Forbidden phrases** table at the top of this document — if you add a banned phrase there, update this regex too. The per-file loop prefixes each line with the filename so grep hits are actionable. One-liner uses `find` (zsh-safe), passes the file via `sys.argv[1]` (apostrophe-in-filename safe), runs `grep -inE` (case-insensitive: catches `Let's` / `We'll` / `Roughly`), and uses `[''`]` character classes so smart quotes (`'` U+2019, the macOS autocorrect default) match alongside straight ASCII `'`:
 
   ```bash
   find . -maxdepth 1 -name '*.html' | while read -r f; do
-    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | grep -inHE --label="$f" "我们一起|让我们|咱们|你会发现|接下来|我们来看|我们来试试|下面我们|Now we('|’)re going to|you('|’)ll discover|together we('|’)ll|let('|’)s|we('|’)ll|这很简单|很简单|显然|trivially|obviously|(^|[^a-zA-Z])just|可能|也许|兴许|大概|差不多|应该是|(^|[^a-zA-Z])roughly|(^|[^a-zA-Z])kind of|(^|[^a-zA-Z])sort of|踩坑|搞起来|撸代码|玩一下|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
+    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | LC_ALL=en_US.UTF-8 grep -inHE --label="$f" "我们一起|让我们|咱们|你会发现|接下来|我们来看|我们来试试|下面我们|Now we('|’)re going to|you('|’)ll discover|together we('|’)ll|let('|’)s|we('|’)ll|这很简单|很简单|显然|trivially|obviously|(^|[^a-zA-Z])just|可能|也许|兴许|大概|差不多|应该是|(^|[^a-zA-Z])roughly|(^|[^a-zA-Z])kind of|(^|[^a-zA-Z])sort of|踩坑|搞起来|撸代码|玩一下|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
   done
   ```
 
@@ -470,10 +474,10 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 
   ```bash
   find . -maxdepth 1 -name '*.html' | while read -r f; do
-    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | grep -nHE --label="$f" "(^|[^a-zA-Z])(我|我们)"
+    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | LC_ALL=en_US.UTF-8 grep -nHE --label="$f" "(^|[^a-zA-Z])(我|我们)"
   done
 
-  Both greps require the shell locale to be UTF-8 (default on macOS / most Linux). If you ever run them with `LC_ALL=C`, the curly-apostrophe and Chinese-character alternations stop matching as expected — the regexes assume codepoint-level alternation, not byte-level.
+  Both greps now pin `LC_ALL=en_US.UTF-8` inline so the curly-apostrophe and Chinese-character alternations match regardless of the caller's locale (a bare `LC_ALL=C` breaks codepoint-level alternation, not byte-level). If your system lacks `en_US.UTF-8`, substitute another installed UTF-8 locale.
   ```
 
   Every hit in **stripped prose** needs a fix or a justification (epistemic note / reader-addressed action / mandated fluency-illusion label / reporting the subject's genuine probability — see "When to break the rules"). Don't ship with raw hits.
@@ -481,7 +485,7 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 
   ```bash
   find . -maxdepth 1 -name '*.html' | while read -r f; do
-    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | grep -inHE --label="$f" "认知负荷|认知负载|cognitive load|内在负荷|外在负荷|相关负荷|germane load|intrinsic load|extraneous load|期望难度|合意困难|desirable difficulty|门槛概念|阈限概念|threshold concept|双重编码|dual coding|提取练习|retrieval practice"
+    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | LC_ALL=en_US.UTF-8 grep -inHE --label="$f" "认知负荷|认知负载|cognitive load|内在负荷|外在负荷|相关负荷|germane load|intrinsic load|extraneous load|期望难度|合意困难|desirable difficulty|门槛概念|阈限概念|threshold concept|双重编码|dual coding|提取练习|retrieval practice"
   done
   ```
 
@@ -598,6 +602,6 @@ See `references/tutorial_template.md` for the hub `index.html` and 相关教程 
 ## What to read next
 
 - [references/cognitive_principles.md](references/cognitive_principles.md) — the cognitive-science research behind the seven principles, with author + year citations. Read this if you find yourself wanting to bend a rule and need to know what the rule is protecting.
-- [references/tutorial_template.md](references/tutorial_template.md) — chapter-by-chapter template with mandatory sections, examples, and a 30-item completeness checklist.
+- [references/tutorial_template.md](references/tutorial_template.md) — chapter-by-chapter template with mandatory sections, examples, and a completeness checklist.
 - [references/research_workflow.md](references/research_workflow.md) — current-docs + web orchestration, source evaluation, when each source wins.
 - [references/diagram_guide.md](references/diagram_guide.md) — content-to-diagram-type matrix, Mermaid vs Excalidraw decision tree, Split-Attention rule examples.

@@ -615,10 +615,11 @@ Required sections (in order):
 - [ ] Hands-on: 应用判别层 ≥1-2 道（主 discrimination 在 capstone）？
 - [ ] Concept-focused: 含 ≥1 处读者绘图提示（本章是唯一着陆点）？
 - [ ] 所有答案集中在文末 `<details>` 内？
+- [ ] 每道题满足五属性（focused / precise / consistent / tractable / effortful）——尤其 tractable：自测题应几乎都能答对，"刚好够不着"留给 challenge 块（见 SKILL.md Principle 5）？
 
 ---
 
-## 全教程完整性自检（30 项 checklist）
+## 全教程完整性自检 checklist
 
 写完整份教程后过一遍。**不通过的项必须修，不是"以后再说"**。
 

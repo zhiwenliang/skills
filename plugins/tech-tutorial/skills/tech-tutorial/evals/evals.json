@@ -1,11 +1,18 @@
 {
   "skill_name": "tech-tutorial",
+  "_assertion_legend": {
+    "_comment": "No automated runner ships yet. This classifies how each assertion is verified so a future grader knows which are mechanical (deterministic grep / bundled script) vs which need an LLM/human judge. The mechanical ones mirror SKILL.md Phase 5 gates + scripts/verify_structure.sh + scripts/svg_overflow_check.js. Best-effort classification; refine as a runner is built.",
+    "manual-grep": ["has_entrypoint", "multi_file_structure", "every_chapter_has_figure", "self_check_named_with_suffix", "self_check_is_last_chapter", "audience_fit_pair_present", "no_pedagogy_jargon_in_prose", "no_forbidden_voice_phrases", "scaffold_index_first_selfcheck_last", "output_is_single_file", "sections_are_h2_not_separate_files", "no_separate_chapter_files", "output_is_markdown", "assumptions_block_present", "related_tutorials_block_present", "hub_index_updated_with_new_card", "at_least_three_figures", "has_learning_path"],
+    "manual-qualitative": ["uses_existing_background_analogy", "explains_mechanism_below_docs", "centers_on_why", "has_design_motivation", "no_invented_concept_labels", "uses_standard_terminology", "has_discrimination_scenarios", "scope_constrained", "covers_scoped_components", "more_than_four_chapters_for_broad_topic", "topical_chapter_names_not_generic", "cognitive_structure_preserved", "capstone_has_discrimination_decisions", "practice_has_worked_partial_open_progression", "produces_tutorial_without_five_question_dialogue", "primer_depth_or_single_file", "marks_current_vs_emerging_dated", "recent_primary_sources", "no_cheerleader_first_person", "figures_in_renderer_supported_form", "retrieval_separation_via_details_or_collapsible", "no_raw_inline_svg_when_unsupported", "hub_clustered_by_theme", "hub_preserves_existing_entries", "related_links_point_to_existing_siblings", "new_tutorial_created", "hands_on_practice_pitfalls_capstone_present", "self_check_five_properties", "routes_away_non_learning_intent", "no_full_tutorial_for_debugging_request", "asks_build_vs_teach_or_redirects"],
+    "mixed": ["has_concept_map", "has_self_check", "has_tradeoffs", "has_pitfalls", "has_concrete_pitfalls", "has_runnable_code", "has_hello_world_example", "has_realistic_example", "has_before_feature", "side_by_side_code", "has_protocol_diagram", "has_when_not_to_use", "has_next_steps", "has_dated_frontier_framing_or_chapter", "has_further_reading", "has_sources"]
+  },
   "evals": [
     {
       "id": 1,
       "name": "open-ended-web-framework",
       "prompt": "我想系统学一个 Python Web 框架，之前只写过简单脚本和几个 Flask 路由。帮我写一份能建立完整心智模型的教程。",
-      "expected_output": "Concept-focused 教程（默认 4 章：index + 01-concepts + 02-principles + 03-self-check）。范围明确（覆盖核心概念，不试图涵盖全框架）。01 用 Flask/脚本经验作类比起点，每个概念配场景走查（不要求可运行代码）；02 含备选方案对比表；03-self-check 含 ≥3 道跨 01+02 场景辨别题（capstone 替代）。包含学习路径 breadcrumb + 下一步建议。",
+      "expected_output": "Concept-focused 教程（默认 4 章：index + 01-concepts + 02-principles + 03-self-check）。范围明确（覆盖核心概念，不试图涵盖全框架）。01 用 Flask/脚本经验作类比起点，每个概念配场景走查（不要求可运行代码）；02 含备选方案对比表；03-self-check 含 ≥3 道跨 01+02 场景辨别题（capstone 替代）。包含学习路径 breadcrumb + 下一步建议。正文无 cheerleader / 第一人称 / AI 套话语气。",
+      "baseline": "无此方法论时（RED）：抓官方文档拼成的单页摘要，章节按 API 面命名（路由 / 中间件 / 部署），无概念地图、无基于读者 Flask/脚本背景的类比、无场景辨别题、无学习路径 breadcrumb，常带『让我们一起』式语气。",
       "files": [],
       "assertions": [
         "has_entrypoint",
@@ -17,7 +24,10 @@
         "has_discrimination_scenarios",
         "has_learning_path",
         "has_further_reading",
-        "has_next_steps"
+        "has_next_steps",
+        "no_forbidden_voice_phrases",
+        "no_cheerleader_first_person",
+        "self_check_five_properties"
       ]
     },
     {
@@ -25,6 +35,7 @@
       "name": "scoped-database-indexes",
       "prompt": "我准备优化一个查询很慢的业务系统。先帮我系统学一下 PostgreSQL 里和索引、查询计划相关的部分（不用讲完整数据库内核），要能让我读完就能动手排查。",
       "expected_output": "范围聚焦索引和查询计划，不发散到完整数据库内核；覆盖索引类型、选择性、执行计划、常见误判；有 hello-world + realistic example；讨论组件级权衡；有 pitfalls。",
+      "baseline": "无此方法论时（RED）：罗列索引类型与 EXPLAIN 语法的速查页，范围发散到数据库总览，无 hello-world→realistic 递进、无组件级权衡、无具体 pitfalls。",
       "files": [],
       "assertions": [
         "has_entrypoint",
@@ -44,6 +55,7 @@
       "name": "feature-deep-dive",
       "prompt": "OAuth 2.0 里的 PKCE 我一直没搞懂为什么要存在，看文档只告诉我怎么配，不告诉我为什么。帮我搞清楚。",
       "expected_output": "重心在 why 而非 API。包含旧方案对比、设计动机（至少 2 项：授权码泄露、防止客户端密钥落到前端、移动端威胁模型）、局限性、不该用的场景、协议流程图。",
+      "baseline": "无此方法论时（RED）：复述如何配置 PKCE 的 how-to，停在 API 表面，不讲授权码泄露 / 前端密钥 / 移动端威胁模型这些设计动机，无旧方案对比，无协议流程图。",
       "files": [],
       "assertions": [
         "has_before_feature",
@@ -62,6 +74,7 @@
       "name": "no-invented-terminology",
       "prompt": "帮我从原理上搞懂 JavaScript 的事件循环（event loop）、微任务和宏任务，要能建立一个可以预测执行顺序的心智模型。我写过几年 JS，但一直没真正理解调度。",
       "expected_output": "Concept-focused 教程。全程使用社区真实术语：event loop / 事件循环、microtask / 微任务、macrotask / 宏任务、call stack / 调用栈、task queue —— 保留英文或采用通用译名，不自造名词（不出现「任务泵」「事件漏斗」「三态调度模型」这类生造标签或硬译）。一句话本质是用真实术语写成的一句话主张（例如：同步代码执行完→清空所有微任务→取一个宏任务，循环往复），不是自创名词。面向读者的正文不出现认知科学黑话（认知负荷 / 门槛概念 / 双重编码 / desirable difficulty）。概念配执行顺序图，含 ≥3 道预测执行顺序的辨别题。",
+      "baseline": "无此方法论时（RED）：正文夹带自造标签（任务泵 / 事件漏斗）或把认知科学黑话（认知负荷 / 双重编码）漏进读者文字，一句话本质写成生造名词，无执行顺序辨别题。",
       "files": [],
       "assertions": [
         "has_entrypoint",
@@ -79,6 +92,7 @@
       "name": "depth-and-frontier-fast-moving",
       "prompt": "我想系统搞懂 LLM 推理优化——KV cache、PagedAttention、continuous batching、投机解码这些。我能调 vLLM 参数，但不理解底层，想懂到能判断什么场景该用哪种、以及现在最新的做法是什么。",
       "expected_output": "Concept-focused 深入教程。重点验证两件事：(1) 深度——每个核心概念讲到『比文档深一层』的机制，例如 PagedAttention 如何像操作系统虚拟内存分页那样管理 KV cache、为什么减少碎片就能提升吞吐，而不是复述『它能提升吞吐』；(2) 时效——index.html 含带日期的『现状速览』，点明什么已稳定、什么在最近 6-12 月快速变化（如投机解码、PD 分离等）、什么被取代；Further reading 含近期一手来源（vLLM/SGLang release notes、近 12 个月的论文/技术博客），而非只有旧综述。另含 ≥3 道『该用哪种』的跨概念辨别题、概念地图、self-check。",
+      "baseline": "无此方法论时（RED）：复述『PagedAttention 提升吞吐』式的文档表层，不讲底层机制；无带日期的现状速览，承重来源是过时综述而非近 12 月一手来源。",
       "files": [],
       "assertions": [
         "has_entrypoint",
@@ -97,6 +111,7 @@
       "name": "broad-topical-concept-structure",
       "prompt": "我想系统搞懂 Kafka——不只是会用，要理解它整套机制：日志存储、分区、副本与 ISR、消费者组与 rebalance、exactly-once 语义。帮我建立完整心智模型，能判断各种取舍。",
       "expected_output": "Concept-focused 但范围『宽』：不应被塞进 4 文件范式，而应按概念依赖图切成 5-6 章，01-concepts + 02-principles 作锚点，其余按主题命名（如 03-storage-log / 04-replication / 05-consumer-groups），收尾可含 frontier 章（KRaft 取代 ZooKeeper 是活跃变化）。index 含适合谁/不适合谁配对、带日期现状速览、一句话本质。self-check 在最后一章且含 ≥3 道跨章辨别题。每章 ≥1 figure。验证 P0 结构模型 + frontier 章 + 适合谁配对。",
+      "baseline": "无此方法论时（RED）：硬塞进固定 4 文件范式，章节用通用槽位名（03-extra），无按概念依赖图切分，无 frontier 章，缺适合谁 / 不适合谁配对。",
       "files": [],
       "assertions": [
         "has_entrypoint",
@@ -116,7 +131,8 @@
       "id": 7,
       "name": "hands-on-mode-regression",
       "prompt": "我想动手学 FastAPI，跟着把一个带依赖注入、Pydantic 校验和 async 路由的小服务写出来，要能在本地跑起来。给我能照着敲的代码进阶。",
-      "expected_output": "Hands-on 模式（用户明确要可运行代码进阶）。应含 worked→partial→open 三阶 practice 章、concrete pitfalls 章、混合判别的 capstone 章，self-check 在最后。代码可运行（或标未本地验证）。capstone 承担 discrimination，self-check 偏 recall。每章 ≥1 figure。验证 hands-on 模式在重构后仍然成立。",
+      "expected_output": "Hands-on 模式（用户明确要可运行代码进阶）。应含 worked→partial→open 三阶 practice 章、concrete pitfalls 章、混合判别的 capstone 章，self-check 在最后。代码可运行（或标未本地验证）。capstone 承担 discrimination，self-check 偏 recall。每章 ≥1 figure。正文无 cheerleader / 第一人称 / 散文里的『坑·踩坑』。验证 hands-on 模式在重构后仍然成立。",
+      "baseline": "无此方法论时（RED）：从 README 抄来的代码片段堆叠，无 worked→partial→open 三阶、无关键决策点留白、无承担判别的 capstone，常带 casual cheerleader 语气与散文里的『踩坑』。",
       "files": [],
       "assertions": [
         "has_entrypoint",
@@ -126,14 +142,17 @@
         "has_runnable_code",
         "has_concrete_pitfalls",
         "self_check_is_last_chapter",
-        "every_chapter_has_figure"
+        "every_chapter_has_figure",
+        "no_forbidden_voice_phrases",
+        "no_cheerleader_first_person"
       ]
     },
     {
       "id": 8,
       "name": "library-hub-integration",
       "prompt": "在我的 learning 目录里再加一篇 multi-agent-patterns 的教程，并把它接进现有的知识库——更新首页索引，跟相关的已有教程连起来。",
-      "expected_output": "目标目录已有兄弟教程（langchain/、langgraph/）+ 根 index.html hub。应：(1) 新建 multi-agent-patterns/ 教程；(2) 增量更新根 hub index.html，把新教程卡片加进合适主题簇（Agent/LLM），保留已有条目不重写；(3) 新教程 index.html 含『相关教程』段，链向已验证存在的兄弟（langchain / langgraph），路径真实存在。验证 P1 知识库层。Baseline（旧 skill）不应产出 hub 更新或相关教程段——对比即价值。",
+      "expected_output": "目标目录已有兄弟教程（langchain/、langgraph/）+ 根 index.html hub。应：(1) 新建 multi-agent-patterns/ 教程；(2) 增量更新根 hub index.html，把新教程卡片加进合适主题簇（Agent/LLM），保留已有条目不重写；(3) 新教程 index.html 含『相关教程』段，链向已验证存在的兄弟（langchain / langgraph），路径真实存在。验证 P1 知识库层。",
+      "baseline": "无此方法论时（RED）：只产出孤立的 multi-agent-patterns/ 教程，不更新根 hub index.html，也不写『相关教程』交叉链接——产物是一堆互不相连的文件夹，对比即价值。",
       "files": ["fixtures/learning-lib"],
       "assertions": [
         "new_tutorial_created",
@@ -142,6 +161,66 @@
         "hub_preserves_existing_entries",
         "related_tutorials_block_present",
         "related_links_point_to_existing_siblings"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "markdown-fallback-mode",
+      "prompt": "在我们团队的 GitHub wiki 上用 Markdown 写一篇 async/await 教程（wiki 支持 Mermaid 和 HTML）。",
+      "expected_output": "用户显式要 Markdown + 宿主支持 Mermaid/HTML。应保持同样的认知结构（概念递进、worked example 顺序、自测分离），用渲染器支持的形式承载图（Mermaid 或导出 SVG via <img> 或 fenced ascii，不强制 inline SVG），自测答案用 <details>/可折叠分离，不在不支持的渲染器里塞裸 inline SVG。验证 Markdown 回退分支仍保持 Principle 3（dual coding）与 Principle 5（retrieval separation）。",
+      "baseline": "无此方法论时（RED）：直接套用 HTML 模板产出（inline <svg> + <style> 块），在 Markdown 渲染器里坏掉；或丢掉图与自测分离，退化成纯散文。",
+      "files": [],
+      "assertions": [
+        "output_is_markdown",
+        "cognitive_structure_preserved",
+        "figures_in_renderer_supported_form",
+        "retrieval_separation_via_details_or_collapsible",
+        "no_raw_inline_svg_when_unsupported",
+        "has_self_check"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "quick-primer-single-file",
+      "prompt": "给我一篇 30 分钟能读完的尾调用优化（tail call optimization）快速入门，别拆成多篇。",
+      "expected_output": "Quick primer 模式：单个 index.html，各节用 <h2>（标题外无独立 <h1> 章首），概念地图 + ≥1 场景 worked + 自测题全部内联同页，不拆成多文件 scaffold。自测不可省（primer 也要 retrieval），单文件下限 ≥3 张图。",
+      "baseline": "无此方法论时（RED）：要么强行拆成 4 文件 scaffold（违背单文件诉求），要么产出无概念地图 / 无自测的散文摘要。",
+      "files": [],
+      "assertions": [
+        "output_is_single_file",
+        "sections_are_h2_not_separate_files",
+        "no_separate_chapter_files",
+        "has_concept_map",
+        "has_self_check",
+        "at_least_three_figures"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "one-shot-primer-no-interview",
+      "prompt": "给我一份关于 Redux 的入门。",
+      "expected_output": "极简一句话请求、显然不期待被访谈。应直接产出 primer（≈3 章或单文件、concept-focused、从 prompt 合理推断背景），不先抛五个 scope 问题阻塞输出；把所做假设（目标读者 / 深度 / 模式）写进 index.html 顶部的 Assumptions 块供读者校正。验证 Phase 1『只问缺失项』降级在裸一句话触发下成立。",
+      "baseline": "无此方法论时（RED，Phase 1 未降级）：先反问五个 scope 问题（学什么 / 为什么 / 背景 / 模式 / 深浅），在用户只想要一份入门时造成访谈摩擦、阻塞输出。",
+      "files": [],
+      "assertions": [
+        "produces_tutorial_without_five_question_dialogue",
+        "assumptions_block_present",
+        "primer_depth_or_single_file",
+        "has_self_check",
+        "has_concept_map"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "diataxis-route-away-non-learning",
+      "prompt": "我这段 Python 代码报 KeyError，你帮我看看哪里错了？",
+      "expected_output": "这是 how-to / 调试意图（Diátaxis 的 work-oriented 模式），不是学习意图——skill 不应直接产出一份教程。应识别出超范围：要么走调试流程帮其定位 KeyError，要么先问『你是想让我修这段代码，还是想系统学会它背后的机制？』（build-vs-teach 澄清）。验证『何时适用』门在 how-to 意图下正确路由开。",
+      "baseline": "无此方法论时（RED）：把一次性调试请求当成学习请求，生成多章 concept-focused 教程，答非所问。",
+      "files": [],
+      "assertions": [
+        "routes_away_non_learning_intent",
+        "no_full_tutorial_for_debugging_request",
+        "asks_build_vs_teach_or_redirects"
       ]
     }
   ]
