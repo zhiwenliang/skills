@@ -213,6 +213,7 @@ The rules above target **author prose** — the visible text the reader reads. T
 - **`<pre><code>` blocks**: code comments like `# 应该是 ProductReview` are predictive assertions about runtime values, not author hedges. LLM prompt strings inside code can contain `"let's please be concise"` or first-person quotes without violating voice — they're program content, not your voice.
 - **`<details>` answer blocks**: factual predictions like "正确答案应该是 X" / "the expected output is roughly 4000 tokens" are *answers*, not commitments-to-the-reader the way prose is. Hedge-shaped wording is the natural English/Chinese form of "the value should equal X." Don't twist these to avoid 应该是 / should-be.
 - **Quoted user material**: when you literally quote the reader's question or a user-facing message ("用户原话：..."), the quoted content keeps its original voice.
+- **Prose reporting the subject's own probability/randomness** (not author uncertainty): `单跑一次的"通过"可能纯属运气`、`命中率大概落在 70-90%` are claims *about how the system behaves* — the same category as a `<details>` expected-value answer, not the author waffling. The hedge ban targets the author hedging their *own* claim (`这个配置应该是对的吧`), not prose precisely stating an outcome is probabilistic. When the uncertainty belongs to the domain, name it precisely (give the condition or distribution) instead of deleting the word. The `可能` hedge is the one most often misfired on — ~28 of its real uses across the corpus were legitimate domain-probability statements, not hedges.
 
 The only legitimate first-person uses in **prose**:
 
@@ -273,19 +274,23 @@ The `<style>` block is identical across chapters. **Don't try to "improve" it pe
 
 HTML-escape special characters when writing example code: `<` → `&lt;`, `>` → `&gt;`, `&` → `&amp;`. Prism reads the escaped text and renders it correctly. **Don't manually wrap tokens in `<span class="tok-kw">` etc.** — Prism does that. You just write clean escaped source code.
 
-### File structure
+### File structure — a scaffold, not a fixed file list
+
+Two files are invariant: **`index.html` first, `NN-self-check.html` last.** Everything between is **topical chapters derived from the concept dependency graph** (Phase 3) — their number and names follow the subject, not a fixed template. Real tutorials average 5–6 chapters; 3 for a tight primer, up to ~8 before splitting deeper.
 
 ```
-<tech-name>/                  # default: concept-focused (4 files)
-├── index.html                # entry page
-├── 01-concepts.html
-├── 02-principles.html
-└── 03-self-check.html        # includes cross-chapter discrimination scenarios
+<tech-name>/
+├── index.html            # entry page — invariant, always first
+├── 01-concepts.html      # core vocabulary (anchor; almost always present)
+├── 02-principles.html    # how it works + tradeoffs (anchor; usually present)
+├── 0N-<topic>.html       # topical chapters, NAMED FOR THE SUBJECT
+│                         #   e.g. 03-routing / 04-replication / 05-mvcc
+└── 0X-self-check.html    # invariant, always last — discrimination scenarios
 ```
 
-`index.html` is the entry per web convention. The `<style>` block inside each HTML is the source of truth — no shared `style.css`, no `style/` directory. Each chapter is a standalone artifact.
+`01-concepts` and `02-principles` anchor most tutorials; past them, name each chapter after what it teaches (`03-streaming`, not a generic `03-extra`). Don't pad to a canonical file count, and don't force a broad subject into 4 files — the dependency graph decides the count. The `<style>` block inside each HTML is the source of truth — no shared `style.css`. Each chapter is a standalone artifact.
 
-For the hands-on extension structure (adds `03-practice` / `04-pitfalls` / `05-capstone`, renumbers self-check to `06-self-check`) and per-file purposes, see **Phase 4** below. Phase 1's mode-selection dialog determines which structure applies.
+**Content mode is orthogonal to chapter count.** *Concept-focused* (default) fills chapters with scenario walkthroughs and needs no runnable-code progression; *hands-on* adds a worked→partial→open progression plus a capstone. Mode decides the *kind* of content and whether a capstone file exists; the dependency graph decides *how many* chapters. The two compose — a broad hands-on tutorial has both topical chapters and a capstone. Per-file purposes and the optional `frontier` chapter are in **Phase 4**.
 
 ## Tooling Discipline (Environment-Agnostic)
 
@@ -337,8 +342,8 @@ Lock down five things with the user before researching:
 | **What exactly?** Whole framework, or specific area? | Scope determines depth and structure. |
 | **Why now?** Evaluating, building, or curious? | Evaluators need decision criteria; builders need runnable code; curious readers need narrative. |
 | **What's their existing background?** | Drives expertise-reversal calibration and analogies. |
-| **Concept-focused or hands-on?** | Default is concept-focused (4 chapters: concepts + principles + self-check with discrimination scenarios) for building mental models. Choose hands-on (adds practice + pitfalls + capstone) only when the user explicitly needs runnable code progression. |
-| **How deep?** Primer (30 min), full (2 hr), deep-dive (half day)? | Determines file structure and example-to-exercise ratio. |
+| **Concept-focused or hands-on?** | The content-mode axis. Default concept-focused (scenario walkthroughs for mental-model building; discrimination lives in self-check). Choose hands-on (adds a worked→partial→open code progression, pitfalls, and a capstone) only when the user explicitly needs runnable code. Decides content *kind*, not chapter *count*. |
+| **How deep / how broad?** Primer (30 min), full (2 hr), deep-dive (half day)? | Sets depth and breadth, which feeds how many topical chapters the Phase 3 dependency graph yields (primer ≈ 3, full ≈ 5–6, deep-dive ≈ 7–8) and the example-to-exercise ratio. Don't promise a fixed file count here — the concept map decides it. |
 
 If the conversation is non-interactive (no user available), make defensible assumptions and **document them near the top of `index.html`** in an "Assumptions" block so the reader can spot misfits.
 
@@ -403,31 +408,39 @@ The lead thread then does a coherence merge pass: re-show the learning-path brea
 
 Chapters that **must stay sequential**: any pair where chapter N's worked example builds on chapter N-1's output, or where N's "上一章" recap names a specific paragraph in N-1.
 
-- **Concept-focused tutorial** (default, 4 files): 01 + 02 parallelizable; `03-self-check` follows everything (needs all chapter content for discrimination scenarios).
-- **Hands-on tutorial** (7 files): 01 + 02 parallelizable; 04 (pitfalls) and 06 (self-check) can fan out from 01-03 once locked; 03 (practice) follows 01-02; 05 (capstone) follows everything.
+- **Concept-focused**: `01-concepts` + `02-principles` + any independent topical chapters parallelize once the dependency graph is locked; a `frontier` chapter parallelizes with them; the trailing `self-check` follows everything (it needs all chapter content for discrimination scenarios).
+- **Hands-on**: same, plus `pitfalls` can fan out from the locked concepts, `practice` follows the concepts it scaffolds, and `capstone` follows everything.
 
 If the tutorial is small (≤3 chapters) or chapters are tightly entangled, draft serially — parallelism overhead exceeds the gain.
 
-Default file structure for a full **concept-focused** tutorial (all HTML — see "Output format" section above for the required layout template):
+Concrete file structure assembles from the scaffold (see "Output format" above): `index.html` first, `NN-self-check.html` last, topical chapters between, each named for what it teaches.
+
+**Minimal concept-focused** (tight scope, ≈3 chapters):
 
 ```
 <tech-name>/
-├── index.html            # Target reader, motivation, concept map, learning-path breadcrumb, TOC
-├── 01-concepts.html      # Core abstractions; each concept anchored with a scenario walkthrough
+├── index.html            # Target reader, motivation, concept map, 一句话本质, 现状速览, learning-path
+├── 01-concepts.html      # Core abstractions; each anchored with a scenario walkthrough
 ├── 02-principles.html    # How it works + design tradeoffs (备选方案 tables required)
 └── 03-self-check.html    # Self-test bank + cross-chapter discrimination scenarios (capstone surrogate)
 ```
 
-For **hands-on tutorials**, extend with three chapters between principles and self-check (self-check renumbers to 06):
+**Typical concept-focused** (full scope, 5–6 chapters): keep `01-concepts` + `02-principles` as anchors, then split the rest of the dependency graph into topical chapters before self-check:
 
 ```
-├── 03-practice.html      # Worked → partial → exercise code progression
-├── 04-pitfalls.html      # Concrete pitfalls (not "pay attention to performance")
-├── 05-capstone.html      # Mixed-concept project requiring discrimination
-└── 06-self-check.html    # Question bank, answers in <details>
+├── 03-<topic-a>.html     # e.g. 03-routing / 03-attention / 03-mvcc — named for the subject
+├── 04-<topic-b>.html     # e.g. 04-replication / 04-scheduling
+├── 05-frontier.html      # OPTIONAL recognized slot — see below
+└── 0N-self-check.html    # always last
 ```
 
-For **quick primers**: collapse to a single `index.html` with all sections as `<h2>`.
+Build each topical chapter like `02-principles`: mechanism one level below the docs, a 备选方案 / 痛点→设计回应 table, predictive questions, ≥1 figure, and a chapter self-check — scoped to its sub-topic. The anchor names `01-concepts` / `02-principles` are conventional, not mandatory; a deep-dive may run `01-concepts-core` / `01-concepts-data-flow`.
+
+**Hands-on** (a content mode, not a chapter count): insert a worked→partial→open progression chapter (`0N-practice.html`), a `0N-pitfalls.html`, and a `0N-capstone.html` before self-check. The capstone carries discrimination, so self-check leans toward recall. These coexist with topical chapters — a broad hands-on tutorial has both.
+
+**Frontier chapter (optional, recognized slot).** Fast-moving topics (most frameworks, all AI/ML, young protocols) often outgrow the index's one-paragraph `现状速览`. When they do, add `0N-frontier.html` (or `0N-landscape.html`) just before self-check: what's **stable**, what's **in flux (dated)**, what's **superseded**, plus a forward "where this is heading." Built from Phase 2's frontier map — the index `现状速览` expanded into a teachable chapter, deepened not duplicated. Seven tutorials in real use grew this chapter unprompted; it is a first-class option.
+
+**Quick primer**: collapse to a single `index.html` with all sections as `<h2>`.
 
 ### Phase 5 — Cross-link, verify, finalize (parallelize audits)
 
@@ -442,7 +455,9 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 - **Density check**: open every chapter and confirm no >300-line stretch of prose without a diagram or worked example.
 - **Retrieval separation check**: open every self-check section and confirm answers are in `<details>` blocks or a separate file, never inline.
 - **Cross-chapter callback check**: every chapter after the first should textually reference at least one earlier concept by name. Grep for the earlier chapter's key terms in the current chapter; they should appear.
-- **Discrimination check**: ≥1 prompt (ideally 3-5) that forces the reader to *choose between* approaches from ≥2 prior chapters. Lives in `03-self-check.html` (concept-focused) or `05-capstone.html` (hands-on).
+- **Discrimination check**: ≥1 prompt (ideally 3-5) that forces the reader to *choose between* approaches from ≥2 prior chapters. Lives in the trailing `*-self-check.html` (concept-focused) or `*-capstone.html` (hands-on) — the chapter number varies with how many topical chapters precede it, so locate it by the `-self-check` / `-capstone` **suffix**, not a fixed number.
+- **Self-check naming check (hard)**: the last chapter must be named `*-self-check.html`. Run `ls *-self-check.html` in the tutorial dir — exactly one match. A tutorial that ships its question bank as `05-discrimination.html` or similar is missing the convention the other checks key on (seen in real use); rename it.
+- **Audience-fit pair check (hard, run as grep)**: `index.html` must contain BOTH 适合谁 and 不适合谁 — the pair silently degrades to one half (seen in real tutorials shipped with only one). Because `适合谁` is a substring of `不适合谁`, count occurrences: `pos=$(grep -o 适合谁 index.html | wc -l); neg=$(grep -o 不适合谁 index.html | wc -l); [ "$neg" -ge 1 ] && [ "$pos" -gt "$neg" ] || echo "AUDIENCE-FIT incomplete"`. `pos > neg` guarantees a standalone 适合谁 section beyond the 不适合谁 ones. Also confirm 读完之后你能做到什么 is present.
 - **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first, then grep. The voice grep pattern is kept in sync with the **Forbidden phrases** table at the top of this document — if you add a banned phrase there, update this regex too. The per-file loop prefixes each line with the filename so grep hits are actionable. One-liner uses `find` (zsh-safe), passes the file via `sys.argv[1]` (apostrophe-in-filename safe), runs `grep -inE` (case-insensitive: catches `Let's` / `We'll` / `Roughly`), and uses `[''`]` character classes so smart quotes (`'` U+2019, the macOS autocorrect default) match alongside straight ASCII `'`:
 
   ```bash
@@ -461,7 +476,7 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
   Both greps require the shell locale to be UTF-8 (default on macOS / most Linux). If you ever run them with `LC_ALL=C`, the curly-apostrophe and Chinese-character alternations stop matching as expected — the regexes assume codepoint-level alternation, not byte-level.
   ```
 
-  Every hit in **stripped prose** needs a fix or a justification (epistemic note / reader-addressed action / mandated fluency-illusion label). Don't ship with raw hits.
+  Every hit in **stripped prose** needs a fix or a justification (epistemic note / reader-addressed action / mandated fluency-illusion label / reporting the subject's genuine probability — see "When to break the rules"). Don't ship with raw hits.
 - **Pedagogy-jargon leak check (hard, run as grep)**: the cognitive-framework vocabulary is the author's design tool and must not surface in reader prose (Terminology discipline, row 3). Over HTML-stripped prose, from the tutorial dir:
 
   ```bash
@@ -482,9 +497,12 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 
   Output should be empty. **`code-block` and `compare-table` do NOT count as figures** — they are sequential text and structured text; neither carries the spatial / parallel relationship that dual coding (Principle 3) is buying. All three (figures + code blocks + tables) coexist; figures are not optional just because other visual elements are present.
 
-  Per-chapter targets:
-  - **Concept-focused (default)**: index 1 (concept map), 01 2-3, 02 2-3, 03-self-check 1 (e.g. gradient pyramid or discrimination scenario map). Total ≥7 for a full concept tutorial.
-  - **Hands-on**: index 1, 01 2-3, 02 2-3, 03-practice 1-2 (e.g. data type flow + training progression), 04-pitfalls 1 (e.g. pitfall taxonomy), 05-capstone 1-2 (architecture + decision tree), 06-self-check 1 (e.g. gradient pyramid). Total ≥10 for a full hands-on tutorial.
+  Per-chapter targets — the rule is **per chapter**, not a canon-wide total (a 9-chapter tutorial and a 4-chapter one are both judged chapter-by-chapter):
+  - **index.html**: ≥1 (the concept map).
+  - **Every content chapter** (`01-concepts`, `02-principles`, every topical chapter, plus `practice` / `pitfalls` / `capstone` / `frontier` when present): ≥1, with concept-heavy and mechanism chapters typically 2–3.
+  - **self-check**: ≥1 (e.g. a difficulty-gradient pyramid or a discrimination-scenario map).
+
+  This floor scales with chapter count automatically: a 4-chapter concept tutorial lands ≥5–7 figures, a 6-chapter one ≥8–10, with no hardcoded canon total to maintain. The old fixed totals (≥7 / ≥10) were pinned to the two canons that <1/4 of real tutorials actually follow.
 
   **Common rationalization to refuse**: "this chapter is pitfalls / question bank / hands-on, doesn't need diagrams." False — pitfalls can show causal links between failure modes; question banks can show difficulty gradient and chapter mapping; hands-on can show type flow and scaffold progression. *Every chapter has a figure-worthy shape; if you can't find one, the chapter outline isn't clear yet.*
 
@@ -512,6 +530,8 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 - **Insight check** (one qualitative self-answer, not a grep): in one sentence, name what a 5-year-experience engineer in this domain would leave with after reading — that they couldn't get from the official docs alone. If you can't write that sentence, the tutorial is still at sign level (Marton's surface processing). Go back: either Phase 2 to surface more surprise material, or Phase 3 to re-pick the threshold concept. Once you can write the sentence, it goes into `index.html`'s "读完之后你能做到什么" section verbatim as the tutorial's USP.
 - **Mechanism-depth check** (qualitative, like the insight check — *not* a count, per the no-checklist rule): walk the core concepts and ask of each, *does the prose go one level below where the official docs stop, or does it restate the doc sentence?* Restatement is surface processing (Marton) — the "longer version of the docs" failure. A concept that only restates goes back to Phase 2 for its mechanism before shipping. Read for the move; don't tally a number (a tally just trains relabeling).
 - **Currency / frontier check**: is the `现状速览` frontier framing present in `index.html` and **dated**? For a fast-moving topic, are the load-bearing sources recent (reject >2-year-old sources for fast-moving tech, per research_workflow.md), and does the prose flag what's in flux vs settled where it matters? If the tutorial reads as if the field is frozen and it is not, the Phase 2 frontier sweep was skipped or too shallow — go back. (For a genuinely frozen topic, the one-line "stable since <year>" note satisfies this.)
+
+- **Library integration check** (only when sibling tutorials exist in the destination): is the hub `index.html` at the library root updated with this tutorial's card under the right theme cluster, and does this tutorial's `index.html` carry a **verified** 相关教程 block? See "Building a knowledge library" below. Skip for a one-off tutorial in an empty/unrelated directory.
 
 ## Anti-patterns (audit your draft for these)
 
@@ -546,6 +566,34 @@ Conventions:
 - **Excalidraw fallback**: complex hand-drawn concept maps can stay as editable source files in the same folder, with the HTML embedding the exported SVG: `<img src="concept-map.svg">`. See `references/diagram_guide.md` for details.
 
 If the user requests Markdown instead of HTML, adapt the same structure to Markdown and use Mermaid or exported SVG only when the target renderer supports it.
+
+## Building a knowledge library (multi-tutorial)
+
+A single tutorial builds one mental model; a *library* of them builds a connected one. When tutorials accumulate in one directory, the reader's real payoff is in the **edges between them** — `milvus-rag` only makes sense next to `milvus`, `vector-database`, `pgvector`; `langgraph` builds on `langchain`. Two lightweight artifacts turn a pile of folders into a navigable system. Both are **opt-in by context**: do them when the output lands in a directory that already holds sibling tutorials (or the user is clearly building a library), skip them for a one-off tutorial in an empty directory.
+
+### 1. Hub index at the library root
+
+When the destination directory already contains ≥1 sibling tutorial (each a folder with its own `index.html`), create or update a single **hub `index.html` at the library root** (one level above the tutorial folders). It:
+
+- **Clusters tutorials by theme**, not alphabetically — the reader scans by domain (e.g. `Agent / LLM 应用`, `向量 / 检索`, `数据存储`, `消息 / 中间件`, `Web / 前端 / 语言`, `工程基础`). Reuse a hub's existing clusters if one already exists; add a new theme only when a tutorial fits none.
+- Gives each entry a **one-line "what schema it builds"** (the tutorial's 一句话本质, trimmed), so the hub itself teaches the shape of the library rather than being a bare link list.
+- Uses the **same visual identity** as the tutorials (copy the layout `<style>`), so it reads as part of the set.
+
+**Update, don't clobber.** If a hub `index.html` already exists, read it, add the new tutorial's card to the right theme cluster, and preserve everything else. Regenerate from scratch only when the user asks.
+
+### 2. "相关教程" cross-links in each tutorial
+
+A tutorial's `index.html` ends with a **相关教程** block (after 参考资料) linking 2-4 sibling tutorials the reader should hit before or after this one — group as `前置`（prerequisite）and `延伸`（follow-on）when both apply (`langgraph` → 前置 `langchain`; `milvus-rag` → 前置 `milvus` / `vector-database`).
+
+**Verify before linking** (same rule as methodology links — never invent a path): only link a sibling whose `../<sibling>/index.html` actually exists on disk. `ls ../<sibling>/index.html` before writing each `<a href>`. Relative form: `<a href="../<sibling>/index.html">`. This is hub-and-spoke *plus* a few spoke-to-spoke edges — exactly the "连进已有知识网" that lets a reader retain a domain instead of isolated topics.
+
+### When to skip
+
+- One-off tutorial in an empty or unrelated directory → no hub, no cross-links (nothing to connect to).
+- The user explicitly wants a standalone artifact → respect that.
+- The host format has its own navigation (a docs site, a wiki) → integrate with the host's index mechanism instead of dropping a second `index.html`. In an Obsidian-style vault the host may prefer its own MOC/index note — ask rather than assume.
+
+See `references/tutorial_template.md` for the hub `index.html` and 相关教程 snippets.
 
 ## What to read next
 

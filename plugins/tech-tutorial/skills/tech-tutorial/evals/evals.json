@@ -91,6 +91,58 @@
         "has_self_check",
         "has_further_reading"
       ]
+    },
+    {
+      "id": 6,
+      "name": "broad-topical-concept-structure",
+      "prompt": "我想系统搞懂 Kafka——不只是会用，要理解它整套机制：日志存储、分区、副本与 ISR、消费者组与 rebalance、exactly-once 语义。帮我建立完整心智模型，能判断各种取舍。",
+      "expected_output": "Concept-focused 但范围『宽』：不应被塞进 4 文件范式，而应按概念依赖图切成 5-6 章，01-concepts + 02-principles 作锚点，其余按主题命名（如 03-storage-log / 04-replication / 05-consumer-groups），收尾可含 frontier 章（KRaft 取代 ZooKeeper 是活跃变化）。index 含适合谁/不适合谁配对、带日期现状速览、一句话本质。self-check 在最后一章且含 ≥3 道跨章辨别题。每章 ≥1 figure。验证 P0 结构模型 + frontier 章 + 适合谁配对。",
+      "files": [],
+      "assertions": [
+        "has_entrypoint",
+        "scaffold_index_first_selfcheck_last",
+        "more_than_four_chapters_for_broad_topic",
+        "topical_chapter_names_not_generic",
+        "has_concept_map",
+        "has_dated_frontier_framing_or_chapter",
+        "audience_fit_pair_present",
+        "has_tradeoffs",
+        "has_discrimination_scenarios",
+        "every_chapter_has_figure",
+        "self_check_named_with_suffix"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "hands-on-mode-regression",
+      "prompt": "我想动手学 FastAPI，跟着把一个带依赖注入、Pydantic 校验和 async 路由的小服务写出来，要能在本地跑起来。给我能照着敲的代码进阶。",
+      "expected_output": "Hands-on 模式（用户明确要可运行代码进阶）。应含 worked→partial→open 三阶 practice 章、concrete pitfalls 章、混合判别的 capstone 章，self-check 在最后。代码可运行（或标未本地验证）。capstone 承担 discrimination，self-check 偏 recall。每章 ≥1 figure。验证 hands-on 模式在重构后仍然成立。",
+      "files": [],
+      "assertions": [
+        "has_entrypoint",
+        "hands_on_practice_pitfalls_capstone_present",
+        "practice_has_worked_partial_open_progression",
+        "capstone_has_discrimination_decisions",
+        "has_runnable_code",
+        "has_concrete_pitfalls",
+        "self_check_is_last_chapter",
+        "every_chapter_has_figure"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "library-hub-integration",
+      "prompt": "在我的 learning 目录里再加一篇 multi-agent-patterns 的教程，并把它接进现有的知识库——更新首页索引，跟相关的已有教程连起来。",
+      "expected_output": "目标目录已有兄弟教程（langchain/、langgraph/）+ 根 index.html hub。应：(1) 新建 multi-agent-patterns/ 教程；(2) 增量更新根 hub index.html，把新教程卡片加进合适主题簇（Agent/LLM），保留已有条目不重写；(3) 新教程 index.html 含『相关教程』段，链向已验证存在的兄弟（langchain / langgraph），路径真实存在。验证 P1 知识库层。Baseline（旧 skill）不应产出 hub 更新或相关教程段——对比即价值。",
+      "files": ["fixtures/learning-lib"],
+      "assertions": [
+        "new_tutorial_created",
+        "hub_index_updated_with_new_card",
+        "hub_clustered_by_theme",
+        "hub_preserves_existing_entries",
+        "related_tutorials_block_present",
+        "related_links_point_to_existing_siblings"
+      ]
     }
   ]
 }

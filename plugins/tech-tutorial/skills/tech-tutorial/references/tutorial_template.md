@@ -4,10 +4,12 @@ This template operationalizes the seven design principles in SKILL.md. Each sect
 
 The base HTML layout (hand-written CSS + Prism CDN + inline SVG utilities) is defined once in **`references/layout-template.html`**. Copy it into every chapter file. This template document focuses on per-chapter **content structure**, not boilerplate.
 
-- **Concept-focused tutorial** (default, ≈2 hr read): 4 files — `index.html` + `01-concepts.html` + `02-principles.html` + `03-self-check.html` (with mandatory cross-chapter discrimination scenarios — capstone surrogate). Use the unlabeled chapter sections + the self-check chapter section.
-- **Hands-on tutorial** (extension, ≈2-3 hr read): 7 files — adds `03-practice.html`, `04-pitfalls.html`, `05-capstone.html` between principles and self-check; self-check renumbers to `06-self-check.html`. Use the sections labeled "(hands-on extension)".
-- **Quick primer** (≈30 min): collapse to a single `index.html` with `<h2>` per section.
-- **Deep dive**: split chapters further (e.g., `01-concepts-core-model.html`, `01-concepts-data-flow.html`).
+**Structure is a scaffold, not a fixed file list** (see SKILL.md "Output format" → "File structure"): `index.html` first, `NN-self-check.html` last, topical chapters in between named for the subject and sized by Phase 3's concept dependency graph (5–6 chapters typical). Two independent axes:
+
+- **Content mode — concept-focused (default) vs hands-on.** Concept-focused fills chapters with scenario walkthroughs (no required runnable code); its self-check carries the cross-chapter discrimination scenarios (capstone surrogate). Hands-on adds a worked→partial→open progression (`0N-practice.html`), a `0N-pitfalls.html`, and a `0N-capstone.html` — the capstone carries discrimination, so self-check leans toward recall. Use the sections labeled "(hands-on extension)" only in hands-on mode.
+- **Chapter decomposition — how many chapters.** `01-concepts` + `02-principles` anchor most tutorials; the rest of the dependency graph becomes topical chapters (`03-routing`, `04-replication`, …), each built with the "0N-<topic>.html — 主题章" template below. A fast-moving subject may add an optional `0N-frontier.html` before self-check (see the frontier-chapter template below).
+  - **Quick primer** (≈30 min): collapse to a single `index.html` with `<h2>` per section.
+  - **Deep dive**: split an anchor further (e.g., `01-concepts-core-model.html`, `01-concepts-data-flow.html`).
 
 ---
 
@@ -257,6 +259,7 @@ Required sections (in order):
 | 目录 | `<nav><ul>` | `<a href="01-concepts.html">` 链每个章节文件。**Concept-focused**：3 个链接（01-concepts / 02-principles / 03-self-check；index 本身不在目录里）。**Hands-on**：6 个链接（01..06；同样不含 index）。文件总数 = 链接数 + 1（index）|
 | 学完之后 | `<section>` | 3-5 个下一步主题，每个一句话说明"它在你 schema 上加了什么" |
 | 参考资料 | `<footer>` | 官方文档（必填）+ 2-3 设计文档/RFC + 2-3 高质量博客 |
+| 相关教程（多教程库时）| `<section class="related-tutorials">` | **仅当同级目录存在兄弟教程时**：链 2-4 篇已在磁盘上验证存在的前置/延伸教程（见 SKILL.md「Building a knowledge library」）。一次性教程跳过此段 |
 
 **index.html 自检**：
 - [ ] 60 秒能判断是否适合自己？
@@ -268,6 +271,63 @@ Required sections (in order):
 - [ ] 学习路径 breadcrumb 嵌入并高亮当前章节？
 - [ ] 流畅感警告嵌入了？
 - [ ] 至少 3 个分场景路径选项（concept-focused 不含"动手写"）？
+
+---
+
+### 相关教程 block（multi-tutorial libraries only — 见 SKILL.md "Building a knowledge library"）
+
+接在 `index.html` 的 参考资料 之后，**仅当**同级存在兄弟教程且已 `ls ../<sibling>/index.html` 验证：
+
+```html
+<section class="related-tutorials">
+  <h2><span class="num">↗</span><span>相关教程</span></h2>
+  <p class="label">前置（先学这些更顺）</p>
+  <ul>
+    <li><a href="../langchain/index.html">LangChain</a> —— {{它在你 schema 上铺了什么}}</li>
+  </ul>
+  <p class="label">延伸（学完往这走）</p>
+  <ul>
+    <li><a href="../multi-agent-patterns/index.html">Multi-Agent Patterns</a> —— {{下一步加什么}}</li>
+  </ul>
+</section>
+```
+
+只链已验证存在的兄弟；某个分组（前置 / 延伸）没有真实条目就整组省略——不要凑数。
+
+---
+
+## hub index.html — 知识库入口（multi-tutorial）
+
+知识库根目录的 `index.html`（在各教程文件夹的上一层）。它不是教程，是教程的**主题目录**。复制布局 `<style>` 让它与整套视觉一致，然后：
+
+```html
+<article>
+  <header><h1>学习库 · Learning</h1>
+    <p class="one-liner">{{N}} 篇认知科学对齐的技术教程，按主题聚类。</p></header>
+
+  <section class="theme-cluster">
+    <h2>Agent / LLM 应用</h2>
+    <ul class="tutorial-cards">
+      <li><a href="langchain/index.html"><strong>LangChain</strong></a>
+          <span class="schema">{{一句话本质，裁剪}}</span></li>
+      <li><a href="langgraph/index.html"><strong>LangGraph</strong></a>
+          <span class="schema">{{...}}</span></li>
+    </ul>
+  </section>
+
+  <section class="theme-cluster">
+    <h2>向量 / 检索</h2>
+    <ul class="tutorial-cards">...</ul>
+  </section>
+  <!-- 数据存储 / 消息·中间件 / Web·前端·语言 / 工程基础 ... -->
+</article>
+```
+
+**hub 自检**：
+- [ ] 按主题聚类（不是字母序）？
+- [ ] 每篇配一句话 schema 描述（不是裸链接）？
+- [ ] 已有 hub 时是**增量更新**（保留旧条目 + 新增一张卡），不是整页重写？
+- [ ] 每个链接的目标 `<tech>/index.html` 实际存在？
 
 ---
 
@@ -350,6 +410,42 @@ Required sections (in order):
 - [ ] 每个机制有"备选方案对比表"或"痛点 → 设计回应"表？
 - [ ] 每个机制有"带来的代价"段？
 - [ ] 至少一个跨概念综合题？
+
+---
+
+## 0N-<topic>.html — 主题章（topical chapter）
+
+中间章（`01-concepts` / `02-principles` 之后、self-check 之前）按**概念依赖图**切分，文件名取自主题（`03-routing` / `04-replication` / `03-attention`），不用通用槽位名。每个主题章**按 `02-principles` 的结构写**，scope 收到它那个子主题：
+
+- 章首 `recap`（回忆上一章）+ `schema-panel`（本章建立什么）
+- 该子主题的核心机制——讲到"比文档深一层"（how / why / 代价 / 何时失效），不是 API tour
+- 备选方案对比表 或 痛点→设计回应表
+- ≥1 张**本章专属** figure（不是复用 index 的概念地图）
+- 预测式提问 + `<details>` 答案
+- 章末 self-check + "刚好够不着"挑战 + 本章参考
+
+满足 Principle 7：本章例子复用前面章定义过的概念，而不是只用本章新东西。
+
+---
+
+## 0N-frontier.html — 现状 / 前沿章（optional, recognized slot）
+
+> Optional。当一个快速演进的主题（多数框架、所有 AI/ML、年轻协议）已经撑不下 `index.html` 里一段话的 `现状速览` 时，加这一章。主题确实冻结就别加——但要在 index 的现状速览写一句"成熟稳定、近年无重大变化"。本章是 index frontier framing 的**展开 + 带日期**，不是复制。
+
+**目的**（depth · currency lens；SKILL.md Phase 5 Currency check）：把 Phase 2 的 frontier map 落成一章可教学内容——读者读完知道哪些是定论、哪些还在动、哪些别再学。
+
+必填结构：
+
+| 区块 | 形式 | 要求 |
+|---|---|---|
+| 现状全景图 | `<figure>` + hand-coded SVG | 时间轴 / 三态分区图（stable · in-flux · superseded），节点带日期 |
+| 稳定核心 | `<section>` | 已成定论、放心学的部分。点明"自 <version/year> 稳定" |
+| 正在变化（带日期）| `<section>` | 最近 6–12 月在动的部分，每条带 `截至 <date>`，配一手来源（release notes / RFC / 近 12 月论文或博客）|
+| 已被取代 | `<section>` + 对照表 | 旧做法 → 新做法，点名让读者别再学旧的 |
+| 往哪走 | `<section>` | 克制的前瞻：方向性判断，明确标"这是判断不是定论"，不炒作 |
+| self-check | `<section>` + `<details>` | ≥1 道"X 现在还该用吗 / 该换成哪个"的辨别题 |
+
+**反模式**：写成 changelog 流水账。重点是 why 这些变化发生、对读者**选型决策**意味着什么，不是罗列版本号。
 
 ---
 
@@ -458,7 +554,7 @@ Required sections (in order):
 
 ## 自测题库（教程最后一章）
 
-**文件名**：concept-focused 默认是 `03-self-check.html`；hands-on 是 `06-self-check.html`。
+**文件名**：始终是最后一章，命名 `NN-self-check.html`（NN = 章号）。最小 concept-focused 是 `03-self-check.html`，加了主题章就顺延（`05-` / `07-` …）；hands-on 默认 `06-self-check.html`。**后缀必须是 `-self-check`**，不要用 `discrimination` 之类别名——Phase 5 的校验脚本按文件名找它（实测有教程漂成 `05-discrimination.html` 导致漏检）。
 
 **目的**（principle 5 testing effect + principle 7 transfer）：教程的最后一章，无论哪种模式。两种模式下自测的"重心"不同：
 
@@ -540,7 +636,7 @@ Required sections (in order):
 **硬性条目**（每条都要 grep 通过，不要"以后再说"）：
 
 - [ ] **每章 ≥1 张 `<figure>`**（含 SVG 或导入图） —— 用 SKILL.md Phase 5 的 `find ... grep -cE '<figure[ >]'` 命令检查（能匹配带 attribute 的 `<figure class="..."> / <figure id="...">`，旧的 `grep -c '<figure>'` 会漏）。`code-block` 和 `compare-table` 不算 figure —— 它们各自有重要作用，但**承载不了 dual coding 的空间关系编码**。
-- [ ] **整本教程总计 ≥7 张 figure（concept-focused）或 ≥10 张（hands-on）**。典型分布：index 1 张概念地图、01 2-3 张、02 2-3 张、self-check 1 张梯度图。Hands-on 额外：03-practice 1-2 张、04-pitfalls 1 张、05-capstone 1-2 张。Quick primer 例外：单文件 ≥3 张。
+- [ ] **每个内容章 ≥1 张 figure（按章判定，不是按范式总数）**，概念/机制重的章 2-3 张。典型：index 1 张概念地图、`01-concepts` 2-3、`02-principles` 2-3、每个主题章 ≥1、self-check 1 张梯度图；hands-on 的 practice/pitfalls/capstone 各 ≥1；frontier 章 1 张现状图。floor 随章数自动放大（4 章 ≥5-7、6 章 ≥8-10）。Quick primer 例外：单文件 ≥3 张。
 - [ ] 时序 / 状态 / 流程 / 关系都配了对应类型的图（参考 diagram_guide.md 的 5 patterns）
 - [ ] 标签直接在图元素上（无"见图 X 中的 A"跨距离引用）
 - [ ] 没有装饰性图（每张图都有信息增量）
@@ -580,18 +676,19 @@ Required sections (in order):
 - [ ] HTML 已 escape `<` `>` `&` inside `<pre><code>` blocks
 - [ ] 没有"参见第 X 章某节"造成的跳跃阅读
 
-### 语调（grep 命令见 SKILL.md Phase 5；HTML 标签由 grader 自动 strip）
+### 语调（权威词表见 SKILL.md **Forbidden phrases** 表；grep 见 Phase 5；HTML 标签由 grader 自动 strip）
 
-本节是阅读 checklist；权威 ban 列表是 SKILL.md 的 **Forbidden phrases** 表 + Phase 5 grep 正则。两者一致由 SKILL.md 表驱动；本 checklist 同步该表的全部分类。
+**不在此重复词表**——SKILL.md 的 Forbidden phrases 表是唯一信源，Phase 5 的 voice grep 是它的可执行镜像（改表必同步改 grep）。本 checklist 只逐项过**类别**，具体词条去表里查：
 
-- [ ] 没有 cheerleader 类（`我们一起` / `让我们` / `咱们` / `让我们一起` / `let's` / `we'll` / `together we'll` / `you'll discover` / `你会发现`）
-- [ ] 没有 filler 过渡（`接下来` / `接下来让我们` / `我们来看` / `我们来试试` / `下面我们` / `Now we're going to`）
-- [ ] 没有 hedging（`可能` / `也许` / `兴许` / `大概` / `差不多` / `应该是` / `roughly` / `kind of` / `sort of`）
-- [ ] 没有 anesthetic 词（`这很简单` / `很简单` / `显然` / `trivially` / `obviously` / `just`）
-- [ ] 没有 colloquial slang（`坑` 在散文中、`踩坑`、`搞起来`、`撸代码`、`玩一下`）
-- [ ] 没有 AI 套话（`在当今快速发展的技术领域` / `本教程将带你` / `踏上...的旅程` / `开启...之旅`）
-- [ ] 第一人称（`我` / `我们`）只剩三类合法用法：作者认识论说明、对读者发出动作邀请、流畅感警告里的三个标签
-- [ ] 智能引号注意：Mac 自动把 `'` 替换为 `'`（U+2019）；SKILL.md Phase 5 grep 用 `('|')` 形式枚举两个变体来兼容（empirically verified），但人工 review 时也注意这两种形态
+- [ ] cheerleader 类（`让我们` / `我们一起` / `let's` …）—— 0 命中
+- [ ] filler 过渡（`接下来` / `我们来看` …）—— 0 命中
+- [ ] hedging（`可能` / `也许` / `应该是` …）—— 0 命中（**例外**：描述被讲对象本身概率性的，见 SKILL.md「When to break the rules」）
+- [ ] anesthetic（`这很简单` / `显然` / `just` …）—— 0 命中
+- [ ] colloquial slang（散文里的 `坑` / `踩坑` / `撸代码` …）—— 0 命中
+- [ ] AI 套话（`在当今...领域` / `本教程将带你` / `踏上...之旅` …）—— 0 命中
+- [ ] 第一人称 `我` / `我们` 只剩三类合法用法（作者认识论说明、对读者动作邀请、流畅感三标签）
+- [ ] 智能引号：Mac 把直引号换成 U+2019 弯引号；Phase 5 grep 已枚举两种形态，人工 review 也留意
+
 
 ### 完整性
 - [ ] 每章都有"参考资料 / Further reading"

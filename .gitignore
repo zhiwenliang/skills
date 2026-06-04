@@ -26,6 +26,9 @@ $RECYCLE.BIN/
 # Project-local temporary workspace
 .tmp/
 
+# skill-creator eval workspaces (generated tutorials, snapshots, benchmarks)
+*-workspace/
+
 # Logs
 *.log
 logs/

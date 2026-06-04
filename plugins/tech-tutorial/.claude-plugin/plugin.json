@@ -1,7 +1,7 @@
 {
   "name": "tech-tutorial",
-  "version": "0.3.2",
-  "description": "Builds cognitive-science-aligned HTML tutorials for technical topics. Concept-focused by default (4 chapters: concepts + principles + self-check with discrimination scenarios), with optional hands-on extension. Grounded in Sweller, Bjork, Mayer, Roediger (seven encoding principles) plus Marton, Bloom, SOLO, Meyer & Land (depth orientation).",
+  "version": "0.4.0",
+  "description": "Builds cognitive-science-aligned HTML tutorials for technical topics. Concept-focused by default (scenario walkthroughs for mental models), with an optional hands-on mode (runnable code progression). Structure is a scaffold — index first, self-check last, topical chapters in between sized to the subject by a concept dependency graph. Grounded in Sweller, Bjork, Mayer, Roediger (seven encoding principles) plus Marton, Bloom, SOLO, Meyer & Land (depth orientation).",
   "author": {
     "name": "Zhiwen Liang"
   },
