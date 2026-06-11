@@ -11,7 +11,7 @@
       "id": 1,
       "name": "open-ended-web-framework",
       "prompt": "我想系统学一个 Python Web 框架，之前只写过简单脚本和几个 Flask 路由。帮我写一份能建立完整心智模型的教程。",
-      "expected_output": "Concept-focused 教程（默认 4 章：index + 01-concepts + 02-principles + 03-self-check）。范围明确（覆盖核心概念，不试图涵盖全框架）。01 用 Flask/脚本经验作类比起点，每个概念配场景走查（不要求可运行代码）；02 含备选方案对比表；03-self-check 含 ≥3 道跨 01+02 场景辨别题（capstone 替代）。包含学习路径 breadcrumb + 下一步建议。正文无 cheerleader / 第一人称 / AI 套话语气。",
+      "expected_output": "Concept-focused 教程，遵循脚手架而非固定章数：index 首、*-self-check 尾，中间为概念依赖图决定的主题章（紧凑范围可收敛为 01-concepts + 02-principles 两章，范围更广则 5-6 章——依赖图决定，不硬凑 4 文件）。范围明确（覆盖核心概念，不试图涵盖全框架）。01 用 Flask/脚本经验作类比起点，每个概念配场景走查（不要求可运行代码）；02 含备选方案对比表；03-self-check 含 ≥3 道跨 01+02 场景辨别题（capstone 替代）。包含学习路径 breadcrumb + 下一步建议。正文无 cheerleader / 第一人称 / AI 套话语气。",
       "baseline": "无此方法论时（RED）：抓官方文档拼成的单页摘要，章节按 API 面命名（路由 / 中间件 / 部署），无概念地图、无基于读者 Flask/脚本背景的类比、无场景辨别题、无学习路径 breadcrumb，常带『让我们一起』式语气。",
       "files": [],
       "assertions": [
@@ -221,6 +221,22 @@
         "routes_away_non_learning_intent",
         "no_full_tutorial_for_debugging_request",
         "asks_build_vs_teach_or_redirects"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "coinage-temptation-unsettled-vocabulary",
+      "prompt": "我想系统搞懂 LLM 推理加速：speculative decoding、continuous batching、chunked prefill 这几个机制各自解决什么问题、怎么配合。给我写一份中文教程。",
+      "expected_output": "快变领域 + 中文译名未沉淀，是造词高危场景。正文与章节/图标题保留社区英文术语（speculative decoding / continuous batching / chunked prefill / KV cache），首次出现用一句白话注解，不自创中文译名、不发明隐喻标签（如『推测漏斗』『批处理河流』）；存在通行译名的（如『投机采样』之于 speculative sampling）需用社区实际用法而非硬译。术语经 Phase 2 term table 供给、Phase 5 terminology check（extract_terms.py 枚举 + 对表判定）把关。含 dated 现状速览（该领域 6-12 个月内仍在变）。",
+      "baseline": "无此方法论时（RED）：为每个英文机制名硬造中文译名或隐喻标签并在全文复用（『推测式解码漏斗』『连续批流』），章节名用自创词命名，无首次白话注解，读者拿着这些词在社区检索零命中。",
+      "files": [],
+      "assertions": [
+        "has_entrypoint",
+        "uses_standard_terminology",
+        "no_invented_concept_labels",
+        "has_dated_frontier_framing_or_chapter",
+        "marks_current_vs_emerging_dated",
+        "no_forbidden_voice_phrases"
       ]
     }
   ]

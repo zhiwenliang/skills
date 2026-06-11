@@ -51,7 +51,7 @@ Every tutorial section must be designed against these. The completeness checklis
 
 ### 1. Declare the target reader (Expertise Reversal)
 
-The same teaching style helps novices and bores experts; trying to serve both serves neither. Open every tutorial with three explicit lists: **适合谁** (required prior knowledge, tooling, versions), **不适合谁** (route elsewhere), **读完之后你能做到什么** (concrete verifiable capabilities). Anyone outside the target is routed away on page one.
+The same teaching style helps novices and bores experts; trying to serve both serves neither (Kalyuga's boundary condition: the effect is strongest for complex, high-element-interactivity material and weaker on simple tasks). Open every tutorial with three explicit lists: **适合谁** (required prior knowledge, tooling, versions), **不适合谁** (route elsewhere), **读完之后你能做到什么** (concrete verifiable capabilities). Anyone outside the target is routed away on page one.
 
 ### 2. Map before territory (Schema Anchoring)
 
@@ -63,7 +63,7 @@ Working memory is empty when the reader opens chapter 1. Give them anchors first
 
 ### 3. Image + labels + reader-draw (Dual Coding + Split-Attention)
 
-Words and images take separate working-memory channels; together they roughly double retention. Cross-references ("see node A in figure 3.2 above") destroy that gain by forcing the eye to ping-pong.
+Words and images take separate working-memory channels; together they substantially increase retention (the magnitude varies by task and design — see [references/cognitive_principles.md](references/cognitive_principles.md)). Cross-references ("see node A in figure 3.2 above") destroy that gain by forcing the eye to ping-pong.
 
 - **≥1 diagram per major section.** A >300-line prose stretch without one is a Principle-3 failure.
 - **Labels go on the diagram elements**, never in surrounding prose.
@@ -121,7 +121,7 @@ The seven principles govern *how* learning encodes. They don't decide *how deep*
 
 **Don't operationalize depth as a checklist** (count quantitative claims, count Bloom-level questions per chapter). That trains the author to game the count without changing what's underneath — the same trap "X test cases per function" falls into. Instead, carry these four frameworks as **author orientation** before and during writing:
 
-- **Marton & Säljö (1976) — deep vs surface processing.** Every concept sentence either anchors a sign ("X is a Y") or a signified ("X enables / prevents / makes possible Z"). Notice which one you're writing. Surface processors retain ~10-15% at one week; deep processors retain ~50-60%.
+- **Marton & Säljö (1976) — deep vs surface processing.** Every concept sentence either anchors a sign ("X is a Y") or a signified ("X enables / prevents / makes possible Z"). Notice which one you're writing. In the original one-week single-passage study, surface processors retained ~10-15% vs ~50-60% for deep processors — the *gap* replicates robustly; the absolute percentages are specific to that task.
 - **Bloom's revised taxonomy (Anderson & Krathwohl 2001).** Every question you ask the reader sits somewhere on Remember → Understand → Apply → Analyze → Evaluate → Create. Surface tutorials cluster at 1-2; deep tutorials weight toward 3-5. Notice where your questions cluster — if 90% are Remember/Understand, you're shipping a recall manual.
 - **SOLO taxonomy (Biggs & Collis 1982).** The reader's mental state after reading is *multistructural* (a bag of unconnected facts) or *relational* (an integrated structure where facts know how they connect). Concept-map edges carry the relational information — if you can't label an edge, you don't have relational understanding of that connection.
 - **Threshold concepts (Meyer & Land 2003).** Every domain has 1-3 concepts that, once internalized, *transform* the reader's view of the field (irreversible, integrative, troublesome). A tutorial without an identified threshold concept lacks a core idea; it covers ground instead of transforming understanding. Find it explicitly.
@@ -160,7 +160,7 @@ Four coinage failures, all banned:
 
 **The one test that catches all four:** for every concept name in bold or quotes, and every section/figure title, ask — *would a working practitioner in this field recognize this as the real term, or did I make it up?* If made up: replace with the real term, or demote it to a clearly-marked analogy (`可以类比成…，但它真正的名字是 X`). An analogy is a teaching aid, never a term you then reuse as if it were established; drop it once the real concept is in place.
 
-This rule is **not** in the Forbidden-phrases table below and **not** in the Phase 5 voice grep — a coined word is novel by definition, so grep cannot find it. It is enforced by the Phase 5 *Terminology check* (qualitative) plus the *pedagogy-jargon leak* grep (which catches only the third row's fixed vocabulary).
+This rule is **not** in the Forbidden-phrases table below and **not** in the Phase 5 voice grep — a coined word is novel by definition, so grep cannot find it. Enforcement is a pipeline instead: Phase 2's **term table** supplies the real words up front, `scripts/extract_terms.py` enumerates every shipped name deterministically, and the Phase 5 *Terminology check* judges each against the table (in a fresh context, with external verification for suspects). The *pedagogy-jargon leak* grep separately catches the third row's fixed vocabulary.
 
 Before / after (coined → standard + plain):
 
@@ -366,15 +366,18 @@ For any tech with research surface ≥3 angles, **fan out in one message**. Typi
 
 Cap each worker at ~400 words of structured findings. **Add to every worker's brief: "Reserve the final 50-80 words for a `## Surprises` section — bullet list, one line each, listing the gaps between your prior model of this tech and what you found. This section is mandatory; if no surprises, say so explicitly."** Surprise is the depth signal; the things that surprised the researcher will surprise the reader. Make the section a separate header so the lead thread can grep it back deterministically — not a free-floating note that gets pruned to fit the 400-word cap.
 
-The lead thread then assembles four artifacts:
+**Add to the official-docs worker's brief**: end with a mandatory `## Terminology` section — one line per concept, fixed format: `<concept> | <canonical term> | <中文处理: keep-English / 通行译名「…」> | <one-phrase plain gloss>`. Same extraction discipline as `## Surprises`: a separate header the lead thread greps back deterministically; if the header is missing, re-prompt the worker.
+
+The lead thread then assembles the following artifacts (don't pin a count here — counts go stale):
 
 - The **concept dependency graph**: which concept must be defined before which?
 - The **why bank**: for each design choice, what alternatives existed and what got sacrificed?
 - The **pitfall list**: concrete things that bite newcomers.
 - The **surprise list**: from each worker's output, locate the line matching `^## Surprises\b` (regex `^## Surprises`, case-sensitive) and extract every bullet line that follows until the next heading or end-of-output. Concatenate the extracted bullets verbatim into a flat list, prefixed with the worker name (e.g., `[official-docs] no implicit await on the close call`). Dedup obvious overlaps but keep the original framing intact. This becomes the candidate-pool for Phase 3's threshold concept and the "what would surprise the reader" hooks for Phase 4 concept introductions. **If a worker omits the `## Surprises` header, treat its surprise contribution as missing and re-prompt that worker. If the assembled list ends up empty or pure restatement of the docs, Phase 2 is not done — send workers back to dig deeper.**
+- The **term table**: from the official-docs worker, locate `^## Terminology` and extract the lines that follow (same rule as the surprise list — header missing means re-prompt). Four columns: concept | canonical term | 中文处理 (keep-English / established translation) | first-use plain gloss. This is the supply that prevents coinage (Terminology discipline: coinage happens when the author lacks the real word at hand) **and the diff baseline for Phase 5's terminology audit** — shipped prose that names a concept outside this table needs a registered reason, not silence.
 - The **frontier map**: from the frontier worker, sort findings into three dated buckets — **stable** (the settled core, teach it plainly), **in flux** (changed in roughly the last 6–12 months, teach it with the date attached), **superseded / deprecated** (name it so the reader doesn't learn the old way). Keep the date on each. This drives Phase 3's frontier framing and the index `现状速览`. If the topic is genuinely frozen, record that as the finding ("stable since <version/year>, nothing material in flux") rather than leaving the bucket empty by omission.
 
-Carry each concept's **canonical term** (from the official-docs worker) into Phase 4 — drafting names concepts with these real terms, not freshly-coined labels (see Terminology discipline). Coinage usually happens because the author lacks the real word at hand; this list is the supply that prevents it.
+Carry the **term table** into Phase 4 — drafting names concepts with these real terms, not freshly-coined labels (see Terminology discipline). A concept the table doesn't cover gets named with a verified standard term and added to the table (registered), or described in plain words — never crowned with a fresh noun.
 
 If research surface is small (a single feature like a CLI flag or one API method), one combined search is fine — don't manufacture parallelism.
 
@@ -405,6 +408,7 @@ Write per [references/tutorial_template.md](references/tutorial_template.md). Th
 - The locked chapter spec (one-line schema-builds + section list)
 - The full concept dependency graph (so it doesn't redefine upstream concepts)
 - The concept map + learning-path breadcrumb (so cross-references stay consistent)
+- The Phase 2 **term table** (so every concept gets its canonical term; a name outside the table needs a one-line registered reason in the worker's notes back to the lead thread — silent coinage is what the Phase 5 audit will catch and bounce)
 - The chapter's specific worked-example / partial-example / open-exercise contract
 
 The lead thread then does a coherence merge pass: re-show the learning-path breadcrumb at each chapter opener with current chapter highlighted, verify cross-chapter callbacks land on actual prose in earlier chapters, deduplicate any concept that got accidentally redefined in two chapters.
@@ -459,47 +463,41 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 - **Retrieval separation check**: open every self-check section and confirm answers are in `<details>` blocks or a separate file, never inline.
 - **Cross-chapter callback check**: every chapter after the first should textually reference at least one earlier concept by name. Grep for the earlier chapter's key terms in the current chapter; they should appear.
 - **Discrimination check**: ≥1 prompt (ideally 3-5) that forces the reader to *choose between* approaches from ≥2 prior chapters. Lives in the trailing `*-self-check.html` (concept-focused) or `*-capstone.html` (hands-on) — the chapter number varies with how many topical chapters precede it, so locate it by the `-self-check` / `-capstone` **suffix**, not a fixed number.
-- **Structural gates — run the bundled script (replaces hand-running the next five greps)**: `bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh" <tutorial-dir>` (or `bash scripts/verify_structure.sh <dir>` from the skill dir). One run covers **self-check naming, audience-fit pair, figure coverage, SVG-utility-CSS presence, and the reader-drawing prompt** — it exits non-zero and prints which gate failed. The five bullets below stay the authoritative spec + rationale (why each gate exists, the failure stories); once the script passes you don't also hand-run their commands. It does **not** cover voice / pedagogy-jargon (kept inline below, table-coupled) or SVG overflow (needs a browser).
-- **Self-check naming check (hard)**: the last chapter must be named `*-self-check.html`. Run `ls *-self-check.html` in the tutorial dir — exactly one match. A tutorial that ships its question bank as `05-discrimination.html` or similar is missing the convention the other checks key on (seen in real use); rename it.
-- **Audience-fit pair check (hard, run as grep)**: `index.html` must contain BOTH 适合谁 and 不适合谁 — the pair silently degrades to one half (seen in real tutorials shipped with only one). Because `适合谁` is a substring of `不适合谁`, count occurrences: `pos=$(grep -o 适合谁 index.html | wc -l); neg=$(grep -o 不适合谁 index.html | wc -l); [ "$neg" -ge 1 ] && [ "$pos" -gt "$neg" ] || echo "AUDIENCE-FIT incomplete"`. `pos > neg` guarantees a standalone 适合谁 section beyond the 不适合谁 ones. Also confirm 读完之后你能做到什么 is present.
-- **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first, then grep. The voice grep pattern is kept in sync with the **Forbidden phrases** table at the top of this document — if you add a banned phrase there, update this regex too. The per-file loop prefixes each line with the filename so grep hits are actionable. One-liner uses `find` (zsh-safe), passes the file via `sys.argv[1]` (apostrophe-in-filename safe), runs `grep -inE` (case-insensitive: catches `Let's` / `We'll` / `Roughly`), and uses `[''`]` character classes so smart quotes (`'` U+2019, the macOS autocorrect default) match alongside straight ASCII `'`:
+- **Structural gates — run the bundled script (the only executable form of the next five gates)**: `bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh" <tutorial-dir>` (or `bash scripts/verify_structure.sh <dir>` from the skill dir). One run covers **self-check naming + position, audience-fit pair, figure coverage, SVG-utility-CSS presence, and the reader-drawing prompt** — it exits non-zero and prints which gate failed. It auto-detects the **quick-primer single-file mode** (a lone `index.html`) and skips the self-check-naming gate there; for a **Markdown-fallback** tutorial the gates don't apply mechanically — hand-check the same five rules against the `.md` output. If your system lacks `en_US.UTF-8`, set `TECH_TUTORIAL_LC_ALL` to any installed UTF-8 locale; otherwise the script keeps your locale when it is already UTF-8. The five bullets below are the authoritative spec + rationale (why each gate exists, the failure stories); the commands live only in the script — don't maintain a second copy by hand. It does **not** cover voice / pedagogy-jargon (kept inline below, table-coupled) or SVG overflow (needs a browser).
+- **Self-check naming check (hard — script gate 1)**: exactly one chapter named `*-self-check.html`, and it must be the **last** chapter. A tutorial that ships its question bank as `05-discrimination.html` or similar is missing the convention the other checks key on (seen in real use); rename it. Appending a chapter after the self-check (e.g. `04-frontier` behind `03-self-check`) breaks the "retrieval comes last" invariant — renumber so self-check keeps the highest prefix.
+- **Audience-fit pair check (hard — script gate 2)**: `index.html` must contain BOTH 适合谁 and 不适合谁 — the pair silently degrades to one half (seen in real tutorials shipped with only one) — plus 读完之后你能做到什么. Because `适合谁` is a substring of `不适合谁`, the gate counts occurrences and requires a standalone 适合谁 beyond the 不适合谁 ones.
+- **Voice check (run as actual grep, not eyeball scan)**: from the tutorial dir, strip HTML markup + `<pre><code>` + `<details>` content first with the bundled `scripts/strip_prose.py` (the single home for the stripping rules — all three prose greps pipe through it, so they always scan the same text), then grep. The voice grep pattern is kept in sync with the **Forbidden phrases** table at the top of this document — if you add a banned phrase there, update this regex too. The per-file loop prefixes each line with the filename so grep hits are actionable; `find` is zsh-safe, the file passes via `sys.argv[1]` (apostrophe-in-filename safe), `grep -inE` is case-insensitive (catches `Let's` / `We'll` / `Roughly`), and `[''`]` character classes make smart quotes (`'` U+2019, the macOS autocorrect default) match alongside straight ASCII `'`:
 
   ```bash
+  STRIP="${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/strip_prose.py"
   find . -maxdepth 1 -name '*.html' | while read -r f; do
-    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | LC_ALL=en_US.UTF-8 grep -inHE --label="$f" "我们一起|让我们|咱们|你会发现|接下来|我们来看|我们来试试|下面我们|Now we('|’)re going to|you('|’)ll discover|together we('|’)ll|let('|’)s|we('|’)ll|这很简单|很简单|显然|trivially|obviously|(^|[^a-zA-Z])just|可能|也许|兴许|大概|差不多|应该是|(^|[^a-zA-Z])roughly|(^|[^a-zA-Z])kind of|(^|[^a-zA-Z])sort of|踩坑|搞起来|撸代码|玩一下|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
+    python3 "$STRIP" "$f" | LC_ALL="${TECH_TUTORIAL_LC_ALL:-en_US.UTF-8}" grep -inHE --label="$f" "我们一起|让我们|咱们|你会发现|接下来|我们来看|我们来试试|下面我们|Now we('|’)re going to|you('|’)ll discover|together we('|’)ll|let('|’)s|we('|’)ll|这很简单|很简单|显然|trivially|obviously|(^|[^a-zA-Z])just|可能|也许|兴许|大概|差不多|应该是|(^|[^a-zA-Z])roughly|(^|[^a-zA-Z])kind of|(^|[^a-zA-Z])sort of|踩坑|搞起来|撸代码|玩一下|在当今.*?领域|本教程将带你|踏上.*?旅程|开启.*?之旅"
   done
   ```
 
   Plus a separate first-person scan over the same stripped text:
 
   ```bash
+  STRIP="${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/strip_prose.py"
   find . -maxdepth 1 -name '*.html' | while read -r f; do
-    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | LC_ALL=en_US.UTF-8 grep -nHE --label="$f" "(^|[^a-zA-Z])(我|我们)"
+    python3 "$STRIP" "$f" | LC_ALL="${TECH_TUTORIAL_LC_ALL:-en_US.UTF-8}" grep -nHE --label="$f" "(^|[^a-zA-Z])(我|我们)"
   done
-
-  Both greps now pin `LC_ALL=en_US.UTF-8` inline so the curly-apostrophe and Chinese-character alternations match regardless of the caller's locale (a bare `LC_ALL=C` breaks codepoint-level alternation, not byte-level). If your system lacks `en_US.UTF-8`, substitute another installed UTF-8 locale.
   ```
 
+  Both greps pin a UTF-8 locale so the curly-apostrophe and Chinese-character alternations match regardless of the caller's locale (a bare `LC_ALL=C` breaks codepoint-level alternation, not byte-level). If your system lacks `en_US.UTF-8` (common on minimal Linux/CI images), set `TECH_TUTORIAL_LC_ALL` to any installed UTF-8 locale (`locale -a | grep -i utf`) — the same variable `verify_structure.sh` honors.
+
   Every hit in **stripped prose** needs a fix or a justification (epistemic note / reader-addressed action / mandated fluency-illusion label / reporting the subject's genuine probability — see "When to break the rules"). Don't ship with raw hits.
-- **Pedagogy-jargon leak check (hard, run as grep)**: the cognitive-framework vocabulary is the author's design tool and must not surface in reader prose (Terminology discipline, row 3). Over HTML-stripped prose, from the tutorial dir:
+- **Pedagogy-jargon leak check (hard, run as grep)**: the cognitive-framework vocabulary is the author's design tool and must not surface in reader prose (Terminology discipline, row 3). Over the same `strip_prose.py`-stripped prose, from the tutorial dir:
 
   ```bash
+  STRIP="${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/strip_prose.py"
   find . -maxdepth 1 -name '*.html' | while read -r f; do
-    python3 -c "import re, sys; t=open(sys.argv[1]).read(); t=re.sub(r'<pre[^>]*><code[^>]*>.*?</code></pre>','',t,flags=re.S); t=re.sub(r'<details>.*?</details>','',t,flags=re.S|re.I); t=re.sub(r'<[^>]+>','',t); print(t)" "$f" | LC_ALL=en_US.UTF-8 grep -inHE --label="$f" "认知负荷|认知负载|cognitive load|内在负荷|外在负荷|相关负荷|germane load|intrinsic load|extraneous load|期望难度|合意困难|desirable difficulty|门槛概念|阈限概念|threshold concept|双重编码|dual coding|提取练习|retrieval practice"
+    python3 "$STRIP" "$f" | LC_ALL="${TECH_TUTORIAL_LC_ALL:-en_US.UTF-8}" grep -inHE --label="$f" "认知负荷|认知负载|cognitive load|内在负荷|外在负荷|相关负荷|germane load|intrinsic load|extraneous load|期望难度|合意困难|desirable difficulty|门槛概念|阈限概念|threshold concept|双重编码|dual coding|提取练习|retrieval practice"
   done
   ```
 
   Hits in reader prose are leaks — rename to the subject's own terms or delete. The list is **deliberately narrow**: it omits `schema` (legit subject term — DB / JSON / GraphQL schema; left to the qualitative Terminology check) and `流畅性错觉 / fluency illusion` (Principle 6 *mandates* a fluency-illusion warning in `index.html`). The seven-principle vocabulary is stable, so this list rarely changes. This grep is **separate from the forbidden-phrases voice grep** and does not touch the grep↔table 1:1 sync.
-- **Diagram coverage check (hard, run as grep)**: every chapter file must contain ≥1 `<figure>`. The pattern matches both `<figure>` and `<figure class="...">` / `<figure id="...">`. From the tutorial dir:
-
-  ```bash
-  find . -maxdepth 1 -name '*.html' | while read -r f; do
-    n=$(grep -cE '<figure[ >]' "$f")
-    [ "$n" -lt 1 ] && echo "MISSING figure in: $f"
-  done
-  ```
-
-  Output should be empty. **`code-block` and `compare-table` do NOT count as figures** — they are sequential text and structured text; neither carries the spatial / parallel relationship that dual coding (Principle 3) is buying. All three (figures + code blocks + tables) coexist; figures are not optional just because other visual elements are present.
+- **Diagram coverage check (hard — script gate 3)**: every chapter file must contain ≥1 `<figure>` (the gate matches `<figure>` with or without attributes). **`code-block` and `compare-table` do NOT count as figures** — they are sequential text and structured text; neither carries the spatial / parallel relationship that dual coding (Principle 3) is buying. All three (figures + code blocks + tables) coexist; figures are not optional just because other visual elements are present.
 
   Per-chapter targets — the rule is **per chapter**, not a canon-wide total (a 9-chapter tutorial and a 4-chapter one are both judged chapter-by-chapter):
   - **index.html**: ≥1 (the concept map).
@@ -510,27 +508,26 @@ Before declaring done, audit against the checklist in [references/tutorial_templ
 
   **Common rationalization to refuse**: "this chapter is pitfalls / question bank / hands-on, doesn't need diagrams." False — pitfalls can show causal links between failure modes; question banks can show difficulty gradient and chapter mapping; hands-on can show type flow and scaffold progression. *Every chapter has a figure-worthy shape; if you can't find one, the chapter outline isn't clear yet.*
 
-- **SVG utility CSS presence check (hard, run as grep)**: every chapter file's `<style>` block must include the SVG utility classes — otherwise `<rect class="diagram-ink node-fill"/>` degrades to **solid black fill** (default SVG `fill` is black) when CSS is missing. From the tutorial dir:
+- **SVG utility CSS presence check (hard — script gate 4)**: every chapter file's `<style>` block must include the SVG utility classes — otherwise `<rect class="diagram-ink node-fill"/>` degrades to **solid black fill** (default SVG `fill` is black) when CSS is missing. If the gate lists a file, paste the canonical SVG utility block (defined at the end of `references/layout-template.html`'s `<style>`) into its `<style>`.
 
-  ```bash
-  find . -maxdepth 1 -name '*.html' -exec grep -L '\.diagram-ink' {} +
-  ```
-
-  Output should be empty (every file must include `.diagram-ink`). If a file is listed, paste the canonical SVG utility block (defined at the end of `references/layout-template.html`'s `<style>`) into its `<style>`.
-
-  **Failure mode this prevents**: an early-drafted chapter without figures shipped with no SVG utility CSS; later iteration adds figures that pass coordinate math but render as opaque black rectangles in the deployed file. *Seen in real tutorials. Always grep before declaring done.*
-- **Reader-drawing check (hard, not soft)**: at least one explicit "draw it yourself" prompt must exist in the tutorial — typically in the self-check chapter (or the capstone, if hands-on). Run `find . -maxdepth 1 -name '*.html' -exec grep -nE "(自己画|亲手画|手画|画一画|画一张|sketch|Draw the)" {} +` from the tutorial dir. Zero hits means dual coding is still one-way; add the prompt before declaring done.
+  **Failure mode this prevents**: an early-drafted chapter without figures shipped with no SVG utility CSS; later iteration adds figures that pass coordinate math but render as opaque black rectangles in the deployed file. *Seen in real tutorials. Always run the gate before declaring done.*
+- **Reader-drawing check (hard, not soft — script gate 5)**: at least one explicit "draw it yourself" prompt must exist in the tutorial — typically in the self-check chapter (or the capstone, if hands-on). Zero hits means dual coding is still one-way; add the prompt (e.g. `亲手画一张图`) before declaring done.
 - **SVG visual self-verify (hard — run BOTH the overflow script and a screenshot pass)**: hand-coded SVG fails in 4 specific ways — text overflow (past a box border / past the viewBox), connector crossings, arrow piercing into nodes, asymmetric stop policy. Text overflow is the most frequent defect and is caught *deterministically by measurement*; the other three need the eye on a rendered screenshot. For each chapter:
   1. `python3 -m http.server 8765` (from the tutorial folder, in background)
   2. Open `http://localhost:8765/<chapter>.html` via browser automation / headless browser / manual browser
-  3. **Run `scripts/svg_overflow_check.js` against the page** (Playwright `browser_evaluate`, headless `page.evaluate`, or DevTools console). It returns `"OK: no SVG text overflow"` or the exact labels that spill past a box border / the viewBox. Fix each (shorten / split to a 2nd line / widen the box / font-size 12) and **re-run until OK**. Do not eyeball text width — the character-count estimate is unreliable for mixed CJK+Latin and is why overflow keeps recurring.
+  3. **Run the bundled overflow script against the page** — read it from `"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/svg_overflow_check.js"` (the cwd here is the tutorial folder, so a bare `scripts/...` relative path won't resolve) and evaluate it via Playwright `browser_evaluate`, headless `page.evaluate`, or the DevTools console. It returns `"OK: no SVG text overflow"` or the exact labels that spill past a box border / the viewBox. Fix each (shorten / split to a 2nd line / widen the box / font-size 12) and **re-run until OK**. Do not eyeball text width — the character-count estimate is unreliable for mixed CJK+Latin and is why overflow keeps recurring.
   4. Capture each figure (`article > figure:nth-of-type(N)`) as a screenshot and inspect for the spatial defects the script can't see: connector lines crossing other connectors; arrow tips inside target boxes; arrows on different sides of a center node touching with inconsistent gaps; viewBox cropping content.
   5. Fix any defect in the SVG source, then re-run the script **and** re-screenshot to confirm.
 
   See `references/diagram_guide.md` "SVG self-verification rules" for the 4 failure modes and fixes. Never declare a tutorial done without the overflow script returning OK **and** a rendered screenshot pass on every figure.
 - **Runnability check**: run each code example if a runtime is available; otherwise mark "未在本机验证" at the top.
 - **Citations check**: each chapter footer has a "Further reading" with 2-5 sources. If the user provides an organization-specific methodology note or internal source, link it only after verifying the path or URL exists.
-- **Terminology check** (qualitative, not grep — the audit for Terminology discipline rows 1-2): collect every concept name you put in bold or quotes, plus every section/figure title. For each, answer in one phrase: *standard term, or coined?* Coined labels get the real term, or a clearly-marked analogy. Non-standard translations get the community's actual term (keep English where the community keeps English). Grep can't find a word that didn't exist before you wrote it, so this self-check is the only gate for invented labels and bad translations — run it even when the prose reads fine.
+- **Terminology check** (the audit for Terminology discipline rows 1-2 — mechanical enumeration, independent judgment, external verification): grep can't find a word that didn't exist before you wrote it, so the audit splits the work into what can be mechanized and what can't:
+  1. **Enumerate candidates deterministically**: `python3 "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/extract_terms.py" <tutorial-dir>` dumps every bold/quoted concept name, section title, and figure caption/label with its location. Judge over this complete list, never over what catches your eye — eye-collection is the same fatigue trap the structural gates were bundled to avoid.
+  2. **Judge each candidate against the Phase 2 term table, in a fresh context**: when parallel workers are available, assign this audit to an independent worker that did *not* write the prose — the author that coined a label is the least likely to flag it. Verdict per candidate: *in the table* / *standard but missing from the table* / *suspected coined or non-standard translation*.
+  3. **Verify suspects externally**: for each suspect, check the term against official docs or a web search. A "term" with zero community usage is coined — replace it with the real term, or demote it to a clearly-marked analogy (`可以类比成…，但它真正的名字是 X`). A non-standard translation gets the community's actual term (keep English where the community keeps English). A standard term that was merely missing from the table gets added to the table — registered, not silently waved through.
+
+  Run it even when the prose reads fine; the judgment step stays qualitative on purpose (a hard table-match gate would punish legitimate subject terms Phase 2 didn't anticipate).
 - **Insight check** (one qualitative self-answer, not a grep): in one sentence, name what a 5-year-experience engineer in this domain would leave with after reading — that they couldn't get from the official docs alone. If you can't write that sentence, the tutorial is still at sign level (Marton's surface processing). Go back: either Phase 2 to surface more surprise material, or Phase 3 to re-pick the threshold concept. Once you can write the sentence, it goes into `index.html`'s "读完之后你能做到什么" section verbatim as the tutorial's USP.
 - **Mechanism-depth check** (qualitative, like the insight check — *not* a count, per the no-checklist rule): walk the core concepts and ask of each, *does the prose go one level below where the official docs stop, or does it restate the doc sentence?* Restatement is surface processing (Marton) — the "longer version of the docs" failure. A concept that only restates goes back to Phase 2 for its mechanism before shipping. Read for the move; don't tally a number (a tally just trains relabeling).
 - **Currency / frontier check**: is the `现状速览` frontier framing present in `index.html` and **dated**? For a fast-moving topic, are the load-bearing sources recent (reject >2-year-old sources for fast-moving tech, per research_workflow.md), and does the prose flag what's in flux vs settled where it matters? If the tutorial reads as if the field is frozen and it is not, the Phase 2 frontier sweep was skipped or too shallow — go back. (For a genuinely frozen topic, the one-line "stable since <year>" note satisfies this.)
