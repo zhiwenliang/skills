@@ -90,17 +90,17 @@ Apply with `marker-end="url(#arrow-ink)"` on `<line>` or `<path>`. `refX="9"` me
 
 Center text inside boxes with `text-anchor="middle"` and a y-coordinate at box-vertical-center + 5 (visual centering for typical fonts).
 
-**Size the box to the text, not the text to the box.** The default sizes above are starting points, not constraints. Choose the label and font-size first, then set the box width to **at least the rendered text width + 24px** (≈12px padding each side). Cramming a long label into a 140px box is the single biggest source of overflow. Rough budget at the default 13px node-label, for sizing intuition only (the overflow script is the real gate): a 140px box holds ~8 CJK chars or ~16 ASCII; a 200px box ~13 CJK; each extra CJK char ≈ 13px, each ASCII ≈ 7px. When a label won't fit, in order of preference: **split to a second line** (a 13px name line + an 11px `.edge-label` sublabel — a 140×60 box beats a 260px one-liner that collides with neighbors), shorten it, widen the box, or drop to font-size 12. Mixed CJK + Latin + digits make hand-estimates unreliable — when unsure, widen and let the script confirm.
+**Size the box to the text, not the text to the box.** The default sizes above are starting points, not constraints. Choose the label and font-size first, then set the box width to **at least the rendered text width + 24px** (≈12px padding each side). Cramming a long label into a 140px box is the single biggest source of overflow. Rough budget at the default 13px node-label, for sizing intuition only (the defect script is the real gate): a 140px box holds ~8 CJK chars or ~16 ASCII; a 200px box ~13 CJK; each extra CJK char ≈ 13px, each ASCII ≈ 7px. When a label won't fit, in order of preference: **split to a second line** (a 13px name line + an 11px `.edge-label` sublabel — a 140×60 box beats a 260px one-liner that collides with neighbors), shorten it, widen the box, or drop to font-size 12. Mixed CJK + Latin + digits make hand-estimates unreliable — when unsure, widen and let the script confirm.
 
 ## SVG self-verification rules (mandatory before declaring a diagram done)
 
-Three failure modes appear repeatedly when an author hand-codes SVG. Catch them before shipping.
+Five failure modes appear repeatedly when an author hand-codes SVG. Catch them before shipping.
 
 ### Rule 1 — Text-overflow check
 
 A text label can exceed its node's box, or the SVG viewBox, when it's too long for its font-size. This is the **most common** hand-coded-SVG defect and the hardest to catch by eye — a label spilling 5px past a border reads as "almost fine" in a quick glance, then ships.
 
-**Do not rely on a mental width estimate.** Character-counting works for pure ASCII or pure CJK, but real labels mix Han (~1em), Latin (~0.55em), digits (~0.6em), spaces (~0.25em) and punctuation — the estimate is wrong often enough that overflow keeps slipping through. Use it only as a coarse pre-check (CJK ≈ font-size px/char, ASCII ≈ 0.55×); the **measurement script is the actual gate** — `scripts/svg_overflow_check.js` reads each label's real rendered width via `getComputedTextLength()` and reports exactly which labels spill where (see "Self-verify" below).
+**Do not rely on a mental width estimate.** Character-counting works for pure ASCII or pure CJK, but real labels mix Han (~1em), Latin (~0.55em), digits (~0.6em), spaces (~0.25em) and punctuation — the estimate is wrong often enough that overflow keeps slipping through. Use it only as a coarse pre-check (CJK ≈ font-size px/char, ASCII ≈ 0.55×); the **measurement script is the actual gate** — `scripts/svg_overflow_check.js` measures each label's real rendered bbox via `getBBox()` (mapped through the transform chain) and reports exactly which labels spill where (see "Self-verify" below).
 
 **Prevent it at authoring time** (cheaper than the fix loop): size the box to the text (see Node sizing conventions above), and split anything long into a 13px name line + an 11px sublabel line rather than one wide line.
 
@@ -139,6 +139,16 @@ In a diagram with multiple arrows pointing at the same node from different direc
 
 Inconsistency (left/right touch, top/bottom 6px short) is visible to the reader as sloppiness.
 
+### Rule 5 — Label-collision check
+
+Two free-floating labels (edge labels, branch labels, annotations) rendered on top of each other. The white halo (`paint-order: stroke`) that lets an edge label sit ON its own line makes a collision worse: the upper label's halo erases part of the lower label.
+
+**When the colliding pair are two edge labels, the root cause is layout, not label placement.** Such a collision almost always means two cross-row edges share the same corridor — the edges themselves cross, and both authors' "natural" label midpoints land in the same band. *Real incident (2026-06): a 15-question map put boxes 04/05 in the inverse columns of their upstream boxes 02/03, forcing two diagonal edges through the same mid-band; both edge labels collided at (440,222)/(478,226) and shipped.*
+
+**Fix for edge-label pairs**: re-place the boxes so each edge gets its own short route (the incident fix swapped the two row-2 boxes — both edges became short near-verticals and the collision disappeared with the crossing). Nudging one label a few pixels treats the symptom and usually leaves the line crossing (Rule 2 violation) in place. **For other pairs** (an annotation drifting into a node caption, an over-long label reaching a neighbor), the local fix — shorten or move the offending label — is correct; don't restructure a sound layout for it.
+
+**Detection is deterministic** — `scripts/svg_overflow_check.js` flags any pair of labels whose bboxes overlap by nearly half the shorter label's height (`issue: 'label collision'`; the exact threshold is the script's `MIN_OVERLAP_RATIO`, with its calibration in the TUNING block). The threshold exists because stacked two-line labels written as two `<text>` elements legitimately overlap em-boxes by a few px without touching ink — those don't flag, and don't need "fixing". If a flagged pair is verified benign on the rendered screenshot, exempt it explicitly with `data-collision-ok` on either `<text>` instead of leaving the gate red.
+
 ### Self-verify with rendered screenshots (the only reliable way)
 
 Mental verification catches obvious errors. To catch subtle layout / overflow / piercing issues, **render and screenshot**:
@@ -157,9 +167,9 @@ Inspect the screenshot. Common issues spotted via screenshot but missed in menta
 - Asymmetric stop-policy
 - viewBox cropped too tight (some content cut off)
 
-**Deterministic overflow check — run this; it is the gate, not the eyeball.** The screenshot catches gross issues, but the eye misses a label 5px past a border. With the chapter loaded in the browser, evaluate `scripts/svg_overflow_check.js` against the page via your browser-eval tool (Playwright `browser_evaluate`, headless `page.evaluate`, or the DevTools console). It measures every `<text>`'s real rendered width and returns `"OK: no SVG text overflow"` or a list of offenders — each with its figure, the text, and whether it spills past the viewBox or past a box border. Fix each, reload, re-run until OK. This converts "looks fine" into a measured fact and is what makes 文字溢出框线 stop recurring. The screenshot pass still owns crossings / arrow-piercing / stop-policy (Rules 2-4), which the script does not check.
+**Deterministic text-defect check — run this; it is the gate, not the eyeball.** The screenshot catches gross issues, but the eye misses a label 5px past a border. With the chapter loaded in the browser, evaluate `scripts/svg_overflow_check.js` against the page via your browser-eval tool (Playwright `browser_evaluate`, headless `page.evaluate`, or the DevTools console). It measures every `<text>`'s real rendered bbox and returns an OK string or a list of violations: overflow entries carry the figure, the offending `text` and its extents; collision entries (Rule 5) are pair-shaped — they carry the two snippets as `a`/`b` plus the overlap size (see the script header for the exact shapes). Fix each, reload, re-run until OK. This converts "looks fine" into a measured fact and is what makes 文字溢出框线 stop recurring. The screenshot pass still owns crossings / arrow-piercing / stop-policy (Rules 2-4), which the script does not check.
 
-**Phase 5 verify mandates both the screenshot pass and the overflow script for every SVG in the tutorial** — see SKILL.md.
+**Phase 5 verify mandates both the screenshot pass and the defect script for every SVG in the tutorial** — see SKILL.md.
 
 ## Content-type → diagram-type matrix (mandatory)
 
@@ -478,7 +488,7 @@ For every SVG in every chapter, before publishing:
 
 ### Self-check (mental + math)
 - [ ] viewBox dimensions match content extent (no cropping, no excess whitespace > 30%)
-- [ ] **`scripts/svg_overflow_check.js` returns OK** for every chapter (Rule 1 — deterministic, measures real rendered width; do NOT rely on the character-count estimate). Run after rendering; fix + re-run until clean.
+- [ ] **`scripts/svg_overflow_check.js` returns OK** for every chapter (Rules 1 + 5 — deterministic: overflow past box/viewBox AND label-vs-label collision; do NOT rely on the character-count estimate). Run after rendering; fix + re-run until clean.
 - [ ] No connector crosses another connector except at a shared node edge (Rule 2)
 - [ ] No arrow endpoint is inside a target box (Rule 3: `(x2, y2)` on EDGE or CORNER, never interior)
 - [ ] Multi-arrow diagrams have consistent stop policy (Rule 4: all touch edges, or all leave consistent gap)

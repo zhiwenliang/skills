@@ -178,6 +178,7 @@ print(parse("5").value)  # 5
 2. Connector lines do not cross other connector lines
 3. Arrow endpoints sit on box EDGE or CORNER, never inside
 4. Multi-arrow diagrams use consistent stop-policy across all directions
+5. No two free-floating labels render on top of each other (label collision)
 
 Verify visually with rendered screenshots — mental verification misses subtle issues.
 

@@ -14,6 +14,17 @@
 #                              render as solid black when the utility CSS is missing)
 #   5. reader-drawing prompt  — >=1 explicit "draw it yourself" prompt across the tutorial
 #
+# OPTIONAL GATE (runs only when a screenshot dir is passed as the 2nd argument):
+#   6. screenshot coverage   — for every chapter, the screenshot dir holds >= as many
+#                              files named <chapter>-fig*.png/.jpg/.jpeg as the chapter has
+#                              <figure> elements, AND each is NEWER than the chapter .html
+#                              (a screenshot taken before the last edit proves nothing).
+#                              This mechanizes "screenshot every figure, no exceptions" —
+#                              a real 2026-06 incident shipped a label collision in the one
+#                              figure whose screenshot was skipped. Capture each figure as
+#                              <chapter>-figN.png (e.g. 01-memory-fig2.png) into the dir,
+#                              then run this script with the dir to prove coverage.
+#
 # MODES
 #   multi-file (default)     — all five gates run.
 #   single-file quick primer — auto-detected (the dir holds exactly one .html and it is
@@ -25,13 +36,14 @@
 # WHAT IT DOES NOT CHECK (kept inline in SKILL.md Phase 5 on purpose):
 #   - voice grep + pedagogy-jargon grep — coupled 1:1 to the Forbidden-phrases table; keeping them
 #     inline preserves the "edit the table, sync the grep" auditability. Run those separately.
-#   - SVG text-overflow / crossings / arrow-piercing — needs a rendered browser (scripts/svg_overflow_check.js
-#     + a screenshot pass).
+#   - SVG text defects (overflow / label collision — scripts/svg_overflow_check.js) and
+#     crossings / arrow-piercing / stop-policy (screenshot pass) — need a rendered browser.
 #   - qualitative gates (terminology coinage, mechanism-depth, insight, currency) — judgment, not grep
 #     (scripts/extract_terms.py enumerates the terminology-audit candidates; judging them stays qualitative).
 #
 # USAGE
-#   bash verify_structure.sh <tutorial-dir>      # defaults to current dir
+#   bash verify_structure.sh <tutorial-dir>                    # defaults to current dir
+#   bash verify_structure.sh <tutorial-dir> <screenshot-dir>   # also enforce gate 6
 #   # when installed as a plugin:
 #   bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh" path/to/<tech>/
 #
@@ -60,6 +72,11 @@ fi
 DIR="${1:-.}"
 if [ ! -d "$DIR" ]; then
   echo "verify_structure: '$DIR' is not a directory" >&2
+  exit 2
+fi
+SHOT_DIR="${2:-}"
+if [ -n "$SHOT_DIR" ] && [ ! -d "$SHOT_DIR" ]; then
+  echo "verify_structure: screenshot dir '$SHOT_DIR' is not a directory" >&2
   exit 2
 fi
 
@@ -168,9 +185,35 @@ else
   note "add a '亲手画一张图' prompt, typically in *-self-check.html (or capstone for hands-on)"
 fi
 
+# --- Gate 6 (optional): screenshot coverage per figure ------------------------
+if [ -n "$SHOT_DIR" ]; then
+  shot_bad=()
+  for f in "${html_files[@]}"; do
+    b="${f##*/}"; base="${b%.html}"
+    n=$(grep -cE '<figure[ >]' "$f")
+    [ "$n" -lt 1 ] && continue  # gate 3 already reports figure-less chapters
+    fresh=$(find "$SHOT_DIR" -maxdepth 1 \( -name "${base}-fig*.png" -o -name "${base}-fig*.jpg" -o -name "${base}-fig*.jpeg" \) -newer "$f" | wc -l | tr -d ' ')
+    total=$(find "$SHOT_DIR" -maxdepth 1 \( -name "${base}-fig*.png" -o -name "${base}-fig*.jpg" -o -name "${base}-fig*.jpeg" \) | wc -l | tr -d ' ')
+    if [ "$fresh" -lt "$n" ]; then
+      shot_bad+=("$b — figures=$n, fresh screenshots=$fresh (total=$total$([ "$total" -gt "$fresh" ] && echo ', some STALER than the html'))")
+    fi
+  done
+  if [ "${#shot_bad[@]}" -eq 0 ]; then
+    pass_line "screenshot coverage: every figure has a fresh screenshot in $SHOT_DIR"
+  else
+    fail_line "screenshot coverage: ${#shot_bad[@]} chapter(s) under-screenshotted"
+    for s in "${shot_bad[@]}"; do note "$s"; done
+    note "capture each figure as <chapter>-figN.png into $SHOT_DIR AFTER the last html edit, then re-run"
+  fi
+fi
+
 echo "------------------------------------------------------------"
 if [ "$fail" -eq 0 ]; then
-  echo "ALL STRUCTURAL GATES PASS. (Still run: voice grep, pedagogy-jargon grep, svg_overflow_check.js + screenshot, and the qualitative checks.)"
+  if [ -n "$SHOT_DIR" ]; then
+    echo "ALL STRUCTURAL GATES PASS (incl. screenshot coverage). (Still run: voice grep, pedagogy-jargon grep, svg_overflow_check.js, the screenshot INSPECTION, and the qualitative checks.)"
+  else
+    echo "ALL STRUCTURAL GATES PASS. (Still run: voice grep, pedagogy-jargon grep, svg_overflow_check.js + screenshot, and the qualitative checks. Tip: pass a screenshot dir as arg 2 to enforce per-figure screenshot coverage.)"
+  fi
 else
   echo "STRUCTURAL GATES FAILED — fix the FAIL lines above, then re-run."
 fi
