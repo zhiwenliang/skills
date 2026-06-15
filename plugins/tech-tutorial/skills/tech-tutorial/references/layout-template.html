@@ -104,15 +104,22 @@ main { position: relative; }
   z-index: 100; transition: width 80ms linear;
 }
 
-/* Learning path breadcrumb at top */
+/* Learning path breadcrumb at top — pinned so it stays visible while scrolling */
 .learning-path {
-  max-width: var(--page-max);
-  margin: 0 auto;
-  padding: 16px 40px 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;            /* below .progress-bar (100), above page content */
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+  padding: 16px 40px 12px;
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--ink-faint);
+}
+.learning-path > .inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
 }
 .learning-path a {
   color: var(--ink-faint);
@@ -548,17 +555,20 @@ figcaption .fig-num {
 }
 .chapter-nav .title { font-weight: 500; font-size: 14px; }
 
-/* Sticky TOC sidebar */
+/* Sticky TOC sidebar — offset below the pinned breadcrumb (~50px tall) */
 .toc-sidebar {
-  position: sticky; top: 24px;
+  position: sticky; top: 74px;
   align-self: start;
   padding-top: 24px;
   font-family: var(--mono);
   font-size: 11px;
   line-height: 1.55;
-  max-height: calc(100vh - 48px);
+  max-height: calc(100vh - 98px);
   overflow-y: auto;
 }
+
+/* Anchor targets clear the pinned breadcrumb when jumped to */
+article h2, article h3, article [id] { scroll-margin-top: 64px; }
 .toc-sidebar .toc-label {
   font-family: var(--mono);
   font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
@@ -633,6 +643,7 @@ figcaption .fig-num {
     Replace links with relative paths to your tutorial's chapters.
   -->
   <nav class="learning-path" aria-label="学习路径">
+   <div class="inner">
     <!-- Default: concept-focused (4 chapters) -->
     <a href="index.html">00 起点</a><span class="sep">—</span>
     <a href="01-concepts.html" class="current">01 概念</a><span class="sep">—</span>
@@ -644,6 +655,7 @@ figcaption .fig-num {
     <a href="05-capstone.html">05 综合</a><span class="sep">—</span>
     <a href="06-self-check.html">06 自测</a>
     -->
+   </div>
   </nav>
 
   <div class="page">
