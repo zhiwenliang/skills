@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>学习库 · Learning</title>
+  <title>Learning Library</title>
   <style>
-    :root { --ink:#0A0A0A; --ink-soft:#555; --ink-faint:#ccc; --bg:#fff; --vermilion:#E2483D; --vermilion-soft:#fbe9e7; }
-    body { font-family: "Noto Sans SC", system-ui, sans-serif; color: var(--ink); background: var(--bg); max-width: 880px; margin: 0 auto; padding: 2rem; line-height: 1.7; }
+    :root { --ink:#0A0A0A; --ink-soft:#555; --ink-faint:#ccc; --bg:#fff; --vermilion:#E2483D; }
+    body { font-family: "Noto Sans", system-ui, sans-serif; color: var(--ink); background: var(--bg); max-width: 880px; margin: 0 auto; padding: 2rem; line-height: 1.7; }
     h1 { font-size: 2rem; }
     .theme-cluster { margin: 2.4rem 0; }
     .tutorial-cards { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; }
@@ -17,23 +17,23 @@
 </head>
 <body>
   <header>
-    <h1>学习库 · Learning</h1>
-    <p>2 篇认知科学对齐的技术教程，按主题聚类。</p>
+    <h1>Learning Library</h1>
+    <p>Two technical tutorials clustered by theme.</p>
   </header>
 
   <section class="theme-cluster">
-    <h2>Agent / LLM 应用</h2>
+    <h2>Agents and LLM Applications</h2>
     <ul class="tutorial-cards">
       <li><a href="langchain/index.html"><strong>LangChain</strong></a>
-          <span class="schema">把 LLM 调用、prompt、工具、记忆串成可组合的链。</span></li>
+          <span class="schema">Connect model calls, prompts, tools, and memory into composable chains.</span></li>
       <li><a href="langgraph/index.html"><strong>LangGraph</strong></a>
-          <span class="schema">用有状态图把 agent 的控制流显式建模，支持循环与回溯。</span></li>
+          <span class="schema">Model agent control flow as a stateful graph that supports loops and backtracking.</span></li>
     </ul>
   </section>
 
   <section class="theme-cluster">
-    <h2>向量 / 检索</h2>
-    <ul class="tutorial-cards"><li><span class="schema">（暂无）</span></li></ul>
+    <h2>Vector Search</h2>
+    <ul class="tutorial-cards"><li><span class="schema">No tutorials yet.</span></li></ul>
   </section>
 </body>
 </html>

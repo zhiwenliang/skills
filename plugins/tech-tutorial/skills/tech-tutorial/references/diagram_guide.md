@@ -1,513 +1,235 @@
 # Diagram Guide
 
-A diagram earns its space by carrying information prose cannot carry as compactly: structure, parallel relationships, sequence, hierarchy, state transitions. A tutorial without diagrams forces single-channel verbal encoding and loses ~50% of long-term retention compared to dual-coded material (Paivio).
+A diagram earns space only when it carries information prose cannot carry as compactly: structure, sequence, hierarchy, state, comparison, or flow. Decorative figures add extraneous load and must be deleted.
 
-This guide makes diagram choice **deterministic**, not aesthetic.
+Tech-tutorial output uses inline hand-authored SVG in standalone HTML. Use Mermaid only in Markdown fallback mode when the host renderer supports it.
 
-## How diagrams render in this skill's HTML output
+## Why Inline SVG
 
-Tutorials produced by this skill use **hand-drawn SVG embedded inline in HTML**. No Mermaid, no JS rendering libs, no external image files (with the rare exception of Excalidraw exports for very complex maps).
+- Matches the minimal monochrome visual identity.
+- Gives exact control over labels, arrows, and spacing.
+- Avoids runtime rendering dependencies.
+- Keeps each chapter self-contained.
 
-**Why hand-drawn SVG instead of Mermaid?**
-- Mermaid's default style clashes with the minimalist monochrome visual identity defined in `layout-template.html`
-- Mermaid needs JS bootstrap to render — adds a runtime dependency that occasionally breaks
-- Hand-drawn SVG gives full control over layout (avoid the "auto-layout tangle" failure mode for >12 nodes)
-- SVG inlined in HTML is editable by anyone reading the source
+The cost is coordinate discipline. Use the CSS utilities from `layout-template.html` and verify every figure in a browser.
 
-**The cost** — coordinates must be computed by the author. The skill provides utility CSS classes + self-verification rules to make this manageable.
+## CSS Utility Classes
 
-### Every diagram is wrapped in `<figure>`
+The layout template defines these SVG classes:
+
+| Class | Use |
+|---|---|
+| `.diagram-ink` | Primary strokes. |
+| `.diagram-accent` | Sparse red accent strokes. |
+| `.diagram-soft` | Secondary strokes. |
+| `.node-fill` | Neutral node fill. |
+| `.node-fill-accent` | Accent node fill. |
+| `.node-label` | Default node name. |
+| `.node-label-accent` | Emphasized node name. |
+| `.edge-label` | Edge or annotation label. |
+| `.branch-label` | Small branch label. |
+
+Every HTML file must contain the SVG utility CSS, even if the first draft of that chapter has no figure. Later-added figures otherwise render as black rectangles.
+
+## Diagram Selection Matrix
+
+| Content | Diagram type |
+|---|---|
+| Concepts and relationships | Concept map. |
+| Request lifecycle, protocol exchange, pipeline | Sequence or flow diagram. |
+| Internal architecture | Layered component diagram. |
+| State transitions | State machine. |
+| Alternatives and tradeoffs | Decision table or comparison map. |
+| Error causes | Cause-and-effect map. |
+| Hands-on progression | Scaffold progression diagram. |
+| Self-check chapter | Difficulty gradient or scenario map. |
+
+Do not use a diagram for three already-clear linear steps. Use prose or a table.
+
+## Base Figure Pattern
 
 ```html
 <figure>
-  <svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg"
-       role="img" aria-label="what this shows">
-    <!-- shapes + lines + text -->
+  <svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" role="img"
+       aria-label="How requests move through the system">
+    <defs>
+      <marker id="arrow-ink" viewBox="0 0 10 10" refX="9" refY="5"
+              markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
+      </marker>
+    </defs>
+
+    <rect x="40" y="120" width="140" height="64" rx="6"
+          class="diagram-ink node-fill"/>
+    <text x="110" y="148" text-anchor="middle" class="node-label">Client</text>
+    <text x="110" y="168" text-anchor="middle" class="edge-label">sends request</text>
+
+    <line x1="180" y1="152" x2="280" y2="152"
+          class="diagram-ink" marker-end="url(#arrow-ink)"/>
   </svg>
-  <figcaption><span class="fig-num">图 1.0</span>One-line claim about the diagram.
-    <strong>注意</strong>：the ONE thing the reader should notice.</figcaption>
+  <figcaption><span class="fig-num">Fig. 1.1</span>The request becomes explicit at the boundary.
+    <strong>Notice</strong>: the boundary owns validation.</figcaption>
 </figure>
 ```
 
-The `<figcaption>` is mandatory and carries the directed claim (see "Every diagram needs a caption" section below).
+## Layout Rules
 
-## The SVG drawing system (utility classes)
+### 1. Fit Text To Nodes
 
-All SVG drawings use utility classes pre-defined in `layout-template.html`'s `<style>` block. **Use these classes — don't re-declare stroke/fill/font on every element.**
+Choose the label first, then size the node to the rendered text plus padding. Do not cram long labels into fixed boxes.
 
-### Stroke classes
+Start with these rough budgets at 13px:
 
-| Class | Stroke | Width | Use for |
-|---|---|---|---|
-| `.diagram-ink` | `var(--ink)` ink black | 1.4px | Primary structure: rectangles, default arrows |
-| `.diagram-accent` | `var(--vermilion)` vermilion | 1.6px | Emphasized edges, central node borders, key relationship arrows |
-| `.diagram-soft` | `var(--ink-faint)` light gray | 1.1px dashed | Secondary / "may also" edges, async/optional flows |
+- 140px node: about 16 ASCII characters.
+- 200px node: about 24 ASCII characters.
+- Long labels should split into a name line and a smaller explanatory line.
 
-All have `stroke-linecap="round" stroke-linejoin="round"` baked in for the hand-drawn feel.
+Mixed digits, punctuation, and code-like names make estimates unreliable. The browser measurement script is the gate.
 
-### Fill classes
+### 2. Stop Arrows At Edges
 
-| Class | Fill | Use for |
-|---|---|---|
-| `.node-fill` | `var(--bg)` page bg | Default node fill — same as page background, makes node "embedded" |
-| `.node-fill-accent` | `vermilion-soft` (6% vermilion) | Emphasized / "this chapter's protagonist" node |
+Arrow tips touch the target edge or corner. They do not pierce the node interior.
 
-### Text classes
+For left-to-right flow:
 
-| Class | Font / size / weight | Use for |
-|---|---|---|
-| `.node-label` | Noto Sans SC 13px / 500 / ink | Default node name |
-| `.node-label-accent` | Noto Sans SC 13px / 700 / vermilion | Emphasized node name |
-| `.edge-label` | JetBrains Mono 11px / ink-soft | Edge labels, type signatures, secondary annotations |
-| `.branch-label` | JetBrains Mono 11px / 700 / vermilion | Branch labels in decision trees ("是" / "否"), key call-outs |
-
-### Arrow markers (define once per SVG, inside `<defs>`)
-
-```svg
-<defs>
-  <marker id="arrow-ink" viewBox="0 0 10 10" refX="9" refY="5"
-          markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-    <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
-  </marker>
-  <marker id="arrow-vermilion" viewBox="0 0 10 10" refX="9" refY="5"
-          markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-    <path d="M 0 0 L 10 5 L 0 10 z" fill="#B73B2F"/>
-  </marker>
-</defs>
+```html
+<line x1="{{sourceRight}}" y1="{{sourceMidY}}"
+      x2="{{targetLeftMinusGap}}" y2="{{targetMidY}}"
+      marker-end="url(#arrow-ink)" class="diagram-ink"/>
 ```
 
-Hex values mirror the `--ink` / `--vermilion` variables in `layout-template.html`. Update both together if the palette ever changes — SVG marker attributes don't process `var()` reliably across browsers, so the colors are hard-coded here.
+Keep a consistent gap policy across a diagram.
 
-Apply with `marker-end="url(#arrow-ink)"` on `<line>` or `<path>`. `refX="9"` means the arrowhead's TIP sits at the line endpoint (important — see "Arrow piercing" rule below).
+### 3. Avoid Connector Crossings
 
-### Node sizing conventions
+If connectors cross, change the layout instead of adding bends as decoration. Typical fixes:
 
-| Shape | Use for | Default size |
-|---|---|---|
-| `<rect rx="6">` rounded corner box | Concepts, components | width 140 × height 44 (single label) or × 60 (label + sublabel) |
-| `<polygon>` diamond | Decision in flowchart | diamond spanning 200 × 140 |
-| `<ellipse>` | Start / end of flow | rx=60, ry=22 |
+- Move from a radial layout to rows.
+- Group related nodes.
+- Use swimlanes.
+- Split a dense concept map into two figures.
 
-Center text inside boxes with `text-anchor="middle"` and a y-coordinate at box-vertical-center + 5 (visual centering for typical fonts).
+### 4. Keep Labels Attached
 
-**Size the box to the text, not the text to the box.** The default sizes above are starting points, not constraints. Choose the label and font-size first, then set the box width to **at least the rendered text width + 24px** (≈12px padding each side). Cramming a long label into a 140px box is the single biggest source of overflow. Rough budget at the default 13px node-label, for sizing intuition only (the defect script is the real gate): a 140px box holds ~8 CJK chars or ~16 ASCII; a 200px box ~13 CJK; each extra CJK char ≈ 13px, each ASCII ≈ 7px. When a label won't fit, in order of preference: **split to a second line** (a 13px name line + an 11px `.edge-label` sublabel — a 140×60 box beats a 260px one-liner that collides with neighbors), shorten it, widen the box, or drop to font-size 12. Mixed CJK + Latin + digits make hand-estimates unreliable — when unsure, widen and let the script confirm.
+Edge labels should sit near their edge, not float in open space. Free-floating labels collide easily and create split attention.
 
-## SVG self-verification rules (mandatory before declaring a diagram done)
+### 5. Verify Label Collisions
 
-Five failure modes appear repeatedly when an author hand-codes SVG. Catch them before shipping.
+Two labels that do not overlap in source order can overlap after transforms or responsive scaling. Run the script and inspect screenshots.
 
-### Rule 1 — Text-overflow check
+## Common Patterns
 
-A text label can exceed its node's box, or the SVG viewBox, when it's too long for its font-size. This is the **most common** hand-coded-SVG defect and the hardest to catch by eye — a label spilling 5px past a border reads as "almost fine" in a quick glance, then ships.
+### Pattern 1 - Layered Architecture
 
-**Do not rely on a mental width estimate.** Character-counting works for pure ASCII or pure CJK, but real labels mix Han (~1em), Latin (~0.55em), digits (~0.6em), spaces (~0.25em) and punctuation — the estimate is wrong often enough that overflow keeps slipping through. Use it only as a coarse pre-check (CJK ≈ font-size px/char, ASCII ≈ 0.55×); the **measurement script is the actual gate** — `scripts/svg_overflow_check.js` measures each label's real rendered bbox via `getBBox()` (mapped through the transform chain) and reports exactly which labels spill where (see "Self-verify" below).
+Use when explaining boundaries or ownership.
 
-**Prevent it at authoring time** (cheaper than the fix loop): size the box to the text (see Node sizing conventions above), and split anything long into a 13px name line + an 11px sublabel line rather than one wide line.
+```html
+<svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Three-layer architecture">
+  <rect x="70" y="60" width="540" height="70" rx="8" class="diagram-ink node-fill"/>
+  <text x="340" y="100" text-anchor="middle" class="node-label">Interface layer</text>
 
-When the script flags a label, fix that specific one — shorten, split to a second line, widen the box, or drop to font-size 12 — then **re-run the script** (a fix can introduce a new overflow). **Common trap**: long horizontal lists like `A · B · C · D · E · F`, and free-floating annotations placed near the viewBox edge; trim, or move the annotation inward.
+  <rect x="70" y="150" width="540" height="70" rx="8" class="diagram-ink node-fill"/>
+  <text x="340" y="190" text-anchor="middle" class="node-label">Domain layer</text>
 
-### Rule 2 — Connector-crossing check
+  <rect x="70" y="240" width="540" height="70" rx="8" class="diagram-ink node-fill"/>
+  <text x="340" y="280" text-anchor="middle" class="node-label">Storage layer</text>
+</svg>
+```
 
-Connector crossings are a hard failure in hand-coded SVG. A reader should never need to untangle "which line belongs to which label."
+### Pattern 2 - Sequence
 
-**Fix**:
-- Prefer orthogonal routes (`<polyline>`) over long diagonals when a connector spans quadrants.
-- In hub-and-spoke diagrams, arrows point to the hub only. Secondary relationships either stay local, route around the outside, or move to a separate figure/table.
-- Keep edge labels on short, uncrossed segments. If a label would sit near an intersection, the route is wrong.
+Use for protocols, request lifecycles, and async order.
 
-### Rule 3 — Arrow-piercing check
+```html
+<svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Sequence across three actors">
+  <line x1="120" y1="60" x2="120" y2="300" class="diagram-soft"/>
+  <line x1="340" y1="60" x2="340" y2="300" class="diagram-soft"/>
+  <line x1="560" y1="60" x2="560" y2="300" class="diagram-soft"/>
+  <text x="120" y="40" text-anchor="middle" class="node-label">Client</text>
+  <text x="340" y="40" text-anchor="middle" class="node-label">Server</text>
+  <text x="560" y="40" text-anchor="middle" class="node-label">Store</text>
+</svg>
+```
 
-When drawing a line from node A to node B with `marker-end`, the arrowhead's TIP sits at the line's `x2/y2` endpoint. **If `(x2, y2)` is inside node B, the arrowhead pierces into the box** — looks like an arrow stabbing into the wall instead of meeting it at the edge.
+### Pattern 3 - State Machine
 
-**Fix**: line endpoints must be on node B's EDGE or CORNER, never inside.
+Use for lifecycle, retries, scheduling, and protocol states.
 
-For a rectangle at `x=x0, y=y0, width=w, height=h`:
-- top edge: any `(x, y0)` with `x ∈ [x0, x0+w]`
-- bottom edge: `(x, y0+h)`
-- left edge: `(x0, y)`
-- right edge: `(x0+w, y)`
-- top-left corner: `(x0, y0)`, top-right: `(x0+w, y0)`, etc.
+```html
+<svg viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="State transition diagram">
+  <rect x="70" y="120" width="130" height="60" rx="30" class="diagram-ink node-fill"/>
+  <text x="135" y="155" text-anchor="middle" class="node-label">Pending</text>
+  <rect x="275" y="120" width="130" height="60" rx="30" class="diagram-ink node-fill"/>
+  <text x="340" y="155" text-anchor="middle" class="node-label">Running</text>
+  <rect x="480" y="120" width="130" height="60" rx="30" class="diagram-ink node-fill"/>
+  <text x="545" y="155" text-anchor="middle" class="node-label">Complete</text>
+</svg>
+```
 
-When line is diagonal (e.g., from corner box to central box), end at the appropriate CORNER of the central box. This looks intentional and clean.
+### Pattern 4 - Tradeoff Map
 
-### Rule 4 — Arrow-asymmetry check
+Use when the tutorial needs the reader to discriminate between approaches.
 
-In a diagram with multiple arrows pointing at the same node from different directions (like a "protocol radiates 4 ways" diagram), every arrow should follow the SAME stopping policy:
+```html
+<svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Tradeoff map">
+  <line x1="120" y1="280" x2="560" y2="280" class="diagram-ink"/>
+  <line x1="120" y1="280" x2="120" y2="80" class="diagram-ink"/>
+  <text x="560" y="306" text-anchor="end" class="edge-label">higher throughput</text>
+  <text x="88" y="84" text-anchor="middle" class="edge-label" transform="rotate(-90 88 84)">lower latency</text>
+  <circle cx="250" cy="210" r="8" class="diagram-accent node-fill-accent"/>
+  <text x="250" y="235" text-anchor="middle" class="node-label">Approach A</text>
+</svg>
+```
 
-- Either all arrows touch the target box edge (line endpoint = box edge coordinate)
-- Or all arrows leave a consistent N-pixel gap
+### Pattern 5 - Concept Map
 
-Inconsistency (left/right touch, top/bottom 6px short) is visible to the reader as sloppiness.
+Use in `index.html`. Keep it to 5-10 nodes. If you need more, split the map.
 
-### Rule 5 — Label-collision check
+Each edge label should be a relationship verb such as "owns", "produces", "invalidates", "schedules", or "persists". If you cannot label an edge, the relation is unclear.
 
-Two free-floating labels (edge labels, branch labels, annotations) rendered on top of each other. The white halo (`paint-order: stroke`) that lets an edge label sit ON its own line makes a collision worse: the upper label's halo erases part of the lower label.
+## Self-Verification
 
-**When the colliding pair are two edge labels, the root cause is layout, not label placement.** Such a collision almost always means two cross-row edges share the same corridor — the edges themselves cross, and both authors' "natural" label midpoints land in the same band. *Real incident (2026-06): a 15-question map put boxes 04/05 in the inverse columns of their upstream boxes 02/03, forcing two diagonal edges through the same mid-band; both edge labels collided at (440,222)/(478,226) and shipped.*
+Run both automated and visual checks.
 
-**Fix for edge-label pairs**: re-place the boxes so each edge gets its own short route (the incident fix swapped the two row-2 boxes — both edges became short near-verticals and the collision disappeared with the crossing). Nudging one label a few pixels treats the symptom and usually leaves the line crossing (Rule 2 violation) in place. **For other pairs** (an annotation drifting into a node caption, an over-long label reaching a neighbor), the local fix — shorten or move the offending label — is correct; don't restructure a sound layout for it.
+### Automated Text Defect Check
 
-**Detection is deterministic** — `scripts/svg_overflow_check.js` flags any pair of labels whose bboxes overlap by nearly half the shorter label's height (`issue: 'label collision'`; the exact threshold is the script's `MIN_OVERLAP_RATIO`, with its calibration in the TUNING block). The threshold exists because stacked two-line labels written as two `<text>` elements legitimately overlap em-boxes by a few px without touching ink — those don't flag, and don't need "fixing". If a flagged pair is verified benign on the rendered screenshot, exempt it explicitly with `data-collision-ok` on either `<text>` instead of leaving the gate red.
+Serve the tutorial and evaluate `scripts/svg_overflow_check.js` in the page context. It reports:
 
-### Self-verify with rendered screenshots (the only reliable way)
+- SVG text that spills outside its node.
+- SVG text that spills outside the viewBox.
+- Free-floating label collisions.
 
-Mental verification catches obvious errors. To catch subtle layout / overflow / piercing issues, **render and screenshot**:
+Fix and rerun until the script reports:
+
+```text
+OK: no SVG text defects
+```
+
+### Screenshot Inspection
+
+Capture every figure and inspect:
+
+- Connector crossings.
+- Lines through unrelated labels.
+- Arrow tips inside boxes.
+- Inconsistent arrow gaps.
+- Cropped content.
+- Labels that visually collide even if intentionally exempted.
+
+Then prove coverage:
 
 ```bash
-# from any directory containing the .html file:
-python3 -m http.server 8765 &
-# use browser automation, a headless browser, or a manual browser screenshot:
-#   open http://localhost:8765/01-concepts.html
-#   screenshot article > figure:nth-of-type(N)
+bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh" <tutorial-dir> <screenshot-dir>
 ```
 
-Inspect the screenshot. Common issues spotted via screenshot but missed in mental verification:
-- Text wrapping or going off-edge
-- Arrows visibly piercing into nodes
-- Asymmetric stop-policy
-- viewBox cropped too tight (some content cut off)
+Screenshots must be newer than the HTML files.
 
-**Deterministic text-defect check — run this; it is the gate, not the eyeball.** The screenshot catches gross issues, but the eye misses a label 5px past a border. With the chapter loaded in the browser, evaluate `scripts/svg_overflow_check.js` against the page via your browser-eval tool (Playwright `browser_evaluate`, headless `page.evaluate`, or the DevTools console). It measures every `<text>`'s real rendered bbox and returns an OK string or a list of violations: overflow entries carry the figure, the offending `text` and its extents; collision entries (Rule 5) are pair-shaped — they carry the two snippets as `a`/`b` plus the overlap size (see the script header for the exact shapes). Fix each, reload, re-run until OK. This converts "looks fine" into a measured fact and is what makes 文字溢出框线 stop recurring. The screenshot pass still owns crossings / arrow-piercing / stop-policy (Rules 2-4), which the script does not check.
+## Excalidraw Fallback
 
-**Phase 5 verify mandates both the screenshot pass and the defect script for every SVG in the tutorial** — see SKILL.md.
+Use Excalidraw or another editable drawing source only for unusually complex maps where hand-authored SVG would become unmaintainable. Export SVG, embed it with `<img src="concept-map.svg">`, and keep the source file beside the export.
 
-## Content-type → diagram-type matrix (mandatory)
-
-Each section content type → required diagram type (all rendered as hand-drawn SVG):
-
-| Content in the section | Required diagram | Implementation notes |
-|---|---|---|
-| Sequence of calls / messages between components | **Sequence diagram** | Vertical lifelines (`<line>`) + horizontal arrows. Hand-drawn SVG sequences over ~6 messages get tangled — consider Excalidraw fallback or split into 2 figures |
-| State transitions of an entity over its lifecycle | **State machine diagram** | `<ellipse>` states + curved `<path>` arrows. Same complexity caveat as sequences |
-| Component relationships, dependencies | **Dependency / component diagram** | `<rect rx="6">` nodes + `<line>` arrows |
-| Data flow through a pipeline | **Flowchart** | Horizontal row of `<rect>` boxes + arrows with type-signature `<text>` labels on/under each arrow |
-| Concept relationships / mental model | **Concept map** | `<rect>` nodes radially arranged around a central concept; edges labeled. See "concept map specifics" below |
-| Architecture (modules + boundaries + data direction) | **Architecture diagram** | Layered `<rect>` rows OR boxes grouped by function. See "architecture diagrams" below |
-| Decision tree (when to use X vs Y) | **Decision flowchart** | `<polygon>` diamonds for decisions + `<rect>` for terminal nodes + branch labels |
-| Comparison across N options on M dimensions | **Comparison table** | `<table class="compare-table">`. Table IS the diagram here — don't draw a chart |
-
-**If a section has the content but lacks the diagram, the section is incomplete.** Add the diagram.
-
-**Complexity ceiling**: when a sequence / state / concept-map diagram needs >12 nodes or >15 edges, hand-coding becomes unreliable. Drop to Excalidraw fallback (see below).
-
-## Density rule (extraneous load protection)
-
-Walls of prose force linear sequential reading and overload working memory. Required, in order of strictness:
-
-1. **Each chapter has ≥1 `<figure>`** — *hard*, grep-enforced in Phase 5. No exceptions for "pitfalls / question bank / hands-on" chapters (see below).
-2. **Each major H2 section has ≥1 figure or worked example** — figures and code count here. Tables alone don't.
-3. **At most ~300 lines of prose without a visual break** — figures, code blocks, comparison tables all count for this looser breaking rule.
-4. **A full tutorial totals ≥7 figures (concept-focused) or ≥10 figures (hands-on)**, distributed across chapters. These are floors, not ceilings — the per-chapter targets in `SKILL.md` Phase 5 give concept-focused a 7-8 range (index 1 + 01 2-3 + 02 2-3 + self-check 1) and hands-on a 10-13 range (index 1 + 01 2-3 + 02 2-3 + 03-practice 1-2 + 04-pitfalls 1 + 05-capstone 1-2 + 06-self-check 1). Aim for the middle of the range; only fall back to the floor when a chapter genuinely has nothing structural to diagram.
-
-**Figures, code blocks, and comparison tables are NOT interchangeable.** Each does a different job:
-
-| Element | What it encodes well | What it doesn't |
-|---|---|---|
-| **`<figure>` + SVG** | Spatial relationships, parallel structure, topology, decision branches, flow | Detailed implementation, character-level syntax |
-| **`<pre><code>`** | Sequential transformations, exact syntax, runnable example | Parallel relationships, "what depends on what" |
-| **`<table class="compare-table">`** | Tabular comparison across rows × columns, "this vs that" | Spatial topology, sequence flow |
-
-When in doubt: **if you can imagine the content as a hand-drawn whiteboard sketch, draw the SVG**. If it's a list of "type X has property Y", that's a table. If it's "exact code that runs", that's a code block. The three coexist; missing any one is a content-shape mistake.
-
-**Common rationalizations to refuse**:
-
-- *"Pitfalls is a list, doesn't need a figure"* → No. Draw the **causal links** between failure modes (which pitfall makes which other pitfall more likely), or a 2D categorization (axis 1: where in the stack, axis 2: severity). Both are figure-worthy.
-- *"Question bank is just questions"* → No. Draw the **difficulty gradient** (pyramid: recall → understand → discriminate) or the **chapter mapping** (which question tests which chapter). Both reinforce the schema the questions probe.
-- *"Hands-on is code"* → No. Draw the **data type flow** through the worked chain (`raw input → parsed object → validated request → response`), or the **scaffold-decrease progression** across the worked → partial → open sequence. The reader's eye finds these spatial patterns the code itself can't show in linear text.
-- *"Discrimination is decisions, just use a table"* → No. The discrimination challenge (whether in `03-self-check` for concept-focused, or `05-capstone` for hands-on) gets two figures: **overall map** (where each decision point lives relative to the chapters' concepts) and **decision tree** (the discrimination path the reader walks). The table lists choices; the figures show structure.
-
-If a section ends up text-heavy:
-1. Add a diagram that the prose was implicitly describing
-2. Split the section into two
-3. Convert a list-heavy paragraph into a `<table class="compare-table">`
-
-## The Split-Attention rule (Sweller & Chandler 1994)
-
-When an image's labels are physically separated from the image, the reader's eye ping-pongs between them, and the cross-reference cost wipes out the dual-coding benefit.
-
-❌ **Wrong**:
-- "Refer to node A in figure 3.2" (labels in prose)
-- A diagram followed by numbered list explaining each arrow
-- Diagram with cryptic node labels (`n1`, `n2`) explained only in the caption
-
-✅ **Right**:
-- Every label sits **on the diagram element** (inside the node, on the arrow)
-- Caption is 1-2 sentences pointing out what the reader should notice
-- Captions never substitute for on-diagram labels
-
-## 5 patterns with copy-able SVG templates
-
-These five patterns cover ~80% of tutorial diagrams. Adapt coordinates to your content.
-
-### Pattern 1 — Layered architecture (4-5 horizontal layers)
-
-```html
-<figure>
-  <svg viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg" role="img"
-       aria-label="System layers from APP down to integrations">
-    <defs>
-      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5"
-              markerWidth="7" markerHeight="7" orient="auto">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#525252"/>
-      </marker>
-    </defs>
-
-    <!-- Layer labels in left gutter -->
-    <text x="20" y="48" class="edge-label" font-weight="700">APP</text>
-    <text x="20" y="123" class="edge-label" font-weight="700">MID</text>
-    <text x="20" y="203" class="edge-label" font-weight="700" fill="#B73B2F">CORE</text>
-    <text x="20" y="285" class="edge-label" font-weight="700">IMPL</text>
-
-    <!-- 4 stacked layer rectangles -->
-    <rect x="100" y="20" width="560" height="48" rx="4" class="diagram-ink node-fill"/>
-    <text x="380" y="49" text-anchor="middle" class="node-label">your code</text>
-
-    <rect x="100" y="92" width="560" height="56" rx="4" class="diagram-ink node-fill"/>
-    <text x="380" y="120" text-anchor="middle" class="node-label">middle layer</text>
-
-    <!-- Highlighted center layer -->
-    <rect x="100" y="172" width="560" height="62" rx="4" class="diagram-accent node-fill-accent"/>
-    <text x="380" y="200" text-anchor="middle" class="node-label-accent">THIS CHAPTER's TOPIC</text>
-
-    <rect x="100" y="258" width="560" height="50" rx="4" class="diagram-ink node-fill"/>
-    <text x="380" y="285" text-anchor="middle" class="node-label">concrete impls</text>
-
-    <!-- Connector arrows -->
-    <line x1="200" y1="68" x2="200" y2="90" stroke="#525252" stroke-width="1.5" marker-end="url(#ar)"/>
-    <line x1="200" y1="148" x2="200" y2="170" stroke="#525252" stroke-width="1.5" marker-end="url(#ar)"/>
-    <line x1="560" y1="234" x2="560" y2="256" stroke="#525252" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#ar)"/>
-  </svg>
-  <figcaption><span class="fig-num">图 N</span>{{one-line claim}}. <strong>注意</strong>：{{the one thing to notice}}.</figcaption>
-</figure>
-```
-
-### Pattern 2 — Protocol contract (central concept + 4 spokes)
-
-```html
-<figure>
-  <svg viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg" role="img"
-       aria-label="Central concept with 4 radiating capabilities">
-    <defs>
-      <marker id="rad" viewBox="0 0 10 10" refX="9" refY="5"
-              markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#B73B2F"/>
-      </marker>
-    </defs>
-
-    <!-- Central node -->
-    <rect x="270" y="160" width="140" height="60" rx="6" class="diagram-accent node-fill-accent" stroke-width="2"/>
-    <text x="340" y="186" text-anchor="middle" class="node-label-accent">CENTER</text>
-    <text x="340" y="206" text-anchor="middle" class="edge-label">(label)</text>
-
-    <!-- Top spoke (terminates AT top box's bottom edge, y=94) -->
-    <line x1="340" y1="160" x2="340" y2="94" class="diagram-accent" marker-end="url(#rad)"/>
-    <rect x="240" y="44" width="200" height="50" rx="4" class="diagram-ink node-fill"/>
-    <text x="340" y="65" text-anchor="middle" class="node-label">.method1</text>
-    <text x="340" y="83" text-anchor="middle" class="edge-label">what it does</text>
-
-    <!-- Right spoke (terminates AT right box's left edge, x=490) -->
-    <line x1="410" y1="190" x2="490" y2="190" class="diagram-accent" marker-end="url(#rad)"/>
-    <rect x="490" y="160" width="180" height="60" rx="4" class="diagram-ink node-fill"/>
-    <text x="580" y="184" text-anchor="middle" class="node-label">.method2</text>
-    <text x="580" y="200" text-anchor="middle" class="edge-label">what it does</text>
-
-    <!-- Bottom spoke (terminates AT bottom box's top edge, y=284) -->
-    <line x1="340" y1="220" x2="340" y2="284" class="diagram-accent" marker-end="url(#rad)"/>
-    <rect x="240" y="284" width="200" height="60" rx="4" class="diagram-ink node-fill"/>
-    <text x="340" y="306" text-anchor="middle" class="node-label">.method3</text>
-
-    <!-- Left spoke (terminates AT left box's right edge, x=190) -->
-    <line x1="270" y1="190" x2="190" y2="190" class="diagram-accent" marker-end="url(#rad)"/>
-    <rect x="10" y="160" width="180" height="60" rx="4" class="diagram-ink node-fill"/>
-    <text x="100" y="184" text-anchor="middle" class="node-label">.method4</text>
-  </svg>
-  <figcaption><span class="fig-num">图 N</span>{{claim about the contract}}. <strong>注意</strong>：{{insight}}.</figcaption>
-</figure>
-```
-
-**Symmetry check**: in this pattern, all 4 spoke endpoints touch their respective box edges. Top spoke ends at y=94 (top box bottom). Bottom spoke ends at y=284 (bottom box top). Left/right spokes end at x=190 and x=490 (the respective box edges). This is Rule 4 (consistent stop policy) in practice.
-
-### Pattern 3 — Horizontal data flow with type signatures
-
-```html
-<figure>
-  <svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img"
-       aria-label="Data flow with type labels on each edge">
-    <defs>
-      <marker id="flow" viewBox="0 0 10 10" refX="9" refY="5"
-              markerWidth="8" markerHeight="8" orient="auto">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
-      </marker>
-    </defs>
-
-    <text x="14" y="100" class="edge-label" font-weight="700">FORM</text>
-    <text x="14" y="170" class="edge-label" font-weight="700">TYPE</text>
-
-    <!-- 5 stages in a row -->
-    <rect x="100" y="74" width="100" height="50" rx="6" class="diagram-ink node-fill"/>
-    <text x="150" y="103" text-anchor="middle" class="node-label">Input</text>
-    <text x="150" y="170" text-anchor="middle" class="edge-label" font-family="JetBrains Mono">dict</text>
-
-    <line x1="200" y1="99" x2="240" y2="99" class="diagram-ink" marker-end="url(#flow)"/>
-
-    <rect x="240" y="74" width="110" height="50" rx="6" class="diagram-ink node-fill"/>
-    <text x="295" y="103" text-anchor="middle" class="node-label">Stage A</text>
-    <text x="295" y="170" text-anchor="middle" class="edge-label" font-family="JetBrains Mono">TypeA</text>
-
-    <!-- ...repeat for stages B, C, etc.... -->
-  </svg>
-  <figcaption><span class="fig-num">图 N</span>...</figcaption>
-</figure>
-```
-
-### Pattern 4 — Decision tree (diamonds + terminals)
-
-```html
-<figure>
-  <svg viewBox="0 0 660 460" xmlns="http://www.w3.org/2000/svg" role="img"
-       aria-label="Decision tree for choosing between A, B, C">
-    <defs>
-      <marker id="dec" viewBox="0 0 10 10" refX="9" refY="5"
-              markerWidth="7" markerHeight="7" orient="auto">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
-      </marker>
-    </defs>
-
-    <!-- Start -->
-    <ellipse cx="330" cy="40" rx="60" ry="22" class="diagram-ink node-fill"/>
-    <text x="330" y="46" text-anchor="middle" class="node-label">开始</text>
-
-    <!-- Decision diamond -->
-    <polygon points="330,80 440,150 330,220 220,150" class="diagram-ink node-fill"/>
-    <text x="330" y="146" text-anchor="middle" class="node-label">Q1: condition?</text>
-    <line x1="330" y1="62" x2="330" y2="80" class="diagram-ink" marker-end="url(#dec)"/>
-
-    <!-- No branch -->
-    <line x1="220" y1="150" x2="100" y2="150" class="diagram-ink" marker-end="url(#dec)"/>
-    <text x="160" y="142" text-anchor="middle" class="branch-label">否</text>
-    <rect x="20" y="128" width="80" height="44" rx="6" class="diagram-ink node-fill"/>
-    <text x="60" y="155" text-anchor="middle" class="node-label">用 A</text>
-
-    <!-- ...continue Yes branch with more diamonds and terminals... -->
-  </svg>
-  <figcaption><span class="fig-num">图 N</span>{{when-to-use claim}}. <strong>注意</strong>：...</figcaption>
-</figure>
-```
-
-### Pattern 5 — Concept map (5-10 nodes radially arranged)
-
-A central concept with related concepts orbiting it. Same node-arrows-to-center geometry as Pattern 2, but emphasize **labeled edges** (depends-on / produces / is-a / wraps).
-
-Hard constraints:
-- Use a clean hub-and-spoke layout for the primary relationship. Do not draw freeform diagonals across the map.
-- Keep secondary relationships short and local. If "A also feeds B" would cross the hub spokes, either route it around the outside with a `<polyline>` or move it into a separate figure.
-- Do not put edge labels at connector intersections. Labels must sit on a clear segment with whitespace around them.
-
-When > 10 nodes, >12 edges, or any secondary edge would need to cross the map: switch to Excalidraw.
-
-## Excalidraw fallback (when SVG hand-coding fails)
-
-Use Excalidraw when:
-- Diagram needs > 12 nodes or > 15 edges
-- Concept map with freeform groupings, hand-drawn aesthetic
-- You've drawn it twice and the layout still looks tangled
-
-Workflow:
-1. Author in Excalidraw or another diagram editor (`.excalidraw.md` can live in the same tutorial folder when supported by the user's editor)
-2. File → Export as SVG → save `concept-map.svg` in the tutorial folder
-3. Embed: `<figure><img src="concept-map.svg" alt="..."> <figcaption>...</figcaption></figure>`
-
-The image inherits no styles from the page CSS, so the Excalidraw export needs to visually match — pick a similar palette (white background, neutral grays, vermilion as the single accent) when designing.
-
-## The concept map specifically
-
-The concept map is the most important diagram in any tutorial. Reader hangs every subsequent detail on it.
-
-**Mandatory properties**:
-- **5-10 nodes** (more → Excalidraw)
-- **Edges are labeled** ("depends on", "produces", "is a", "wraps")
-- **Visual grouping by domain** — cluster related concepts (use proximity or `<g>` grouping)
-- **Clear entry point** — reader's eye lands on the central abstraction (usually the unique concept the technology introduces)
-- **Every node is defined somewhere in the tutorial prose**
-- **Every prose-defined concept appears on the map**
-
-## The learning-path breadcrumb (re-shown each chapter)
-
-Smaller than the concept map — shows the linear chapter sequence, not concept relationships.
-
-The learning path lives in the top breadcrumb `<nav class="learning-path">`, not as an SVG figure. Each chapter marks the current step with `<span class="current">` rendered as vermilion color + bold (no underline, per the v2 minimalist CSS). No separate SVG needed.
-
-This **is** still forced retrieval (re-encountering the chapter list every page) and orientation (reader always knows where they are) — just rendered as text breadcrumb instead of SVG.
-
-## Architecture diagrams
-
-Architecture diagrams in `02-principles.html` show **components and their interactions**. Conventions:
-
-- **`<rect>` boxes** = components / processes
-- **`<rect>` with `<ellipse>` motif** = storage (or use `<rect>` and label "DB")
-- Solid arrows = sync calls / direct data flow
-- Dashed arrows (`.diagram-soft`) = async / events
-- **Arrow labels are required** (`<text>` next to the line) — what's being sent
-- Group by trust / process boundary — outer `<rect>` with dashed stroke around inner nodes
-- **One diagram per major mechanism**, not one giant diagram
-
-## Every diagram needs a caption
-
-Caption lives in `<figcaption>` directly under the SVG (zero spatial gap by design).
-
-1. State what the diagram shows (one phrase)
-2. Point out the **one thing the reader should notice** that isn't obvious from a glance — usually the load-bearing asymmetry, the unusual edge, the boundary between "what's special here" and "what's standard"
-
-A diagram without a directed caption is interpreted however the reader feels, which is usually wrong.
-
-## Reader-drawn diagrams (at least once per tutorial)
-
-Paivio's dual coding gets stronger when the reader *constructs* the imagery channel themselves. Source theory: "手画 > 看现成图" — drawing turns dual coding into retrieval practice for spatial content.
-
-At least once per tutorial, prompt the reader to draw. Two patterns:
-
-**Pattern A — recall draw** (end-of-chapter retrieval):
-> 不看教程，在纸上画出 §2.1 的架构图。然后翻回去对照，你把缓存画在 API 边界的哪一侧？
-
-**Pattern B — extension draw** (transfer):
-> 把数据流套到你自己的应用上画一遍。这一章的哪些组件对应到你已有的系统？哪些是新加的？
-
-Put these at chapter boundaries or in the final self-check / capstone chapter — places where the reader is already in active mode.
-
-## Anti-patterns (delete on sight)
-
-- **Decorative imagery**: brain icon next to "learning", lightbulb next to "tip" — pure extraneous load
-- **Reformatted lists**: a 3-step linear process drawn as a flowchart is worse than the 3-step list. Diagrams are for parallel / branching / spatial, not linear
-- **Cryptic labels with caption decoder**: `n1, n2` defined in caption forces remote binding (split-attention)
-- **Diagram that restates a code snippet**: just show the code
-- **Wall of text with one decorative banner image**: banner is not a diagram
-
-## Verification checklist
-
-For every SVG in every chapter, before publishing:
-
-### Self-check (mental + math)
-- [ ] viewBox dimensions match content extent (no cropping, no excess whitespace > 30%)
-- [ ] **`scripts/svg_overflow_check.js` returns OK** for every chapter (Rules 1 + 5 — deterministic: overflow past box/viewBox AND label-vs-label collision; do NOT rely on the character-count estimate). Run after rendering; fix + re-run until clean.
-- [ ] No connector crosses another connector except at a shared node edge (Rule 2)
-- [ ] No arrow endpoint is inside a target box (Rule 3: `(x2, y2)` on EDGE or CORNER, never interior)
-- [ ] Multi-arrow diagrams have consistent stop policy (Rule 4: all touch edges, or all leave consistent gap)
-- [ ] Every node has a label on it (no `n1`/`n2` codes)
-- [ ] Every edge with semantic meaning has a label
-
-### Visual check (rendered screenshot)
-- [ ] Render the chapter HTML via `python3 -m http.server` + browser automation or a manual browser screenshot for `article > figure:nth-of-type(N)`
-- [ ] Scan each figure for: text overflow, arrow piercing, viewBox crop, label collision
-- [ ] Fix any issue found by the screenshot that mental verification missed
-
-### Coverage check
-- [ ] Every major H2 section has ≥1 diagram, code block, or comparison table
-- [ ] No prose stretch >300 lines without a visual break
-- [ ] Every concept defined in prose has a corresponding map node (and vice versa)
-- [ ] At least one reader-drawing prompt exists in the tutorial (Principle 3 hard requirement)
-
-### Caption check
-- [ ] Every `<figure>` has a `<figcaption>` with `.fig-num` + directed claim
-- [ ] No caption is "this diagram shows X" — instead "**注意**：the one unusual thing"
-
-A failing item is a draft-blocking issue, not a "ship and fix later" — diagram errors are extra cognitive load on every reader who follows.
+Do not use this fallback to avoid ordinary SVG layout work.

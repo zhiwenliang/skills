@@ -1,129 +1,131 @@
 # Research Workflow
 
-Writing a tutorial is mostly a research problem. The drafting is the easy part — the hard part is knowing what's true, what's current, and what's worth saying.
+Writing a tutorial is mostly a research problem. Drafting starts only after the agent knows what is true, current, and worth teaching.
 
-This file is the playbook for combining a **current documentation lookup tool** with **web search / web fetch**, plus how to evaluate sources.
+Use this workflow with any current documentation lookup tool, web search, source repositories, RFCs, release notes, and user-provided material.
 
-## Decision tree: where to look first
+## Where To Look First
 
-```
-Question type                          → First source
-─────────────────────────────────────────────────────────
-"What does function X do?"             → current docs lookup (official docs)
-"What's the type signature of Y?"      → current docs lookup
-"How do I install Z?"                  → current docs lookup
-"What changed in version 4.0?"         → current docs lookup (changelog) or web (announcement post)
-"Why was X designed this way?"         → web (design docs, blog posts, conf talks)
-"How does X actually work inside?"     → source / RFCs / deep-dive talks (the depth lens — one level below docs)
-"What are alternatives to X?"          → web (comparison articles)
-"What are the common pitfalls?"        → web (community posts, Stack Overflow trends)
-"Is library X still maintained?"       → web (GitHub activity, recent releases)
-"What's the newest viable way to X?"   → web (release notes, changelogs, recent talks, arXiv) — the frontier
-"What's deprecated / superseded?"      → web (migration guides, "X vs <newer>" posts)
-"Real-world case study"                → web (engineering blogs)
-```
+| Question type | First source |
+|---|---|
+| What does function or command X do? | Current official docs. |
+| What is the type signature or option name? | Current official docs or API reference. |
+| How do I install or configure it? | Official docs and release notes. |
+| What changed in version N? | Changelog, migration guide, announcement post. |
+| Why was X designed this way? | RFC, design doc, maintainer post, conference talk. |
+| How does X work internally? | Source, architecture docs, deep-dive talks. |
+| What are common pitfalls? | GitHub issues, discussions, Stack Overflow, production writeups. |
+| What are alternatives? | Official comparison docs, migration stories, engineering blogs. |
+| Is it still maintained? | GitHub activity, releases, roadmap, maintainer statements. |
+| What is current or emerging? | Release notes, roadmap, RFCs, recent conference talks, recent papers for AI/ML. |
+| What is deprecated or superseded? | Migration guides, deprecation notices, changelogs. |
 
-The boundary: **official docs own "what it is" — web sources own "why it is."**
+Official docs own the API surface. Rationale, tradeoffs, and production failure modes usually require sources beyond docs.
 
-## Using A Current Documentation Tool Effectively
+## Current Documentation Tool
 
-If the environment provides a documentation lookup tool, use a two-step pattern:
+If a docs lookup tool is available:
 
-1. **Resolve the library/project identity** if the tool requires it — e.g., "react router" → the official React Router docs package.
-2. **Query with a focused topic** — e.g., `loader redirects`, not `everything`.
+1. Resolve the project identity if required.
+2. Query focused topics, such as `loader redirects`, not the whole framework.
 
-When to call it:
-- Before writing any code example, to confirm current API.
-- When you need to state a specific behavior ("the default timeout is X seconds").
-- For version-specific information.
+Use it before writing code examples, stating defaults, or describing version-specific behavior.
 
-When **not** to call it:
-- For motivation, history, or design rationale — that's almost never in API docs.
-- For comparisons against other libraries — official docs are biased.
+Do not use it as the only source for design rationale, alternatives, or production pitfalls.
 
-## Using Web Search + Web Fetch
+## Web Search And Fetch
 
-Web search finds candidates; web fetch reads them.
+Good query patterns:
 
-Prompt patterns that work:
+| Goal | Query shape |
+|---|---|
+| Design rationale | `"<tech>" design site:<official-blog-domain>` |
+| Architecture | `"<tech>" "<core design term>" tradeoffs` |
+| Pitfalls | `"<tech>" lessons learned` or `"<tech>" gotchas` |
+| Alternatives | `"<tech>" vs "<alternative>" <current-year>` |
+| Recent state | `"<tech>" release notes <current-year>` |
+| Internals | `how does "<tech>" work internally`, `"<tech>" internals` |
+| Frontier | `"<tech>" roadmap`, `"<tech>" RFC`, `what's new in "<tech>" <current-year>` |
+| Deprecation | `"<tech>" deprecated`, `"<old approach>" migration` |
 
-| Goal | Good query | Why |
-|---|---|---|
-| Design rationale | `"<tech>" "design" site:<official-blog-domain>` | Project's own blog usually has design posts |
-| Architecture | `"<tech>" "<core design term>" tradeoffs` | Combine the tech with the design concept |
-| Pitfalls | `"<tech>" "lessons learned"` OR `"<tech>" gotchas` | Engineers post lessons after pain |
-| Comparisons | `"<tech>" vs "<main alternative>" 2026` | Year qualifier filters stale comparisons |
-| Recent state | `"<tech>" 2026 release` | For "is this still relevant" |
-| Mechanism / internals | `how does "<tech>" work internally`, `"<tech>" internals`, or read the source | The depth lens — gets you one level below the API surface |
-| What's new / frontier | `"<tech>" release notes <year>`, `what's new in "<tech>" <year>`, project roadmap / RFCs | Recent shipped changes the stable docs often lag |
-| Deprecated / superseded | `"<tech>" deprecated`, `"<old approach>" vs "<new approach>" <year>`, migration guides | So the tutorial doesn't teach the way the field already left |
+Avoid content-farm queries such as `"<tech> tutorial"` or `"best <tech> practices"` unless they are only a starting point and every claim is verified elsewhere.
 
-**Bad queries** (will return SEO sludge):
-- `"<tech> tutorial"` — endless AI-generated reposts
-- `"best <tech> practices"` — listicle factories
-- `"<tech> explained simply"` — content farm magnet
-
-## Source evaluation
-
-When you find a source, score it before quoting:
+## Source Evaluation
 
 | Source type | Trust default | Notes |
 |---|---|---|
-| Official docs | High | Always cite, but read the date |
-| Project's own blog / RFCs | High | Best for design rationale |
-| Conference talks (KubeCon, QCon, Strange Loop) | High | Pre-vetted by review committees |
-| Maintainer's personal blog | High | Often the only place rationale exists |
-| GitHub issues / discussions (project repo) | High for behavior, medium for opinion | "We chose X because Y" from maintainers is gold |
-| Established engineering blogs (Netflix, Uber, etc.) | Medium-high | Battle-tested practice; check date |
-| Stack Overflow accepted answers | Medium | Verify against current docs |
-| Medium articles | Low by default | Treat as starting point, verify everything |
-| AI-generated content farms | Reject | Often factually wrong, always shallow |
-| Year >2 old for fast-moving tech | Reject unless mature ecosystem | The framework probably changed |
+| Official docs | High | Check version and date. |
+| Project blog, RFCs, design docs | High | Best source for rationale. |
+| Conference talks | High | Useful for design context and tradeoffs. |
+| Maintainer personal blog | High | Often explains why decisions were made. |
+| GitHub issues and discussions | High for behavior, medium for opinion | Maintainer comments are valuable. |
+| Established engineering blogs | Medium-high | Verify against current docs. |
+| Stack Overflow accepted answers | Medium | Check date and current docs. |
+| Medium-style posts | Low by default | Treat as leads, not authority. |
+| AI-generated content | Reject | Too shallow and often wrong. |
+| Sources older than two years for fast-moving tech | Reject unless the ecosystem is stable | Mature protocols can be exceptions. |
 
-If something feels off — a claim that's repeated without source, a snippet that doesn't compile, a "best practice" with no rationale — **stop and verify**. Tutorials propagate errors; one wrong claim can mislead hundreds of readers.
+If a claim feels repeated but unsourced, stop and verify it. Tutorials spread errors efficiently.
 
-## Parallel research strategy
+## Parallel Research Strategy
 
-For a real tutorial, spawn 3-4 research workers in parallel when worker/task tools are available; otherwise do them sequentially but keep each pass tight. Here, **lead thread** means the main orchestration context, and **worker** means any parallel task unit.
+Use parallel workers when the environment supports them and the topic has multiple independent research angles.
 
-- **Worker A**: current docs lookup — pull the official docs for the topic. Goal: get current API surface.
-- **Worker B**: Web search for design rationale **and mechanism**. Goal: 2-3 high-quality "why" sources, plus how each core concept works *one level below the API surface* (source, RFCs, deep-dive talks) — this is the depth lens.
-- **Worker C**: Web search for pitfalls and real-world experience. Goal: find 3-5 specific gotchas to address in chapter 04.
-- **Worker D**: Web search for adjacent tech and comparisons. Goal: know what to compare against.
-- **Worker E** (frontier — for any topic that isn't frozen): release notes, changelogs, roadmap / RFCs, recent conference talks, arXiv for AI/ML. Goal: what shipped in roughly the last 6–12 months, what's emerging or experimental, what's been superseded — **each dated**. This is the currency lens. Fold into Worker D for a small or genuinely frozen topic; give it its own worker for anything fast-moving (frameworks, AI/ML, young protocols).
+| Worker | Goal |
+|---|---|
+| Official docs | Current API, version notes, official examples, canonical terminology. |
+| Design rationale + mechanism | Alternatives considered, tradeoffs, internals one level below docs. |
+| Pitfalls + production experience | 3-5 concrete failure modes with symptoms and fixes. |
+| Alternatives | Adjacent tools and when to choose each. |
+| Frontier | Recent changes, emerging approaches, deprecations, all dated. |
 
-**Every worker brief must include (mandatory)**: the worker reserves the final 50-80 words of its ~400-word output for a literal `## Surprises` markdown section — a bullet list of gaps between the worker's prior model of this tech and what the worker actually found in the sources. The section header is on its own line; bullets follow on subsequent lines. Empty case (no surprises) is written as two real lines:
+Every worker returns about 400 words and reserves the final section:
 
+```markdown
+## Surprises
+- <gap between prior model and source-backed finding>
 ```
+
+If there are no surprises, write:
+
+```markdown
 ## Surprises
 - none worth noting
 ```
 
-This is the depth-orientation channel that feeds Phase 3's threshold-concept identification; without it, Phase 3 has nothing to derive from. See SKILL.md Phase 2 for the full surprise-list extraction protocol the lead thread uses to consume these sections.
+The official-docs worker also returns:
 
-When workers return, **synthesize** before drafting. Don't write chapter 1 with only Worker A's results, then realize in chapter 2 that Worker B contradicts something.
-
-## Recording sources as you go
-
-Keep a running `sources.md` (scratch file, not part of the final output) with:
-
+```markdown
+## Terminology
+- <concept> | <canonical term> | <language handling> | <plain gloss>
 ```
+
+`language handling` means how to render the term in the requested tutorial language. For English output, this is usually `standard English term`. For another requested language, record whether the field uses a local translation or keeps the English term.
+
+The lead thread extracts these sections mechanically. If a required header is missing, re-prompt the worker.
+
+## Source Log
+
+Keep a scratch `sources.md` while researching:
+
+```markdown
 - url: <link>
   trust: high|medium|low
-  used_for: <which sections>
-  key_claim: <one-line summary of what you took from it>
+  used_for: <section>
+  key_claim: <one-line summary>
 ```
 
-This makes the "Further reading" sections at the end of each chapter writable in 2 minutes instead of 30.
+This makes chapter "Further reading" sections fast and auditable.
 
-## When to stop researching
+## Stop Criteria
 
-You're ready to write when:
-- You can explain the technology to someone in 5 minutes without checking notes.
-- You can name the 4-8 core concepts and define each in one sentence.
-- For each core concept, you can explain the mechanism *one level below the docs* — how it works, not just what it does (the depth lens).
-- You can name at least 2 design tradeoffs with their alternatives.
-- You have at least 3 specific pitfalls you'd warn a junior engineer about.
-- You can say where the topic is now: what's stable, what changed in roughly the last 6–12 months, what's been superseded — or confirm it's genuinely frozen (the currency lens).
+Research is ready when the lead thread can:
 
-If you can't do any of these, more research. If you can do all of these, **stop researching and start drafting** — perfectionist research is procrastination.
+- Explain the topic in five minutes without notes.
+- Name 4-8 core concepts and define each in one sentence.
+- Explain each core concept one level below docs.
+- Name at least two tradeoffs and their rejected alternatives.
+- Name at least three concrete pitfalls.
+- State what is stable, in flux, and superseded, or explain why the subject is frozen.
+
+If any item is missing, do targeted research. If all are present, stop researching and draft.

@@ -10,7 +10,7 @@ Collects, from every top-level .html file:
   - <strong> / <b> text                      (emphasized concept names)
   - <h1>-<h4> text                           (section titles)
   - <figcaption> text and <svg aria-label>   (figure titles)
-  - quoted spans in prose: 「…」 『…』 “…” 《…》  (quoted terms)
+  - quoted spans in prose: "..." and "curly quoted" terms
 
 Skips <pre>/<code>/<script>/<style> content. Candidates longer than 40 chars are
 dropped (those are sentences, not names). Output is deduplicated by term, keeping
@@ -28,7 +28,7 @@ from html.parser import HTMLParser
 
 CAPTURE = {"strong", "b", "h1", "h2", "h3", "h4", "figcaption"}
 SKIP = {"pre", "code", "script", "style"}
-QUOTE_RE = re.compile(r"「([^」]{1,40})」|『([^』]{1,40})』|“([^”]{1,40})”|《([^》]{1,40})》")
+QUOTE_RE = re.compile(r"\"([^\"]{1,40})\"|“([^”]{1,40})”|'([^']{1,40})'|‘([^’]{1,40})’")
 MAX_LEN = 40
 
 

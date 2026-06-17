@@ -7,8 +7,8 @@
 # WHAT IT CHECKS (the five static, table-independent gates):
 #   1. self-check naming     — exactly one *-self-check.html, and it is the LAST chapter
 #                              (skipped in single-file primer mode, see MODES below)
-#   2. audience-fit pair     — index.html has BOTH 适合谁 and 不适合谁 (a standalone 适合谁 beyond
-#                              the 不适合谁 ones), plus 读完之后你能做到什么
+#   2. audience-fit sections — index.html has semantic markers or English headings
+#                              for audience-for, audience-not-for, and outcomes
 #   3. figure coverage       — every chapter .html has >=1 <figure> (code-blocks/tables don't count)
 #   4. SVG-utility-CSS        — every .html <style> includes .diagram-ink (else node-fill rects
 #                              render as solid black when the utility CSS is missing)
@@ -34,8 +34,8 @@
 #                              Hand-check the same five rules against the .md output.
 #
 # WHAT IT DOES NOT CHECK (kept inline in SKILL.md Phase 5 on purpose):
-#   - voice grep + pedagogy-jargon grep — coupled 1:1 to the Forbidden-phrases table; keeping them
-#     inline preserves the "edit the table, sync the grep" auditability. Run those separately.
+#   - prose checks — run scripts/verify_prose.sh for forbidden English voice phrases,
+#     first-person author narration, and pedagogy-jargon leaks.
 #   - SVG text defects (overflow / label collision — scripts/svg_overflow_check.js) and
 #     crossings / arrow-piercing / stop-policy (screenshot pass) — need a rendered browser.
 #   - qualitative gates (terminology coinage, mechanism-depth, insight, currency) — judgment, not grep
@@ -50,11 +50,11 @@
 # EXIT CODE: 0 if every gate passes, 1 if any gate fails, 2 on usage errors
 # (not a directory / no .html files). Prints PASS/FAIL per gate with details.
 #
-# Locale: the CJK / smart-quote alternations need a UTF-8 locale (LC_ALL=C breaks
+# Locale: smart-quote alternations need a UTF-8 locale (LC_ALL=C breaks
 # codepoint-level matching). Resolution order:
 #   1. TECH_TUTORIAL_LC_ALL, if set — explicit override for systems without en_US.UTF-8
-#   2. the caller's own locale, when it is already UTF-8 (don't downgrade a working zh_CN.UTF-8)
-#   3. the first installed UTF-8 locale among en_US.UTF-8 / C.UTF-8 / zh_CN.UTF-8 (via locale -a)
+#   2. the caller's own locale, when it is already UTF-8
+#   3. the first installed UTF-8 locale among en_US.UTF-8 / C.UTF-8 (via locale -a)
 
 if [ -n "${TECH_TUTORIAL_LC_ALL:-}" ]; then
   export LC_ALL="$TECH_TUTORIAL_LC_ALL"
@@ -63,7 +63,7 @@ else
   case "$cur" in
     *.[Uu][Tt][Ff]-8|*.[Uu][Tt][Ff]8) export LC_ALL="$cur" ;;
     *)
-      utf8_loc=$(locale -a 2>/dev/null | grep -iE '^(en_US|C|zh_CN)\.utf-?8$' | head -n1)
+      utf8_loc=$(locale -a 2>/dev/null | grep -iE '^(en_US|C)\.utf-?8$' | head -n1)
       export LC_ALL="${utf8_loc:-en_US.UTF-8}"
       ;;
   esac
@@ -131,22 +131,21 @@ else
   fi
 fi
 
-# --- Gate 2: audience-fit pair (index.html) -----------------------------------
+# --- Gate 2: audience-fit sections (index.html) -------------------------------
 idx="$DIR/index.html"
 if [ ! -f "$idx" ]; then
-  fail_line "audience-fit: index.html not found"
+  fail_line "audience-fit sections: index.html not found"
 else
-  pos=$(grep -o 适合谁 "$idx" | wc -l | tr -d ' ')
-  neg=$(grep -o 不适合谁 "$idx" | wc -l | tr -d ' ')
-  can=$(grep -c 读完之后你能做到什么 "$idx")
-  # pos counts every 适合谁 INCLUDING those inside 不适合谁; a standalone 适合谁 section requires pos > neg.
-  if [ "$neg" -ge 1 ] && [ "$pos" -gt "$neg" ] && [ "$can" -ge 1 ]; then
-    pass_line "audience-fit pair: 适合谁 + 不适合谁 + 读完之后你能做到什么 all present"
+  for_count=$(grep -iEo "data-tech-tutorial=[\"']audience-for[\"']|Who this is for" "$idx" | wc -l | tr -d ' ')
+  not_count=$(grep -iEo "data-tech-tutorial=[\"']audience-not-for[\"']|Who this is not for" "$idx" | wc -l | tr -d ' ')
+  can_count=$(grep -iEo "data-tech-tutorial=[\"']outcomes[\"']|What you can do after reading" "$idx" | wc -l | tr -d ' ')
+  if [ "$for_count" -ge 1 ] && [ "$not_count" -ge 1 ] && [ "$can_count" -ge 1 ]; then
+    pass_line "audience-fit sections: audience-for + audience-not-for + outcomes all present"
   else
-    fail_line "audience-fit pair incomplete in index.html (适合谁=$pos 不适合谁=$neg 读完之后…=$can)"
-    [ "$pos" -le "$neg" ] && note "no standalone 适合谁 section (pos must exceed neg)"
-    [ "$neg" -lt 1 ] && note "missing 不适合谁 section"
-    [ "$can" -lt 1 ] && note "missing 读完之后你能做到什么 section"
+    fail_line "audience-fit sections incomplete in index.html (for=$for_count not_for=$not_count outcomes=$can_count)"
+    [ "$for_count" -lt 1 ] && note "missing audience-for section (English heading or data-tech-tutorial marker)"
+    [ "$not_count" -lt 1 ] && note "missing audience-not-for section (English heading or data-tech-tutorial marker)"
+    [ "$can_count" -lt 1 ] && note "missing outcomes section (English heading or data-tech-tutorial marker)"
   fi
 fi
 
@@ -176,13 +175,12 @@ else
 fi
 
 # --- Gate 5: reader-drawing prompt (>=1 across the tutorial) ------------------
-# 手画 also covers 亲手画 / 随手画 (substring), so those need no alternative of their own.
-draw=$(grep -lE "自己画|手画|画一画|画一张|sketch|Draw the" "${html_files[@]}" 2>/dev/null | head -n1)
+draw=$(grep -liE "data-tech-tutorial=[\"']reader-drawing[\"']|draw it yourself|draw from memory|sketch from memory|sketch .*from memory|close the .*sketch|draw the" "${html_files[@]}" 2>/dev/null | head -n1)
 if [ -n "$draw" ]; then
   pass_line "reader-drawing prompt: found in ${draw##*/}"
 else
   fail_line "reader-drawing prompt: none found (dual coding stays one-way)"
-  note "add a '亲手画一张图' prompt, typically in *-self-check.html (or capstone for hands-on)"
+  note "add a 'Draw it yourself' prompt or data-tech-tutorial=\"reader-drawing\", typically in *-self-check.html (or capstone for hands-on)"
 fi
 
 # --- Gate 6 (optional): screenshot coverage per figure ------------------------
@@ -210,9 +208,9 @@ fi
 echo "------------------------------------------------------------"
 if [ "$fail" -eq 0 ]; then
   if [ -n "$SHOT_DIR" ]; then
-    echo "ALL STRUCTURAL GATES PASS (incl. screenshot coverage). (Still run: voice grep, pedagogy-jargon grep, svg_overflow_check.js, the screenshot INSPECTION, and the qualitative checks.)"
+    echo "ALL STRUCTURAL GATES PASS (incl. screenshot coverage). (Still run: verify_prose.sh, svg_overflow_check.js, the screenshot INSPECTION, and the qualitative checks.)"
   else
-    echo "ALL STRUCTURAL GATES PASS. (Still run: voice grep, pedagogy-jargon grep, svg_overflow_check.js + screenshot, and the qualitative checks. Tip: pass a screenshot dir as arg 2 to enforce per-figure screenshot coverage.)"
+    echo "ALL STRUCTURAL GATES PASS. (Still run: verify_prose.sh, svg_overflow_check.js + screenshot, and the qualitative checks. Tip: pass a screenshot dir as arg 2 to enforce per-figure screenshot coverage.)"
   fi
 else
   echo "STRUCTURAL GATES FAILED — fix the FAIL lines above, then re-run."

@@ -4,7 +4,7 @@
  * WHY THIS EXISTS
  *   Hand-estimating label geometry is unreliable: real labels mix Han characters (~1em),
  *   Latin (~0.55em), digits (~0.6em), spaces (~0.25em) and punctuation, so the
- *   character-count formula is wrong often enough that "文字溢出框线" keeps slipping
+ *   character-count formula is wrong often enough that text overflow keeps slipping
  *   through screenshot review. This measures the REAL rendered extent of every visible
  *   <text> via getBBox(), mapped through the element's full transform chain into the
  *   root <svg> coordinate system, and flags:

@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="UTF-8"><title>LangGraph 教程</title></head>
+<html lang="en">
+<head><meta charset="UTF-8"><title>LangGraph Tutorial</title></head>
 <body>
   <header><h1>LangGraph</h1></header>
-  <section><h2>适合谁</h2><p>用过 LangChain，需要带循环/分支的有状态 agent 控制流。</p></section>
-  <section><h2>不适合谁</h2><p>只需要线性链、不涉及状态机的读者。</p></section>
-  <section class="schema-panel"><p class="label">一句话本质</p>
-    <p>LangGraph 把 agent 的控制流建模成有状态的图：节点是步骤，边是转移，状态在图上流动，因此天然支持循环与回溯。</p></section>
-  <nav><ul><li><a href="01-concepts.html">01 核心概念</a></li><li><a href="02-self-check.html">02 自测</a></li></ul></nav>
+  <section data-tech-tutorial="audience-for"><h2>Who this is for</h2><p>Engineers who have used LangChain and need stateful agent control flow with loops or branches.</p></section>
+  <section data-tech-tutorial="audience-not-for"><h2>Who this is not for</h2><p>Readers who only need a linear chain without state-machine behavior.</p></section>
+  <section data-tech-tutorial="outcomes"><h2>What you can do after reading</h2><p>Explain why graph state makes loops, retries, and backtracking explicit.</p></section>
+  <section class="schema-panel"><p class="label">Core idea</p>
+    <p>LangGraph models agent control flow as a stateful graph: nodes are steps, edges are transitions, and state moves through the graph.</p></section>
+  <nav><ul><li><a href="01-concepts.html">01 Concepts</a></li><li><a href="02-self-check.html">02 Self-check</a></li></ul></nav>
 </body>
 </html>

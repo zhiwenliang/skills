@@ -6,14 +6,14 @@
 
   Aesthetic: minimalist monochrome + single vermillion accent
     - White background, neutral grays, single warm-red accent.
-    - Sans-serif body (Noto Sans SC) for information density.
+    - Sans-serif body (Noto Sans) for information density.
     - No textures, no decorative numerals, no rainbow callouts.
     - Vermillion is used sparingly: warning callout, current
       breadcrumb, code keywords, selected table row, link hover,
       challenge & predict labels.
 
   Tech stack:
-    - Google Fonts: Noto Sans SC + JetBrains Mono only
+    - Google Fonts: Noto Sans + JetBrains Mono only
     - Prism.js (CDN) for syntax highlighting — custom theme overrides palette
     - Zero CSS framework, zero JS framework, no build step
 
@@ -38,15 +38,15 @@
     .self-check   .challenge   .references   .chapter-nav
   ════════════════════════════════════════════════════════════════
 -->
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{CHAPTER TITLE}} · {{TECH NAME}} 教程</title>
+<title>{{CHAPTER TITLE}} · {{TECH NAME}} Tutorial</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
 
 <style>
@@ -72,7 +72,7 @@
   --code-fn:     #2C3E50;    /* muted blue */
 
   /* Typography */
-  --sans:        'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --sans:        'Noto Sans', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
   --mono:        'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
 
   /* Rhythm */
@@ -270,7 +270,7 @@ article .one-liner {
   border-left: 2px solid var(--ink-faint);
 }
 
-/* "为什么需要它" rationale block */
+/* "Why it exists" rationale block */
 article .rationale {
   background: var(--bg-soft);
   padding: 12px 16px;
@@ -605,7 +605,7 @@ article h2, article h3, article [id] { scroll-margin-top: 64px; }
 
 /* ============================================================
    SVG conventions — utility classes for hand-drawn diagrams
-   (full规约 see references/diagram_guide.md)
+   (full rules: see references/diagram_guide.md)
    ============================================================ */
 .diagram-ink       { stroke: var(--ink);       fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .diagram-accent    { stroke: var(--vermilion); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
@@ -618,7 +618,7 @@ article h2, article h3, article [id] { scroll-margin-top: 64px; }
 .branch-label      { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--vermilion); paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; }
 
 /* ============================================================
-   Multi-tutorial library: hub index + 相关教程 cross-links
+   Multi-tutorial library: hub index + related-tutorial cross-links
    (see SKILL.md "Building a knowledge library")
    ============================================================ */
 .theme-cluster          { margin: 2.4rem 0; }
@@ -642,18 +642,18 @@ article h2, article h3, article [id] { scroll-margin-top: 64px; }
     Learning path breadcrumb. Mark the current chapter with class="current".
     Replace links with relative paths to your tutorial's chapters.
   -->
-  <nav class="learning-path" aria-label="学习路径">
+  <nav class="learning-path" aria-label="Learning path">
    <div class="inner">
     <!-- Default: concept-focused (4 chapters) -->
-    <a href="index.html">00 起点</a><span class="sep">—</span>
-    <a href="01-concepts.html" class="current">01 概念</a><span class="sep">—</span>
-    <a href="02-principles.html">02 原理</a><span class="sep">—</span>
-    <a href="03-self-check.html">03 自测</a>
-    <!-- Hands-on extension: replace the line above (03 自测) with:
-    <a href="03-practice.html">03 实操</a><span class="sep">—</span>
-    <a href="04-pitfalls.html">04 陷阱</a><span class="sep">—</span>
-    <a href="05-capstone.html">05 综合</a><span class="sep">—</span>
-    <a href="06-self-check.html">06 自测</a>
+    <a href="index.html">00 Start</a><span class="sep">—</span>
+    <a href="01-concepts.html" class="current">01 Concepts</a><span class="sep">—</span>
+    <a href="02-principles.html">02 Principles</a><span class="sep">—</span>
+    <a href="03-self-check.html">03 Self-check</a>
+    <!-- Hands-on extension: replace the line above (03 Self-check) with:
+    <a href="03-practice.html">03 Practice</a><span class="sep">—</span>
+    <a href="04-pitfalls.html">04 Pitfalls</a><span class="sep">—</span>
+    <a href="05-capstone.html">05 Capstone</a><span class="sep">—</span>
+    <a href="06-self-check.html">06 Self-check</a>
     -->
    </div>
   </nav>
@@ -668,8 +668,8 @@ article h2, article h3, article [id] { scroll-margin-top: 64px; }
 
     </article>
 
-    <aside class="toc-sidebar" aria-label="本章目录">
-      <p class="toc-label">本章 · TOC</p>
+    <aside class="toc-sidebar" aria-label="Chapter table of contents">
+      <p class="toc-label">Chapter TOC</p>
       <ul>
         <!-- e.g.: <li><a href="#s11" data-toc-target="s11">1.1 ...</a></li> -->
       </ul>
@@ -729,15 +729,15 @@ document.querySelectorAll('.code-block .copy').forEach(btn => {
     try {
       await navigator.clipboard.writeText(el.innerText);
       const original = btn.textContent;
-      btn.textContent = '已复制';
+      btn.textContent = 'Copied';
       btn.classList.add('copied');
       setTimeout(() => {
         btn.textContent = original;
         btn.classList.remove('copied');
       }, 1400);
     } catch (e) {
-      btn.textContent = '失败';
-      setTimeout(() => { btn.textContent = '复制'; }, 1400);
+      btn.textContent = 'Failed';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1400);
     }
   });
 });

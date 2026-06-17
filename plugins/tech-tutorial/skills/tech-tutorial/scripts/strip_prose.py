@@ -10,7 +10,7 @@ Strips, in order:
   1. <pre...><code...>...</code></pre> — code blocks: comments and prompt strings
      inside code are program content, not author voice.
   2. <details ...>...</details>        — answer blocks: expected-value hedges
-     ("正确答案应该是 X") are answers, not commitments-to-the-reader.
+     ("the expected answer is X") are answers, not commitments-to-the-reader.
   3. every remaining tag               — markup is structure, not voice.
 
 Usage: python3 strip_prose.py <file.html>
