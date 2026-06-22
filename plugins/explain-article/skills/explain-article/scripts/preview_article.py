@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import re
 import sys
 import webbrowser
 from pathlib import Path
@@ -87,11 +88,11 @@ def build_html(md: str, src_name: str) -> str:
     b64 = base64.b64encode(md.encode("utf-8")).decode("ascii")
     first_line = next((ln for ln in md.splitlines() if ln.strip()), "explain-article preview")
     title = first_line.lstrip("# ").strip() or "explain-article preview"
-    return (
-        TEMPLATE.replace("__TITLE__", title)
-        .replace("__SRC__", src_name)
-        .replace("__B64__", b64)
-    )
+    # Single left-to-right pass so a token that appears inside an earlier
+    # substitution (e.g. a title literally containing "__B64__") is inserted
+    # verbatim and never re-scanned as another placeholder.
+    replacements = {"__TITLE__": title, "__SRC__": src_name, "__B64__": b64}
+    return re.sub(r"__TITLE__|__SRC__|__B64__", lambda m: replacements[m.group(0)], TEMPLATE)
 
 
 def main() -> int:

@@ -6,7 +6,11 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from evaluate_article import evaluate, transfer_question_count
+from evaluate_article import (
+    evaluate,
+    has_understanding_questions,
+    transfer_question_count,
+)
 
 
 def write_tmp(text: str) -> Path:
@@ -437,6 +441,23 @@ def test_inline_questions_counted_separately() -> None:
     assert transfer_question_count(section) >= 3
 
 
+def test_understanding_questions_ignore_source_url_query_marks() -> None:
+    # A check section with no real questions must not be rescued by '?' marks
+    # appearing in source-section URL query strings.
+    text = (
+        "<!-- explain-article:check -->\n"
+        "## 检查\n"
+        "回顾一下这个机制的关键环节。\n"
+        "\n"
+        "<!-- explain-article:sources -->\n"
+        "## 来源\n"
+        "- https://example.com/a?utm=1\n"
+        "- https://example.com/b?ref=2\n"
+        "- https://example.com/c?id=3\n"
+    )
+    assert has_understanding_questions(text) is False
+
+
 if __name__ == "__main__":
     test_shallow_article_fails_depth_check()
     test_depth_labels_without_content_fail()
@@ -447,4 +468,5 @@ if __name__ == "__main__":
     test_short_article_skips_depth_probes()
     test_short_article_requires_depth_probes_in_full_mode()
     test_inline_questions_counted_separately()
+    test_understanding_questions_ignore_source_url_query_marks()
     print("test_evaluate_article.py: PASS")

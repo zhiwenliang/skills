@@ -133,10 +133,11 @@ def marker_word_position(text: str, marker: str) -> int | None:
 
 
 def has_understanding_questions(text: str) -> bool:
-    check_idx = text.find("<!-- explain-article:check -->")
-    if check_idx == -1:
+    # Bound to the check section so '?' inside source-section URLs (e.g.
+    # "?utm=", "?ref=") cannot satisfy the question-count fallback below.
+    check_section = section_after_marker(text, "check")
+    if not check_section:
         return False
-    check_section = text[check_idx:]
     numbered = re.findall(r"^\s*\d+[\.)、]", check_section, flags=re.MULTILINE)
     bullets_with_question = re.findall(r"^\s*[-*]\s+.*[?？]", check_section, flags=re.MULTILINE)
     question_marks = re.findall(r"[?？]", check_section)

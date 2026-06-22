@@ -48,6 +48,25 @@ class PrepareBookSourceTests(unittest.TestCase):
         self.assertIn("# 01-foundation.txt", normalized)
         self.assertIn("# 02-method.md", normalized)
 
+    def test_excludes_nested_output_on_rerun(self) -> None:
+        source = self.tmp / "book"
+        source.mkdir()
+        (source / "chapter.md").write_text("alpha beta gamma delta epsilon", encoding="utf-8")
+        nested_out = source / "prepared"
+
+        first = prepare_book_source(source, nested_out, chunk_words=3)
+        # Re-run with output nested inside the source: the prior run's
+        # normalized_book.md/chunks must not be re-ingested.
+        second = prepare_book_source(source, nested_out, chunk_words=3)
+
+        self.assertEqual(first["total_files"], 1)
+        self.assertEqual(second["total_files"], 1)
+        self.assertEqual(first["total_words"], second["total_words"])
+        self.assertEqual(
+            [Path(item["path"]).name for item in second["files"]],
+            ["chapter.md"],
+        )
+
     def test_strips_html_noise(self) -> None:
         source = self.tmp / "chapter.html"
         source.write_text(

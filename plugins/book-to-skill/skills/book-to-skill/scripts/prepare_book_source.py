@@ -161,7 +161,16 @@ def _extract_file(path: Path, label: str | None = None) -> list[ExtractedFile]:
     return [ExtractedFile(source_label, suffix, text)]
 
 
-def extract_sources(source: Path) -> list[ExtractedFile]:
+def _is_within(path: Path, directory: Path) -> bool:
+    """True if path is the directory itself or nested under it."""
+    try:
+        path.resolve().relative_to(directory)
+        return True
+    except ValueError:
+        return False
+
+
+def extract_sources(source: Path, exclude: Path | None = None) -> list[ExtractedFile]:
     source = source.expanduser().resolve()
     if not source.exists():
         raise FileNotFoundError(source)
@@ -169,8 +178,14 @@ def extract_sources(source: Path) -> list[ExtractedFile]:
     if source.is_file():
         return _extract_file(source)
 
+    # When the output directory lives inside the source tree, skip it so a
+    # previous run's normalized_book.md/chunks are not re-ingested (which would
+    # compound the corpus on every re-run).
+    exclude_dir = exclude.expanduser().resolve() if exclude is not None else None
     extracted: list[ExtractedFile] = []
     for path in sorted(item for item in source.rglob("*") if item.is_file()):
+        if exclude_dir is not None and _is_within(path, exclude_dir):
+            continue
         label = str(path.relative_to(source))
         extracted.extend(_extract_file(path, label))
     if not extracted:
@@ -212,7 +227,7 @@ def prepare_book_source(source: str | Path, out_dir: str | Path, chunk_words: in
     output = Path(out_dir)
     output.mkdir(parents=True, exist_ok=True)
 
-    files = extract_sources(source_path)
+    files = extract_sources(source_path, exclude=output)
     normalized_parts: list[str] = []
     file_manifest: list[dict[str, int | str]] = []
     for extracted in files:
