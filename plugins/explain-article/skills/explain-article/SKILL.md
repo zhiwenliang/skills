@@ -60,7 +60,7 @@ Short answers (under about 500 words, validated with `--short`) may omit the `de
    - Keep diagram labels short. Put explanation in prose around the diagram.
 
 5. **Draft the article**
-   - Start with the core claim within the first 150 words.
+   - Start with the core claim early — aim for the first ~150 words; the evaluator warns only if it lands later than 180 words in.
    - Explain mechanism before terminology piles up.
    - Add a depth-probes section that shows why the mechanism is necessary, what tradeoff it creates, what would break without it, how it differs from a tempting simpler model, and one non-obvious detail learned from sources.
    - Use concrete examples before abstract generalization when the reader is likely new.
