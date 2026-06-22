@@ -28,11 +28,10 @@ Core principle: Excalidraw is the renderer, not the goal. A good result should t
    - why this visual grammar explains the topic better than a generic box flow
 4. Read [references/excalidraw-style.md](references/excalidraw-style.md) for Excalidraw renderer and scene-style rules.
 5. Create a `.excalidraw` scene JSON. Include top-level `visualExplainer` design metadata matching the contract below.
-6. Validate before export (run scripts from the skill root):
+6. Validate before export:
 
 ```bash
-cd <skill-root>
-node scripts/validate_visual_explainer_scene.mjs path/to/diagram.excalidraw
+node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer/scripts/validate_visual_explainer_scene.mjs" path/to/diagram.excalidraw
 ```
 
 If validation fails, revise the `.excalidraw` source. Do not bypass the validator with a handmade SVG or a decorative sketch.
@@ -40,15 +39,14 @@ If validation fails, revise the `.excalidraw` source. Do not bypass the validato
 7. Export SVG through the bundled renderer:
 
 ```bash
-cd <skill-root>
-npm install --prefix scripts
-node scripts/render_excalidraw_svg.mjs --input path/to/diagram.excalidraw --output path/to/diagram.svg
+npm install --prefix "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer/scripts"
+node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer/scripts/render_excalidraw_svg.mjs" --input path/to/diagram.excalidraw --output path/to/diagram.svg
 ```
 
 If the renderer cannot find Chrome or bundled Chromium, run:
 
 ```bash
-npm run --prefix scripts install-browser
+npm run --prefix "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer/scripts" install-browser
 ```
 
 8. Verify the SVG is real Excalidraw output: it contains `svg-source:excalidraw`, scene metadata, Excalifont text, and rough path geometry.
@@ -96,7 +94,7 @@ Allowed `diagramPattern` values: `process-flow`, `layered-system`, `feedback-loo
 
 Use `conceptStructure` and `visualGrammar` as planning metadata when they help future review. They are not shape-count rules. They record why the drawing uses a gauge, map, boundary, tension metaphor, landscape, control loop, causal field, cutaway, or another transferable strategy.
 
-Each arrow element must have a matching `semanticArrows` entry. Main relationship arrows need `labelElementId` pointing to a visible text label near the arrow. Only use `"kind": "callout-pointer"` without a visible label for short pointers from a note to the thing it annotates. Treat arrows as relationship verbs, not connectors.
+Each arrow element must have a matching `semanticArrows` entry, and every entry needs `elementId`, `verb`, `from`, and `to`. Main relationship arrows additionally need `labelElementId` pointing to a visible text label near the arrow. Use `"kind": "callout-pointer"` for a short pointer from a note to the thing it annotates: it omits only the visible `labelElementId`, but still requires `verb`/`from`/`to` (for example `"verb": "annotates"`). An entry missing `verb`/`from`/`to` is ignored, and its arrow then fails validation as a missing entry. Treat arrows as relationship verbs, not connectors.
 
 Each primary visual shape must have a `visualAnchors` entry with an `elementId` and `role`. Add `labelElementId` when the anchor has a visible text label. This prevents orphaned boxes, dots, or example panels that look important but do not participate in the explanation.
 

@@ -68,10 +68,10 @@ Short answers (under about 500 words, validated with `--short`) may omit the `de
    - Avoid filler, cheerleading, and "obvious/just/simply" language.
 
 6. **Verify and revise**
-   - Run `python3 scripts/evaluate_article.py <article.md>` when the article is saved to a file.
+   - Run `python3 "${CLAUDE_PLUGIN_ROOT}/skills/explain-article/scripts/evaluate_article.py" <article.md>` when the article is saved to a file.
    - For short answers (under about 500 words), add `--short` so the one-diagram/one-source shape and the omitted `depth-probes` section are accepted instead of failed.
    - Use `--allow-unverified-note` only when the user explicitly asked for a quick, source-light draft.
-   - To see the rendered Mermaid diagrams, run `python3 scripts/preview_article.py <article.md>` to build a self-contained HTML view and open it in the browser. Add `--no-open` for headless/CI. This needs internet for the diagram libraries.
+   - To see the rendered Mermaid diagrams, run `python3 "${CLAUDE_PLUGIN_ROOT}/skills/explain-article/scripts/preview_article.py" <article.md>` to build a self-contained HTML view and open it in the browser. Add `--no-open` for headless/CI. This needs internet for the diagram libraries.
    - Fix any failed required checks unless the user requested an intentionally shorter answer.
    - Review manually for factual accuracy, reader fit, diagram usefulness, misconception coverage, and source quality.
    - For high-stakes, long-form, or eval work, use [references/evaluation-rubric.md](references/evaluation-rubric.md).

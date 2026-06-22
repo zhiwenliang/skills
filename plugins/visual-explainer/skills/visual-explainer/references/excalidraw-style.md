@@ -50,10 +50,10 @@ Research anchors:
 
 ## Renderer Rules
 
-- Render with `scripts/render_excalidraw_svg.mjs`.
+- Render with `${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer/scripts/render_excalidraw_svg.mjs`.
 - The script uses `@excalidraw/utils` and Playwright/Chrome to call Excalidraw's `exportToSvg`.
-- Run `npm install --prefix scripts` once before the first render.
-- The renderer first tries local Chrome, then bundled Chromium. If neither exists, run `npm run --prefix scripts install-browser`.
+- Run `npm install --prefix "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer/scripts"` once before the first render.
+- The renderer first tries local Chrome, then bundled Chromium. If neither exists, run `npm run --prefix "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer/scripts" install-browser`.
 - Pass `--browser <channel>` to force a specific Playwright Chromium channel.
 - Treat the generated SVG as disposable output. Edit the `.excalidraw` source, then regenerate.
 

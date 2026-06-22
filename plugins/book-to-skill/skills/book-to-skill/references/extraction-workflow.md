@@ -109,7 +109,7 @@ Recommended `evals/evals.json` shape:
 Run these checks before delivery:
 
 ```bash
-python scripts/validate_book_skill.py <generated-skill-dir>
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/book-to-skill/scripts/validate_book_skill.py" <generated-skill-dir>
 ```
 
 `validate_book_skill.py` is self-contained. Optionally, if the separate `skill-creator` plugin is installed, also run its generic `quick_validate.py <generated-skill-dir>` for a second structural opinion; skip it when that plugin is unavailable.

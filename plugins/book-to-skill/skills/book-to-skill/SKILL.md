@@ -21,7 +21,7 @@ Respect copyright and source limits. Use the source to synthesize original proce
 2. **Prepare the source.** For local files or directories, run:
 
 ```bash
-python scripts/prepare_book_source.py <book-or-source-dir> --out .tmp/book-to-skill/<slug> --chunk-words 1200
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/book-to-skill/scripts/prepare_book_source.py" <book-or-source-dir> --out .tmp/book-to-skill/<slug> --chunk-words 1200
 ```
 
 Use the generated `normalized_book.md`, `manifest.json`, and `chunks/` as the working corpus. If PDF extraction reports a missing dependency, install or use an available local extractor before falling back to manual reading.
@@ -46,7 +46,7 @@ Use the generated `normalized_book.md`, `manifest.json`, and `chunks/` as the wo
 8. **Validate and evaluate.** Run:
 
 ```bash
-python scripts/validate_book_skill.py <generated-skill-dir>
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/book-to-skill/scripts/validate_book_skill.py" <generated-skill-dir>
 ```
 
 `validate_book_skill.py` already covers frontmatter, structure, source map, and evals. Optionally, if the separate `skill-creator` plugin is installed, also run its generic `quick_validate.py` for a second structural opinion; skip it when that plugin is unavailable.
