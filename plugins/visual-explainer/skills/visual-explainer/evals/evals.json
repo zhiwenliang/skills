@@ -1,0 +1,196 @@
+{
+  "skill_name": "visual-explainer",
+  "evals": [
+    {
+      "id": 1,
+      "name": "one-concept-svg-explainer",
+      "prompt": "Use $visual-explainer to explain API rate limiting as one SVG image.",
+      "expected_output": "Produces a concept-designed .excalidraw scene and an SVG exported with the bundled Excalidraw renderer.",
+      "assertions": [
+        "uses_excalidraw_scene_as_source",
+        "exports_svg_with_renderer",
+        "limits_diagram_to_one_topic",
+        "preserves_editable_source",
+        "selects_topic_appropriate_diagram_pattern",
+        "includes_visual_explainer_design_metadata",
+        "passes_scene_design_validator",
+        "labels_arrows_with_semantic_relationships",
+        "shows_visible_labels_for_main_arrows",
+        "uses_visual_encodings_to_reduce_text",
+        "passes_visual_evaluation_rubric"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "style-specific-request-with-design-first",
+      "prompt": "Make a simple Excalidraw-style SVG that explains how a queue works.",
+      "expected_output": "Chooses an appropriate process or state diagram for queue behavior, then uses Excalidraw-native rendering rather than handmade sketch SVG.",
+      "assertions": [
+        "does_not_treat_style_as_the_primary_goal",
+        "reads_style_reference",
+        "uses_diagram_pattern_reference",
+        "uses_excalidraw_defaults",
+        "avoids_fake_roughening",
+        "uses_compact_explanatory_text",
+        "shows_concrete_micro_example",
+        "every_main_arrow_has_a_visible_relationship_label"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "non-flow-topic",
+      "prompt": "Use $visual-explainer to explain gradient descent in Chinese as one SVG image.",
+      "expected_output": "Avoids a generic four-box flow, uses an optimization-landscape or equivalent pattern, keeps Chinese labels short, and exports both .excalidraw and SVG files.",
+      "assertions": [
+        "does_not_force_left_to_right_box_flow",
+        "uses_optimization_landscape_or_equivalent_pattern",
+        "keeps_chinese_labels_phrase_like",
+        "includes_micro_example",
+        "labels_update_arrows_visibly",
+        "passes_scene_design_validator",
+        "passes_visual_evaluation_rubric"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "complex-feedback-loop-cn-kubernetes",
+      "prompt": "Use $visual-explainer to explain Kubernetes 调谐循环 in Chinese as one SVG image.",
+      "expected_output": "Uses a feedback-loop diagram, not a one-way deployment flow, showing desired state, actual state, controller comparison, correction, and a compact replica-count micro-example.",
+      "assertions": [
+        "uses_feedback_loop_pattern",
+        "shows_desired_state_actual_state_and_controller",
+        "labels_feedback_and_correction_arrows_visibly",
+        "includes_visual_anchors_for_all_primary_shapes",
+        "keeps_chinese_labels_phrase_like",
+        "passes_scene_design_validator",
+        "passes_visual_evaluation_rubric"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "complex-security-flow-cn-oauth-pkce",
+      "prompt": "Use $visual-explainer to explain OAuth PKCE in Chinese as one SVG image.",
+      "expected_output": "Uses a process-flow diagram that makes code, challenge, verifier, token endpoint validation, and the intercepted-code risk visible without long prose.",
+      "assertions": [
+        "uses_process_flow_pattern",
+        "shows_code_and_verifier_as_different_security_artifacts",
+        "labels_each_main_arrow_with_a_security_verb",
+        "includes_a_risk_callout_without_turning_it_into_a_second_topic",
+        "includes_visual_anchors_for_all_primary_shapes",
+        "passes_scene_design_validator"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "nontechnical-causal-cn-inflation-expectations",
+      "prompt": "Use $visual-explainer to explain 通胀预期 in Chinese as one SVG image.",
+      "expected_output": "Uses a causal-model diagram that shows expectations changing wages, costs, pricing, actual inflation, and credible policy stabilization.",
+      "assertions": [
+        "uses_causal_model_pattern",
+        "does_not_force_a_generic_process_flow",
+        "labels_cause_arrows_visibly",
+        "uses_visual_encoding_to_distinguish_pressure_and_stabilization",
+        "includes_a_concrete_price_or_wage_micro_example",
+        "passes_scene_design_validator"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "nontechnical-mental-model-cn-cognitive-dissonance",
+      "prompt": "Use $visual-explainer to explain 认知失调 in Chinese as one SVG image.",
+      "expected_output": "Uses a mental-model diagram that shows the conflict between self-image and behavior, the discomfort state, and three connected pressure-release choices.",
+      "assertions": [
+        "uses_mental_model_pattern",
+        "shows_the_core_conflict_before_the_resolution_choices",
+        "connects_every_choice_or_declares_it_as_a_visual_anchor",
+        "labels_resolution_arrows_visibly",
+        "keeps_visible_text_compact",
+        "passes_scene_design_validator"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "nonsoftware-process-cn-immune-response",
+      "prompt": "Use $visual-explainer to explain 免疫反应 in Chinese as one SVG image.",
+      "expected_output": "Uses a process-flow diagram, not an anatomy pattern, showing pathogen detection, innate response, antigen presentation, adaptive response, memory, and a vaccine micro-example.",
+      "assertions": [
+        "uses_process_flow_pattern_for_ordered_response",
+        "does_not_mislabel_a_sequence_as_anatomy",
+        "labels_each_main_arrow_with_a_biology_verb",
+        "includes_visual_anchors_for_all_primary_shapes",
+        "includes_a_vaccine_micro_example",
+        "passes_scene_design_validator"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "mapping-grammar-database-index",
+      "prompt": "Use $visual-explainer to explain database index lookup as one SVG image.",
+      "expected_output": "Selects transferable visual grammar: mapping. The diagram uses an index/table/router-like object as the main visual, not a topic-specific database template or a generic request flow.",
+      "assertions": [
+        "selects_transferable_visual_grammar",
+        "does_not_use_topic_specific_template",
+        "uses_mapping_visual_grammar",
+        "shows_key_to_row_lookup",
+        "keeps_arrows_secondary_to_the_map",
+        "passes_scene_design_validator"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "pressure-grammar-error-budget-cn",
+      "prompt": "Use $visual-explainer to explain 错误预算 burn rate in Chinese as one SVG image.",
+      "expected_output": "Selects transferable visual grammar: pressure or burn gauge. The diagram makes budget depletion and threshold risk visible without turning SRE policy into a step-by-step flow.",
+      "assertions": [
+        "selects_transferable_visual_grammar",
+        "does_not_use_topic_specific_template",
+        "uses_pressure_or_gauge_visual_grammar",
+        "shows_budget_threshold_and_burn_rate",
+        "includes_a_release_freeze_micro_example",
+        "passes_scene_design_validator"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "tension-grammar-procrastination-cn",
+      "prompt": "Use $visual-explainer to explain 拖延症 as one SVG image in Chinese.",
+      "expected_output": "Selects transferable visual grammar: tension or pressure release. The diagram shows short-term relief pulling against long-term goals and a small-start release path.",
+      "assertions": [
+        "selects_transferable_visual_grammar",
+        "does_not_use_topic_specific_template",
+        "uses_tension_visual_grammar",
+        "shows_conflicting_forces_before_resolution",
+        "keeps_text_phrase_like",
+        "passes_scene_design_validator"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "causal-field-carbon-cycle-cn",
+      "prompt": "Use $visual-explainer to explain 碳循环 in Chinese as one SVG image.",
+      "expected_output": "Selects transferable visual grammar: causal field or cycle. The diagram shows reservoirs and flows as a field of exchange, not a row of boxes.",
+      "assertions": [
+        "selects_transferable_visual_grammar",
+        "does_not_use_topic_specific_template",
+        "uses_causal_field_visual_grammar",
+        "shows_reservoirs_and_exchange_flows",
+        "uses_position_or_size_as_meaning",
+        "passes_scene_design_validator"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "field-grammar-supply-and-demand",
+      "prompt": "Use $visual-explainer to explain supply and demand elasticity as one SVG image.",
+      "expected_output": "Selects transferable visual grammar: field or landscape. The diagram uses curves, slope, and movement on axes to show how elasticity changes quantity response.",
+      "assertions": [
+        "selects_transferable_visual_grammar",
+        "does_not_use_topic_specific_template",
+        "uses_field_or_landscape_visual_grammar",
+        "shows_slope_as_visual_encoding",
+        "includes_a_price_change_micro_example",
+        "passes_scene_design_validator"
+      ]
+    }
+  ]
+}

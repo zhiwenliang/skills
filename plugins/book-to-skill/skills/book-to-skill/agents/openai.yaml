@@ -1,0 +1,4 @@
+interface:
+  display_name: "Book to Skill"
+  short_description: "Turn books into agent skills"
+  default_prompt: "Use $book-to-skill to transform this book into a focused agent skill."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Explain Article"
+  short_description: "Write researched explanatory articles"
+  default_prompt: "Use $explain-article to write a clear explanatory article about this concept."

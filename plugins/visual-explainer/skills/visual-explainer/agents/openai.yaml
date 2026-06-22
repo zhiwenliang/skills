@@ -1,0 +1,4 @@
+interface:
+  display_name: "Visual Explainer"
+  short_description: "Concept-first Excalidraw SVG explainers"
+  default_prompt: "Use $visual-explainer to explain one concept as a diagram-designed, editable Excalidraw SVG."

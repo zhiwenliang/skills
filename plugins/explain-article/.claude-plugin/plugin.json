@@ -1,0 +1,11 @@
+{
+  "name": "explain-article",
+  "version": "0.1.0",
+  "description": "Writes researched explanatory Markdown articles with reader fit, mechanisms, examples, Mermaid diagrams, boundaries, and understanding checks.",
+  "author": {
+    "name": "Zhiwen Liang"
+  },
+  "repository": "https://github.com/zhiwenliang/skills",
+  "license": "MIT",
+  "keywords": ["article", "explanation", "writing", "mermaid", "learning"]
+}

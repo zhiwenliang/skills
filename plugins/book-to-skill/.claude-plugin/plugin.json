@@ -1,0 +1,11 @@
+{
+  "name": "book-to-skill",
+  "version": "0.1.0",
+  "description": "Transforms book-like sources into focused agent skills with source maps, evals, and validation helpers.",
+  "author": {
+    "name": "Zhiwen Liang"
+  },
+  "repository": "https://github.com/zhiwenliang/skills",
+  "license": "MIT",
+  "keywords": ["book", "skill", "agent-skills", "knowledge-extraction", "documentation"]
+}

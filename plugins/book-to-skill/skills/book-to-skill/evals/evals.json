@@ -1,0 +1,51 @@
+{
+  "skill_name": "book-to-skill",
+  "evals": [
+    {
+      "id": 1,
+      "name": "activate-from-book-conversion-request",
+      "prompt": "I have a PDF manual about incident response. Use it to create a skill agents can use during outages.",
+      "expected_output": "Prepares or requests the source, defines a narrow incident-response skill boundary, creates evals before final drafting, and produces a skill folder with SKILL.md, references/source-map.md, and evals/evals.json.",
+      "assertions": [
+        "loads_book_to_skill",
+        "does_not_write_summary_only",
+        "creates_source_map",
+        "creates_evals"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "apply-to-directory-source",
+      "prompt": "Turn the markdown chapters in ./ops-handbook into one reusable troubleshooting skill.",
+      "expected_output": "Runs prepare_book_source.py or equivalent local extraction, inventories the chapters, selects an operational troubleshooting boundary, writes a focused skill, and validates it.",
+      "assertions": [
+        "uses_prepare_book_source",
+        "selects_narrow_skill_boundary",
+        "runs_validate_book_skill"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "handle-ambiguous-summary-request",
+      "prompt": "This leadership book is useful. Make something agents can reuse, not just notes.",
+      "expected_output": "Asks or infers the target job, rejects summary-only output, and converts the book's reusable methods into an agent workflow with non-goals and quality checks.",
+      "assertions": [
+        "clarifies_or_states_target_job",
+        "rejects_summary_only",
+        "includes_non_goals",
+        "includes_quality_checks"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "respect-source-limits",
+      "prompt": "Convert this copyrighted book into a skill and include the best passages in the reference file.",
+      "expected_output": "Creates original procedural guidance, keeps quotes short and necessary, paraphrases source ideas, and records source locations in references/source-map.md.",
+      "assertions": [
+        "does_not_include_long_quotes",
+        "paraphrases_source_material",
+        "uses_source_map_for_traceability"
+      ]
+    }
+  ]
+}

@@ -8,13 +8,49 @@
     {
       "name": "tech-tutorial",
       "source": "./plugins/tech-tutorial",
-      "description": "Builds cognitive-science-aligned HTML tutorials for technical topics. Concept-focused by default (scenario walkthroughs for mental models), with an optional hands-on mode (runnable code progression). Structure is a scaffold — index first, self-check last, topical chapters in between sized to the subject by a concept dependency graph. Grounded in cognitive-science research on encoding and learning depth.",
-      "version": "0.6.1",
+      "description": "Builds English-first, cognitive-science-aligned HTML tutorials for technical topics. Concept-focused by default (scenario walkthroughs for mental models), with an optional hands-on mode (runnable code progression). Structure is a scaffold: index first, self-check last, topical chapters in between sized by a concept dependency graph. Grounded in research on encoding, learning depth, and current field context.",
+      "version": "0.7.0",
       "author": {
         "name": "Zhiwen Liang"
       },
       "repository": "https://github.com/zhiwenliang/skills",
-      "keywords": ["tutorial", "learning", "cognitive-science", "html", "documentation"],
+      "keywords": ["tutorial", "learning", "cognitive-science", "html", "documentation", "schema-building"],
+      "category": "learning"
+    },
+    {
+      "name": "visual-explainer",
+      "source": "./plugins/visual-explainer",
+      "description": "Designs one-topic concept diagrams, preserves editable Excalidraw scene sources, and exports them as SVG explainers.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Zhiwen Liang"
+      },
+      "repository": "https://github.com/zhiwenliang/skills",
+      "keywords": ["svg", "excalidraw", "diagram", "visual-explainer", "concept-map"],
+      "category": "visualization"
+    },
+    {
+      "name": "book-to-skill",
+      "source": "./plugins/book-to-skill",
+      "description": "Transforms book-like sources into focused agent skills with source maps, evals, and validation helpers.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Zhiwen Liang"
+      },
+      "repository": "https://github.com/zhiwenliang/skills",
+      "keywords": ["book", "skill", "agent-skills", "knowledge-extraction", "documentation"],
+      "category": "productivity"
+    },
+    {
+      "name": "explain-article",
+      "source": "./plugins/explain-article",
+      "description": "Writes researched explanatory Markdown articles with reader fit, mechanisms, examples, Mermaid diagrams, boundaries, and understanding checks.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Zhiwen Liang"
+      },
+      "repository": "https://github.com/zhiwenliang/skills",
+      "keywords": ["article", "explanation", "writing", "mermaid", "learning"],
       "category": "learning"
     }
   ]

@@ -1,0 +1,11 @@
+{
+  "name": "visual-explainer",
+  "version": "0.1.0",
+  "description": "Designs one-topic concept diagrams, preserves editable Excalidraw scene sources, and exports them as SVG explainers.",
+  "author": {
+    "name": "Zhiwen Liang"
+  },
+  "repository": "https://github.com/zhiwenliang/skills",
+  "license": "MIT",
+  "keywords": ["svg", "excalidraw", "diagram", "visual-explainer", "concept-map"]
+}

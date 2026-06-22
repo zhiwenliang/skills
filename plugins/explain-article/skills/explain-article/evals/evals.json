@@ -1,0 +1,53 @@
+{
+  "skill_name": "explain-article",
+  "evals": [
+    {
+      "id": 1,
+      "name": "technical-concept-article",
+      "prompt": "Use $explain-article to explain Transformer in Chinese.",
+      "expected_output": "A Chinese Markdown explanatory article with audience assumptions, core claim, at least two default Mermaid diagrams, mechanism explanation, concrete example, misconception or boundary section, understanding questions, and sources.",
+      "assertions": [
+        "uses_required_markers",
+        "includes_default_mermaid_diagrams",
+        "explains_mechanism_below_labels",
+        "includes_depth_probes",
+        "includes_source_backed_depth_detail",
+        "includes_boundaries_or_misconceptions",
+        "ends_with_understanding_checks",
+        "uses_transfer_questions",
+        "runs_evaluate_article_when_saved"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "nontechnical-abstract-concept",
+      "prompt": "Use $explain-article to write an article explaining inflation to a curious high-school student.",
+      "expected_output": "An explanatory article that defines reader assumptions, builds from concrete examples to causal model, uses visuals for flow or contrast, avoids unsupported policy claims, and includes checks.",
+      "assertions": [
+        "declares_target_reader",
+        "uses_concrete_to_abstract_progression",
+        "includes_depth_probes",
+        "includes_source_backed_depth_detail",
+        "contains_at_least_two_visuals",
+        "separates_mechanism_from_policy_opinion",
+        "uses_at_least_two_sources",
+        "cites_sources_or_marks_limits"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "misconception-repair",
+      "prompt": "Use $explain-article to explain why correlation is not causation.",
+      "expected_output": "An article that states the tempting wrong model, shows why it fails, introduces a better causal model, uses contrasting cases, and tests transfer.",
+      "assertions": [
+        "states_wrong_model",
+        "repairs_misconception",
+        "includes_depth_probes",
+        "includes_source_backed_depth_detail",
+        "uses_contrasting_case",
+        "includes_mermaid_visual_model",
+        "asks_transfer_questions"
+      ]
+    }
+  ]
+}
