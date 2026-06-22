@@ -31,6 +31,12 @@ const ALLOWED_DIAGRAM_PATTERNS = new Set([
 ]);
 const PATTERNS_ALLOWING_BENT_ARROWS = new Set(["feedback-loop", "state-machine", "causal-model"]);
 
+function normalizeScene(scene) {
+  // Accept a bare top-level array of elements, matching the renderer's input
+  // handling, so both tools agree on what a valid scene shape is.
+  return Array.isArray(scene) ? { elements: scene } : scene;
+}
+
 function visibleElements(scene) {
   return Array.isArray(scene?.elements) ? scene.elements.filter((element) => !element.isDeleted) : [];
 }
@@ -64,6 +70,7 @@ function validItems(items, requiredKeys) {
 }
 
 export function analyzeVisualExplainerScene(scene) {
+  scene = normalizeScene(scene);
   const elements = visibleElements(scene);
   const textElements = elements.filter((element) => element.type === "text" && textForElement(element));
   const texts = textElements.map(textForElement);
@@ -111,6 +118,7 @@ export function analyzeVisualExplainerScene(scene) {
 }
 
 export function validateVisualExplainerScene(scene, options = {}) {
+  scene = normalizeScene(scene);
   const config = { ...DEFAULTS, ...options };
   const stats = analyzeVisualExplainerScene(scene);
   const errors = [];
@@ -202,7 +210,6 @@ export function validateVisualExplainerScene(scene, options = {}) {
         `Anatomy diagrams should label parts, not encode an ordered sequence with ${mainSemanticArrows.length} main arrows. Use process-flow when steps happen in order.`,
       );
     }
-    const semanticArrowIds = new Set(semanticArrows.map((arrow) => arrow.elementId));
     const semanticArrowById = new Map(semanticArrows.map((arrow) => [arrow.elementId, arrow]));
     for (const arrow of arrows) {
       const semanticArrow = semanticArrowById.get(arrow.id);

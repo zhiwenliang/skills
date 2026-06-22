@@ -299,6 +299,8 @@ For public or shared skill repositories:
 - Audit any third-party skills before importing them.
 - Review scripts carefully before publishing or installing.
 
+> Cross-ecosystem note: the locations below describe how **Cursor** discovers skills. This repository is a **Claude Code plugin marketplace** — users install it with `/plugin marketplace add` (see [README.md](./README.md)), not via these paths. The list is kept for portability context.
+
 Cursor discovers skills from these common locations:
 
 ```text
@@ -322,9 +324,9 @@ When adding a new skill, place it under an existing plugin (extending its skill 
 6. Add scripts only for deterministic repeated work, in the skill's own `scripts/`.
 7. Add eval prompts in the skill's `evals/` for important behavior.
 8. Update `README.md` (and `marketplace.json` if you scaffolded a new plugin) so users can find the skill.
+9. Run the skill quality checklist.
 
 Reminder: plugins are copied to `~/.claude/plugins/cache/` on install — never reference files outside the plugin directory with `../`; nothing outside `plugins/<plugin-name>/` is shipped to the user.
-8. Run the skill quality checklist.
 
 When updating an existing skill:
 

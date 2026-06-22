@@ -149,7 +149,7 @@ async function launchBrowser(chromium, preferredChannel, options = {}) {
   }
 
   throw new Error(
-    `Could not launch a Chromium browser.\nTried:\n- ${failures.join("\n- ")}\nInstall Google Chrome, pass --browser <channel>, or run "npm run --prefix scripts install-browser" from the skill root (equivalently "npx playwright install chromium" in ${scriptDir}).`,
+    `Could not launch a Chromium browser.\nTried:\n- ${failures.join("\n- ")}\nInstall Google Chrome, pass --browser <channel>, or install Chromium with: npm run --prefix "${scriptDir}" install-browser (equivalently: npx playwright install chromium, run in ${scriptDir}).`,
   );
 }
 

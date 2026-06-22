@@ -98,6 +98,17 @@ Each arrow element must have a matching `semanticArrows` entry, and every entry 
 
 Each primary visual shape must have a `visualAnchors` entry with an `elementId` and `role`. Add `labelElementId` when the anchor has a visible text label. This prevents orphaned boxes, dots, or example panels that look important but do not participate in the explanation.
 
+### Validator limits
+
+`validate_visual_explainer_scene.mjs` enforces these bounds; design within them to avoid avoidable failures:
+
+- 28–70 visible word-equivalents total, and at most 18 per text element.
+- 5–18 text elements; at least one title element with `fontSize` ≥ 28.
+- At least 4 primary shapes (rectangle/diamond/ellipse), each with a `visualAnchors` entry.
+- 1–9 arrows; bent arrows only in `feedback-loop`, `state-machine`, or `causal-model` patterns.
+- At least 3 `readerTakeaways` and 2 `visualEncodings`.
+- `anatomy` diagrams allow at most 2 main (non-pointer) semantic arrows.
+
 ## Output Contract
 
 - Always preserve the `.excalidraw` scene next to the exported SVG.

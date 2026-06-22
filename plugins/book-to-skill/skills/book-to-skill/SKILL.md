@@ -49,7 +49,7 @@ Use the generated `normalized_book.md`, `manifest.json`, and `chunks/` as the wo
 python3 "${CLAUDE_PLUGIN_ROOT}/skills/book-to-skill/scripts/validate_book_skill.py" <generated-skill-dir>
 ```
 
-`validate_book_skill.py` already covers frontmatter, structure, source map, and evals. Optionally, if the separate `skill-creator` plugin is installed, also run its generic `quick_validate.py` for a second structural opinion; skip it when that plugin is unavailable.
+`validate_book_skill.py` already covers frontmatter, structure, source map, and evals. Optionally, if the separate `skill-creator` plugin is installed, also run its generic `quick_validate.py` for a second structural opinion; skip it when that plugin is unavailable. Both `prepare_book_source.py` and `validate_book_skill.py` accept a `--json` flag for machine-readable output.
 
 Then run or manually inspect the eval scenarios. Fix the skill if it behaves like a summary, lacks source grounding, has vague triggers, omits verification, or cannot guide a new agent through the target work.
 

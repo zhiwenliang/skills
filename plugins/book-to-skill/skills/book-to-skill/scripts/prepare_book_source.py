@@ -29,6 +29,13 @@ TEXT_SUFFIXES = {".txt", ".md", ".markdown", ".rst"}
 HTML_SUFFIXES = {".html", ".htm", ".xhtml"}
 SUPPORTED_SUFFIXES = TEXT_SUFFIXES | HTML_SUFFIXES | {".docx", ".epub", ".pdf"}
 WORD_RE = re.compile(r"\b\w+\b", re.UNICODE)
+# Block-level tags whose start/end mark a line boundary in extracted text.
+# `br`/`hr` are void (start tag only) and handled separately.
+_BLOCK_TAGS = {
+    "p", "div", "section", "article", "li",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "tr", "td", "blockquote", "pre",
+}
 
 
 @dataclass(frozen=True)
@@ -48,14 +55,14 @@ class _HTMLTextExtractor(HTMLParser):
         if tag in {"script", "style", "noscript"}:
             self._skip_depth += 1
             return
-        if tag in {"p", "br", "div", "section", "article", "li", "h1", "h2", "h3", "h4"}:
+        if tag in _BLOCK_TAGS or tag in {"br", "hr"}:
             self._parts.append("\n")
 
     def handle_endtag(self, tag: str) -> None:
         if tag in {"script", "style", "noscript"} and self._skip_depth:
             self._skip_depth -= 1
             return
-        if tag in {"p", "div", "section", "article", "li", "h1", "h2", "h3", "h4"}:
+        if tag in _BLOCK_TAGS:
             self._parts.append("\n")
 
     def handle_data(self, data: str) -> None:

@@ -35,7 +35,7 @@ MERMAID_TYPES = (
 )
 
 DEPTH_PROBE_CATEGORIES = {
-    "mechanism_chain": re.compile(r"机制|因果|causal|what changes|changes what|sequence|链", re.IGNORECASE),
+    "mechanism_chain": re.compile(r"机制|因果|causal|what changes|changes what|sequence|链条", re.IGNORECASE),
     "constraint_tradeoff": re.compile(r"约束|权衡|代价|成本|限制|constraint|tradeoff|cost", re.IGNORECASE),
     "counterfactual": re.compile(r"反事实|如果没有|假如没有|without|what would break|would fail", re.IGNORECASE),
     "model_comparison": re.compile(r"模型对比|对比|相比|versus|ordinary|centralized|centralised|普通", re.IGNORECASE),
