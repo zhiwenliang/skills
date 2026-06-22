@@ -230,7 +230,7 @@ The official-docs worker also ends with:
 The lead thread synthesizes:
 
 - Concept dependency graph.
-- Why bank.
+- Rationale list: why each core concept exists and matters.
 - Pitfall list.
 - Surprise list.
 - Term table.
@@ -270,7 +270,7 @@ Then run prose checks over stripped prose:
 bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_prose.sh" <tutorial-dir>
 ```
 
-This checks forbidden English voice phrases, first-person author narration, and pedagogy-jargon leaks while ignoring code and hidden answer blocks. For explicit non-English output, run this script for any English prose that remains and add an equivalent language-specific voice review for the requested language. Every hit in reader-facing prose needs a fix or an explicit exception.
+This checks forbidden English voice phrases, first-person author narration, and pedagogy-jargon leaks while ignoring code and hidden answer blocks (`verify_prose.sh` calls `strip_prose.py` to strip code and answer blocks before scanning). For explicit non-English output, run this script for any English prose that remains and add an equivalent language-specific voice review for the requested language. Every hit in reader-facing prose needs a fix or an explicit exception.
 
 Run terminology enumeration:
 
@@ -298,7 +298,7 @@ Also verify:
 - Discrimination scenarios exist.
 - Code examples run, or the tutorial clearly states what was not run.
 - Further reading links are real.
-- The insight check sentence exists in "What you can do after reading".
+- The insight-check sentence (what an experienced engineer gains beyond the docs) exists in "What you can do after reading".
 - Every core concept goes one level below docs.
 - Frontier framing is dated where the field is moving.
 

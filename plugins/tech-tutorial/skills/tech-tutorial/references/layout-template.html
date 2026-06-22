@@ -631,6 +631,12 @@ article h2, article h3, article [id] { scroll-margin-top: 64px; }
 .related-tutorials      { margin-top: 2.6rem; padding-top: 1.4rem; border-top: 1px solid var(--ink-faint); }
 .related-tutorials .label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 0.9rem 0 0.3rem; }
 .related-tutorials ul   { margin: 0.2rem 0 0.6rem; }
+.related-grid           { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem; margin: 0.9rem 0 0.4rem; }
+.related-grid a         { display: block; text-decoration: none; color: inherit; border: 1px solid var(--ink-faint); border-left: 3px solid var(--ink); border-radius: 4px; padding: 0.7rem 0.9rem; transition: border-color .15s ease; }
+.related-grid a:hover   { border-left-color: var(--vermilion); }
+.related-grid .label    { display: block; margin: 0 0 0.3rem; }
+.related-grid strong    { display: block; }
+.related-grid a > span:not(.label) { display: block; margin-top: 0.3rem; font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
 </style>
 </head>
 <body>

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tech Tutorial"
+  short_description: "Cognitive-science HTML tutorials for technical topics"
+  default_prompt: "Use $tech-tutorial to build a structured, English-first HTML tutorial for this technical topic."

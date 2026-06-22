@@ -40,8 +40,17 @@ scan() {
   local pattern="$2"
   local case_flag="$3"
   local any=0
+  local stripped
   for f in "${html_files[@]}"; do
-    if python3 "$STRIP" "$f" | grep "$case_flag" -nHE --label="$f" "$pattern"; then
+    # Capture strip output first and check its exit status explicitly. Piping
+    # strip_prose.py straight into grep would let a strip crash (empty output,
+    # non-zero exit) read as "no matches" and silently PASS the chapter.
+    if ! stripped=$(python3 "$STRIP" "$f"); then
+      echo "verify_prose: strip_prose.py failed on $f" >&2
+      fail=1
+      continue
+    fi
+    if printf '%s\n' "$stripped" | grep "$case_flag" -nHE --label="$f" "$pattern"; then
       any=1
     fi
   done

@@ -28,7 +28,11 @@ from html.parser import HTMLParser
 
 CAPTURE = {"strong", "b", "h1", "h2", "h3", "h4", "figcaption"}
 SKIP = {"pre", "code", "script", "style"}
-QUOTE_RE = re.compile(r"\"([^\"]{1,40})\"|“([^”]{1,40})”|'([^']{1,40})'|‘([^’]{1,40})’")
+# Single straight quotes are omitted on purpose: a straight apostrophe is also
+# the contraction character, so `'([^']{1,40})'` would match the span between
+# two unrelated contractions and pollute the candidate list. Curly single
+# quotes are safe because they require a distinct opening mark.
+QUOTE_RE = re.compile(r"\"([^\"]{1,40})\"|“([^”]{1,40})”|‘([^’]{1,40})’")
 MAX_LEN = 40
 
 
