@@ -148,17 +148,20 @@ Escape `<`, `>`, and `&` inside `<pre><code>`. Prism handles syntax tokens; do n
   <svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" role="img"
        aria-label="{{what this diagram shows}}">
     <defs>
-      <marker id="arrow-ink" viewBox="0 0 10 10" refX="9" refY="5"
+      <marker id="arrow-ink-{{N}}" viewBox="0 0 10 10" refX="9" refY="5"
               markerWidth="8" markerHeight="8" orient="auto-start-reverse">
         <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
       </marker>
     </defs>
-    <!-- Use .diagram-ink, .diagram-accent, .node-fill, .node-label, .edge-label. -->
+    <!-- Use .diagram-ink, .diagram-accent, .node-fill, .node-label, .edge-label;
+         arrows: marker-end="url(#arrow-ink-{{N}})". -->
   </svg>
   <figcaption><span class="fig-num">Fig. N.M</span>{{one-line claim about the figure}}.
     <strong>Notice</strong>: {{the one thing the reader should notice}}.</figcaption>
 </figure>
 ```
+
+Give each figure its own marker id (`arrow-ink-1`, `arrow-ink-2`, ...): `url(#id)` resolves to the first element with that id on the page, so a shared id borrows another figure's marker, and every later arrowhead disappears when that first copy sits inside a closed `<details>`.
 
 Before shipping a diagram:
 
@@ -168,7 +171,7 @@ Before shipping a diagram:
 4. Multi-arrow diagrams use a consistent stop policy.
 5. Free-floating labels do not collide.
 
-Use `scripts/svg_overflow_check.js` and screenshots; do not rely on mental width estimates.
+Use `"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/svg_overflow_check.js"` and screenshots; do not rely on mental width estimates.
 
 ### Callouts
 
@@ -429,6 +432,11 @@ Skeleton:
       <li>In {{scenario}}, choose {{approach A}} or {{approach B}}. Explain why.</li>
     </ol>
   </section>
+
+  <figure>
+    <!-- Difficulty gradient or scenario map (Diagram snippet above). Every chapter,
+         this one included, needs at least one <figure>. -->
+  </figure>
 
   <div class="predict" data-tech-tutorial="reader-drawing">
     <span class="question-label">Draw it yourself</span>

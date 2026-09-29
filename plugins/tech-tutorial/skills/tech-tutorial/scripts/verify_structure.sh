@@ -33,13 +33,13 @@
 #   Markdown fallback        — no .html files: the gates don't apply; exit 2 with a note.
 #                              Hand-check the same five rules against the .md output.
 #
-# WHAT IT DOES NOT CHECK (kept inline in SKILL.md Phase 5 on purpose):
-#   - prose checks — run scripts/verify_prose.sh for forbidden English voice phrases,
+# WHAT IT DOES NOT CHECK (separate SKILL.md Phase 5 steps):
+#   - prose checks — run verify_prose.sh (next to this script) for forbidden English voice phrases,
 #     first-person author narration, and pedagogy-jargon leaks.
-#   - SVG text defects (overflow / label collision — scripts/svg_overflow_check.js) and
+#   - SVG text defects (overflow / label collision — svg_overflow_check.js, next to this script) and
 #     crossings / arrow-piercing / stop-policy (screenshot pass) — need a rendered browser.
 #   - qualitative gates (terminology coinage, mechanism-depth, insight, currency) — judgment, not grep
-#     (scripts/extract_terms.py enumerates the terminology-audit candidates; judging them stays qualitative).
+#     (extract_terms.py, next to this script, enumerates the terminology-audit candidates; judging them stays qualitative).
 #
 # USAGE
 #   bash verify_structure.sh <tutorial-dir>                    # defaults to current dir
@@ -50,24 +50,10 @@
 # EXIT CODE: 0 if every gate passes, 1 if any gate fails, 2 on usage errors
 # (not a directory / no .html files). Prints PASS/FAIL per gate with details.
 #
-# Locale: smart-quote alternations need a UTF-8 locale (LC_ALL=C breaks
-# codepoint-level matching). Resolution order:
-#   1. TECH_TUTORIAL_LC_ALL, if set — explicit override for systems without en_US.UTF-8
-#   2. the caller's own locale, when it is already UTF-8
-#   3. the first installed UTF-8 locale among en_US.UTF-8 / C.UTF-8 (via locale -a)
+# Locale: every pattern here is ASCII, so the checks run with byte semantics
+# (LC_ALL=C, present on every system) and never depend on an installed locale.
 
-if [ -n "${TECH_TUTORIAL_LC_ALL:-}" ]; then
-  export LC_ALL="$TECH_TUTORIAL_LC_ALL"
-else
-  cur="${LC_ALL:-${LC_CTYPE:-${LANG:-}}}"
-  case "$cur" in
-    *.[Uu][Tt][Ff]-8|*.[Uu][Tt][Ff]8) export LC_ALL="$cur" ;;
-    *)
-      utf8_loc=$(locale -a 2>/dev/null | grep -iE '^(en_US|C)\.utf-?8$' | head -n1)
-      export LC_ALL="${utf8_loc:-en_US.UTF-8}"
-      ;;
-  esac
-fi
+export LC_ALL=C
 
 DIR="${1:-.}"
 if [ ! -d "$DIR" ]; then
@@ -87,8 +73,9 @@ skip_line() { printf 'SKIP  %s\n' "$1"; }
 fail_line() { printf 'FAIL  %s\n' "$1"; fail=1; }
 
 # Collect top-level .html files (the tutorial chapters; not nested, not the parent hub).
+# Dotfiles such as macOS "._index.html" sidecars are not chapters.
 html_files=()
-while IFS= read -r f; do html_files+=("$f"); done < <(find "$DIR" -maxdepth 1 -name '*.html' | sort)
+while IFS= read -r f; do html_files+=("$f"); done < <(find "$DIR" -maxdepth 1 -type f -name '*.html' ! -name '.*' | sort)
 
 if [ "${#html_files[@]}" -eq 0 ]; then
   echo "verify_structure: no .html files in '$DIR' — these gates apply to HTML output only." >&2
@@ -109,7 +96,7 @@ if [ "$single_file" -eq 1 ]; then
   skip_line "self-check naming: single-file primer — self-check is an inline section; verify it by eye"
 else
   sc=()
-  while IFS= read -r f; do sc+=("$f"); done < <(find "$DIR" -maxdepth 1 -name '*-self-check.html' | sort)
+  while IFS= read -r f; do sc+=("$f"); done < <(find "$DIR" -maxdepth 1 -type f -name '*-self-check.html' ! -name '.*' | sort)
   if [ "${#sc[@]}" -eq 1 ]; then
     # html_files is sorted, so the last NN- prefixed entry is the last chapter.
     last_chapter=""
@@ -150,9 +137,13 @@ else
 fi
 
 # --- Gate 3: figure coverage (every chapter file has >=1 <figure>) ------------
+# Counts <figure> occurrences, not matching lines: compact or minified markup can
+# put several figures on one line, and gate 6 needs the true per-chapter total.
+count_figures() { grep -aoE '<figure([[:space:]>]|$)' "$1" | wc -l | tr -d ' '; }
+
 missing_fig=()
 for f in "${html_files[@]}"; do
-  n=$(grep -cE '<figure[ >]' "$f")
+  n=$(count_figures "$f")
   [ "$n" -lt 1 ] && missing_fig+=("${f##*/}")
 done
 if [ "${#missing_fig[@]}" -eq 0 ]; then
@@ -163,9 +154,11 @@ else
 fi
 
 # --- Gate 4: SVG-utility-CSS presence (.diagram-ink in every file) ------------
+# Match the CSS rule (".diagram-ink {"), not the bare name: the Diagram snippet's
+# own comment mentions ".diagram-ink," and would pass a chapter with no utility CSS.
 missing_css=()
 for f in "${html_files[@]}"; do
-  grep -q '\.diagram-ink' "$f" || missing_css+=("${f##*/}")
+  grep -q '\.diagram-ink[[:space:]]*{' "$f" || missing_css+=("${f##*/}")
 done
 if [ "${#missing_css[@]}" -eq 0 ]; then
   pass_line "SVG utility CSS: .diagram-ink present in every file"
@@ -175,7 +168,8 @@ else
 fi
 
 # --- Gate 5: reader-drawing prompt (>=1 across the tutorial) ------------------
-draw=$(grep -liE "data-tech-tutorial=[\"']reader-drawing[\"']|draw it yourself|draw from memory|sketch from memory|sketch .*from memory|close the .*sketch|draw the" "${html_files[@]}" 2>/dev/null | head -n1)
+# (^|[^[:alpha:]]) keeps "withdraw the" / "redraw the" from counting as a drawing prompt.
+draw=$(grep -liE "data-tech-tutorial=[\"']reader-drawing[\"']|(^|[^[:alpha:]])(draw it yourself|draw from memory|draw the)|sketch .*from memory|close the .*sketch" "${html_files[@]}" 2>/dev/null | head -n1)
 if [ -n "$draw" ]; then
   pass_line "reader-drawing prompt: found in ${draw##*/}"
 else
@@ -184,14 +178,24 @@ else
 fi
 
 # --- Gate 6 (optional): screenshot coverage per figure ------------------------
+# Distinct figure numbers N among <chapter>-figN.{png,jpg,jpeg} in the screenshot
+# dir; extra find args (e.g. -newer FILE) narrow the set. Numbers, not files:
+# fig1.png plus fig1.jpg (or a retake) is still one figure and must not stand in
+# for an uncaptured fig2.
+shot_figures() {
+  local base="$1"; shift
+  find "$SHOT_DIR" -maxdepth 1 \( -name "${base}-fig*.png" -o -name "${base}-fig*.jpg" -o -name "${base}-fig*.jpeg" \) "$@" |
+    while IFS= read -r p; do p="${p##*/}"; p="${p#"$base-fig"}"; printf '%s\n' "${p%%[!0-9]*}"; done |
+    grep '^[0-9]' | sort -u | wc -l | tr -d ' '
+}
 if [ -n "$SHOT_DIR" ]; then
   shot_bad=()
   for f in "${html_files[@]}"; do
     b="${f##*/}"; base="${b%.html}"
-    n=$(grep -cE '<figure[ >]' "$f")
+    n=$(count_figures "$f")
     [ "$n" -lt 1 ] && continue  # gate 3 already reports figure-less chapters
-    fresh=$(find "$SHOT_DIR" -maxdepth 1 \( -name "${base}-fig*.png" -o -name "${base}-fig*.jpg" -o -name "${base}-fig*.jpeg" \) -newer "$f" | wc -l | tr -d ' ')
-    total=$(find "$SHOT_DIR" -maxdepth 1 \( -name "${base}-fig*.png" -o -name "${base}-fig*.jpg" -o -name "${base}-fig*.jpeg" \) | wc -l | tr -d ' ')
+    fresh=$(shot_figures "$base" -newer "$f")
+    total=$(shot_figures "$base")
     if [ "$fresh" -lt "$n" ]; then
       shot_bad+=("$b — figures=$n, fresh screenshots=$fresh (total=$total$([ "$total" -gt "$fresh" ] && echo ', some STALER than the html'))")
     fi

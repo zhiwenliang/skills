@@ -53,7 +53,7 @@ Do not use a diagram for three already-clear linear steps. Use prose or a table.
   <svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" role="img"
        aria-label="How requests move through the system">
     <defs>
-      <marker id="arrow-ink" viewBox="0 0 10 10" refX="9" refY="5"
+      <marker id="arrow-ink-1" viewBox="0 0 10 10" refX="9" refY="5"
               markerWidth="8" markerHeight="8" orient="auto-start-reverse">
         <path d="M 0 0 L 10 5 L 0 10 z" fill="#0A0A0A"/>
       </marker>
@@ -65,12 +65,14 @@ Do not use a diagram for three already-clear linear steps. Use prose or a table.
     <text x="110" y="168" text-anchor="middle" class="edge-label">sends request</text>
 
     <line x1="180" y1="152" x2="280" y2="152"
-          class="diagram-ink" marker-end="url(#arrow-ink)"/>
+          class="diagram-ink" marker-end="url(#arrow-ink-1)"/>
   </svg>
   <figcaption><span class="fig-num">Fig. 1.1</span>The request becomes explicit at the boundary.
     <strong>Notice</strong>: the boundary owns validation.</figcaption>
 </figure>
 ```
+
+Give each figure its own marker id (`arrow-ink-1`, `arrow-ink-2`, ...): `url(#id)` resolves to the first element with that id on the page, so a shared id borrows another figure's marker, and every later arrowhead disappears when that first copy sits inside a closed `<details>`.
 
 ## Layout Rules
 
@@ -95,7 +97,7 @@ For left-to-right flow:
 ```html
 <line x1="{{sourceRight}}" y1="{{sourceMidY}}"
       x2="{{targetLeftMinusGap}}" y2="{{targetMidY}}"
-      marker-end="url(#arrow-ink)" class="diagram-ink"/>
+      marker-end="url(#arrow-ink-{{N}})" class="diagram-ink"/>
 ```
 
 Keep a consistent gap policy across a diagram.
@@ -115,9 +117,11 @@ Edge labels should sit near their edge, not float in open space. Free-floating l
 
 ### 5. Verify Label Collisions
 
-Two labels that do not overlap in source order can overlap after transforms or responsive scaling. Run the script and inspect screenshots.
+Two labels that do not overlap in source order can overlap after transforms or responsive scaling. Run the script and inspect screenshots. Fix a collision with layout (move a label to its own edge, or re-flow the figure) rather than by nudging it a few pixels. A pair verified benign on a screenshot can be exempted with `data-collision-ok` on either `<text>`.
 
 ## Common Patterns
+
+Each pattern shows only the `<svg>`. Wrap it in the Base Figure Pattern's `<figure>` with a `<figcaption>`: `verify_structure.sh` counts `<figure>` elements, not bare `<svg>`.
 
 ### Pattern 1 - Layered Architecture
 
@@ -197,7 +201,7 @@ Run both automated and visual checks.
 
 ### Automated Text Defect Check
 
-Serve the tutorial and evaluate `scripts/svg_overflow_check.js` in the page context. It reports:
+Serve the tutorial and evaluate `"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/svg_overflow_check.js"` in the page context (the working directory is the tutorial folder, so a bare `scripts/...` path does not resolve). It reports:
 
 - SVG text that spills outside its node.
 - SVG text that spills outside the viewBox.
@@ -211,7 +215,7 @@ OK: no SVG text defects
 
 ### Screenshot Inspection
 
-Capture every figure and inspect:
+Capture every figure as `<chapter>-figN.png` (for example `01-concepts-fig2.png`) and inspect:
 
 - Connector crossings.
 - Lines through unrelated labels.

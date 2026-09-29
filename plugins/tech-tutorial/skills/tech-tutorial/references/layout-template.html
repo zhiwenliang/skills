@@ -324,7 +324,9 @@ article .rationale p { margin: 4px 0; }
   color: var(--ink);
   background: var(--bg-soft);
 }
-.code-block pre code { background: none; padding: 0; color: inherit; border: none; font-weight: 400; }
+/* font-family / line-height / text-shadow: the Prism theme's code[class*="language-"]
+   rule would otherwise swap in its own font stack and a white text shadow. */
+.code-block pre code { background: none; padding: 0; color: inherit; border: none; font-weight: 400; font-family: inherit; line-height: inherit; text-shadow: none; }
 
 /* Prism theme — restrained palette: 4 token colors + neutrals */
 .token.keyword,
@@ -619,7 +621,7 @@ article h2, article h3, article [id] { scroll-margin-top: 64px; }
 
 /* ============================================================
    Multi-tutorial library: hub index + related-tutorial cross-links
-   (see SKILL.md "Building a knowledge library")
+   (see SKILL.md "Knowledge Libraries")
    ============================================================ */
 .theme-cluster          { margin: 2.4rem 0; }
 .theme-cluster > h2     { margin-bottom: 1rem; }
@@ -629,6 +631,7 @@ article h2, article h3, article [id] { scroll-margin-top: 64px; }
 .tutorial-cards a       { text-decoration: none; }
 .tutorial-cards .schema { display: block; margin-top: 0.3rem; font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
 .related-tutorials      { margin-top: 2.6rem; padding-top: 1.4rem; border-top: 1px solid var(--ink-faint); }
+.related-tutorials > h2 { border-top: none; padding-top: 0; margin-top: 0; }  /* the section already draws the rule */
 .related-tutorials .label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 0.9rem 0 0.3rem; }
 .related-tutorials ul   { margin: 0.2rem 0 0.6rem; }
 .related-grid           { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem; margin: 0.9rem 0 0.4rem; }
@@ -726,25 +729,28 @@ const obs = new IntersectionObserver((entries) => {
 }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
 sectionEls.forEach(el => obs.observe(el));
 
-// 3. Copy code button
+// 3. Copy code button. The label is captured once, before any click: reading it
+//    inside the handler would capture 'Copied' on a quick second click and leave
+//    the button stuck on it (and a localized label must survive a failed copy).
 document.querySelectorAll('.code-block .copy').forEach(btn => {
+  const label = btn.textContent;
+  let reset;
   btn.addEventListener('click', async () => {
     const targetId = btn.dataset.copyTarget;
     const el = document.getElementById(targetId);
     if (!el) return;
     try {
       await navigator.clipboard.writeText(el.innerText);
-      const original = btn.textContent;
       btn.textContent = 'Copied';
       btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = original;
-        btn.classList.remove('copied');
-      }, 1400);
     } catch (e) {
       btn.textContent = 'Failed';
-      setTimeout(() => { btn.textContent = 'Copy'; }, 1400);
     }
+    clearTimeout(reset);
+    reset = setTimeout(() => {
+      btn.textContent = label;
+      btn.classList.remove('copied');
+    }, 1400);
   });
 });
 </script>

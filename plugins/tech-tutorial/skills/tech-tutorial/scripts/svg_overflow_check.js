@@ -11,7 +11,8 @@
  *     1. any label that spills past its viewBox (gets clipped) — both axes,
  *     2. any label that spills past its containing <rect> border (overflows the box),
  *     3. any TWO labels whose rendered boxes overlap each other (label collision —
- *        added after a shipped 2026-06 defect; full account in diagram_guide.md Rule 5).
+ *        added after a shipped 2026-06 defect: two labels collided in the one figure
+ *        whose screenshot was skipped).
  *   Run it on every chapter before declaring the tutorial done — it is the GATE, not
  *   the eyeball.
  *
@@ -21,9 +22,12 @@
  *   3. Evaluate the function below against the page:
  *        - Playwright MCP:  browser_evaluate  with the trailing arrow function
  *        - headless Playwright (python):
- *            page.evaluate(open(os.environ['CLAUDE_PLUGIN_ROOT'] + '/skills/tech-tutorial/scripts/svg_overflow_check.js').read())
- *          (cwd is the tutorial dir, so use the plugin-root path, not a bare filename)
- *        - DevTools console:  paste the body of the arrow function, then call it
+ *            page.evaluate(open('<plugin-root>/skills/tech-tutorial/scripts/svg_overflow_check.js').read())
+ *          (cwd is the tutorial dir, so use the absolute path SKILL.md Phase 5 gives, not a
+ *          bare filename; CLAUDE_PLUGIN_ROOT is substituted into SKILL.md text, not exported
+ *          to shell or Python processes, so os.environ has no such key)
+ *        - DevTools console:  paste `const check = ` followed by the arrow function, then
+ *          run check() (a bare body fails: its `return` is illegal at the top level)
  *   4. Result is "OK: no SVG text defects"  OR  an array of violations, each with:
  *        { fig, issue: 'past viewBox' | 'past box border', text, ... extents }
  *        { fig, issue: 'label collision', a, b, overlapX, overlapY, shorterLabelHeight }
@@ -31,9 +35,10 @@
  *        - overflow: shorten / split to a 2nd line with <tspan dy> / widen the box /
  *          font-size 12. Multi-line <tspan> labels measure as the union of their lines
  *          (widest line wins), so the split fix converges.
- *        - label collision: the fix is usually layout, not nudging — see
- *          diagram_guide.md Rule 5. A pair verified benign on a screenshot can be
- *          exempted by adding data-collision-ok to either <text>.
+ *        - label collision: the fix is usually layout, not nudging (move one label to
+ *          its own edge, or re-flow the figure — diagram_guide.md Rules 3-5). A pair
+ *          verified benign on a screenshot can be exempted by adding data-collision-ok
+ *          to either <text>.
  *
  * MEASUREMENT NOTES
  *   - getBBox() is used instead of getComputedTextLength(): it respects text-anchor and
@@ -42,9 +47,11 @@
  *     space via screen-CTM composition (all four corners, so rotated elements get their
  *     true axis-aligned envelope), and labels and rects inside nested
  *     <g transform="translate/scale/rotate(...)"> compare in one coordinate system.
- *   - Invisible text (visibility:hidden or opacity:0 — e.g. a hidden draft label or a
- *     duplicate-text halo underlay) has no ink, so it is skipped entirely: it can
- *     neither overflow nor collide. display:none already yields no usable bbox.
+ *   - Invisible text (visibility:hidden, or opacity:0 on the text or any ancestor inside
+ *     the <svg> — e.g. a hidden draft label or a duplicate-text halo underlay) has no
+ *     ink, so it is skipped entirely: it can neither overflow nor collide. display:none
+ *     already yields no usable bbox. Text and rects inside <defs>, <symbol>, <clipPath>,
+ *     <mask>, <marker>, or <pattern> are never drawn in place, so they are skipped too.
  *   - An <svg> without a viewBox attribute exposes viewBox.baseVal as an all-zero rect;
  *     the check falls back to clientWidth/Height (its user units ARE CSS px then).
  *
@@ -96,11 +103,20 @@
       ? vbRaw
       : { x: 0, y: 0, width: svg.clientWidth, height: svg.clientHeight };
     const fig = (svg.getAttribute('aria-label') || ('svg#' + si)).slice(0, 40);
-    const rects = [...svg.querySelectorAll('rect')].map(bboxToRoot).filter(Boolean);
+    // Rects inside <defs>/<clipPath>/<mask>/<marker>/<pattern>/<symbol> are never drawn
+    // where they sit, so they are not boxes a label can overflow.
+    const rects = [...svg.querySelectorAll('rect')]
+      .filter(r => !r.closest('defs, clipPath, mask, marker, pattern, symbol'))
+      .map(bboxToRoot).filter(Boolean);
+    const area = r => (r.right - r.left) * (r.bottom - r.top);
     const labels = [];
     svg.querySelectorAll('text').forEach(t => {
-      const cs = getComputedStyle(t);
-      if (cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return; // no ink
+      if (t.closest('defs, clipPath, mask, marker, pattern, symbol')) return; // never drawn in place
+      // No ink: visibility is inherited, but opacity is not, so walk up to the <svg>.
+      if (getComputedStyle(t).visibility === 'hidden') return;
+      for (let n = t; n && n !== svg; n = n.parentElement) {
+        if (parseFloat(getComputedStyle(n).opacity) === 0) return;
+      }
       const tb = bboxToRoot(t);
       if (!tb) return;
       const snippet = (t.textContent || '').trim().slice(0, 28);
@@ -114,10 +130,14 @@
           viewBoxX: [Math.round(vb.x), Math.round(vb.x + vb.width)],
           viewBoxY: [Math.round(vb.y), Math.round(vb.y + vb.height)] });
       }
-      // 2) past the border of the rect containing the text's center → overflows the box
+      // 2) past the border of the innermost rect containing the text's center → overflows
+      //    the box. Innermost = smallest: a lane, group frame, or background rect drawn
+      //    earlier also contains the center and would hide a node-box overflow.
       //    (horizontal uses PAD = "cramped counts"; vertical uses EPS = true spill only)
       const cx = (tb.left + tb.right) / 2, cy = (tb.top + tb.bottom) / 2;
-      const box = rects.find(r => cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom);
+      const box = rects
+        .filter(r => cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom)
+        .reduce((best, r) => (!best || area(r) < area(best) ? r : best), null);
       if (box) {
         if (tb.left < box.left + PAD - EPS || tb.right > box.right - PAD + EPS ||
             tb.top < box.top - EPS || tb.bottom > box.bottom + EPS) {
@@ -144,5 +164,10 @@
       }
     }
   });
-  return out.length ? out : 'OK: no SVG text defects';
+  if (out.length) return out;
+  // An SVG embedded as <img> (the Excalidraw fallback) has no DOM here to measure.
+  const imgs = [...document.querySelectorAll('img')].filter(i => /\.svg(\?|#|$)/i.test(i.getAttribute('src') || ''));
+  return 'OK: no SVG text defects' + (imgs.length
+    ? ` in inline <svg>; ${imgs.length} <img> SVG(s) not measured: open each .svg file directly and run this check there`
+    : '');
 }

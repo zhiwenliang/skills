@@ -7,7 +7,7 @@ description: Use when the user wants to learn, understand, teach, or build a sys
 
 A tutorial that does not build a mental model is a long paraphrase of the docs. This skill produces professional, English-first technical tutorials that teach durable understanding: low extraneous load, diagrams that carry structure, worked examples, retrieval practice, spaced revisit, interleaving, mechanism depth, and current field context.
 
-Default output language is English. If the user explicitly requests another language, keep the same structure and verification intent. Localize visible headings, but preserve stable `data-tech-tutorial` markers for structural gates.
+Default output language is English. If the user explicitly requests another language, keep the same structure and verification intent. Localize visible headings and set `<html lang>` to the output language (the layout template ships `lang="en"`), but preserve stable `data-tech-tutorial` markers for structural gates.
 
 ## Scope Gate
 
@@ -254,7 +254,7 @@ Use [references/tutorial_template.md](references/tutorial_template.md).
 
 Before each concept introduction, perform the Feynman test in scratch space: explain it in 50 jargon-free words. If that stalls, return to sources before writing.
 
-Parallelize independent chapter drafts only after the outline and dependency graph are locked. The lead thread owns the coherence merge: breadcrumb, cross-chapter callbacks, term consistency, and duplicate-definition cleanup.
+Parallelize independent chapter drafts only after the outline and dependency graph are locked. Give every chapter worker the Phase 2 term table, so drafts name concepts with standard terms instead of coining labels. The lead thread owns the coherence merge: breadcrumb, cross-chapter callbacks, term consistency, and duplicate-definition cleanup.
 
 ### Phase 5 - Verify
 
@@ -284,8 +284,8 @@ For SVGs:
 
 1. Serve the tutorial folder locally.
 2. Open each chapter in a browser.
-3. Run `scripts/svg_overflow_check.js` against the page.
-4. Capture every figure and inspect connector crossings, label collisions, arrow piercing, and cropping.
+3. Evaluate `"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/svg_overflow_check.js"` against the page. Read it from that path: the working directory is the tutorial folder, so a bare `scripts/...` path does not resolve. Fix each violation and re-run until it returns `OK: no SVG text defects`; a collision verified benign on a screenshot can be exempted with `data-collision-ok` on either `<text>`.
+4. Capture every figure as `<chapter>-figN.png` (for example `01-concepts-fig2.png`) into a screenshot folder outside the tutorial, and inspect connector crossings, label collisions, arrow piercing, and cropping.
 5. Re-run:
 
 ```bash
@@ -301,6 +301,7 @@ Also verify:
 - The insight-check sentence (what an experienced engineer gains beyond the docs) exists in "What you can do after reading".
 - Every core concept goes one level below docs.
 - Frontier framing is dated where the field is moving.
+- The checklists in [references/tutorial_template.md](references/tutorial_template.md) pass: the Index checklist, each chapter type's checklist, and the Full Tutorial Checklist.
 
 ## Knowledge Libraries
 
