@@ -42,7 +42,7 @@ Every HTML file must contain the SVG utility CSS, even if the first draft of tha
 | Alternatives and tradeoffs | Decision table or comparison map. |
 | Error causes | Cause-and-effect map. |
 | Hands-on progression | Scaffold progression diagram. |
-| Self-check chapter | Difficulty gradient or scenario map. |
+| Self-check chapter | The reference answer to the reader-drawing prompt (usually the index concept map), inside the answer `<details>`. |
 
 Do not use a diagram for three already-clear linear steps. Use prose or a table.
 
@@ -206,7 +206,12 @@ Serve the tutorial and evaluate `"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scr
 - SVG text that spills outside its node. Nodes are `<rect>`, `<ellipse>`, `<circle>`, and `<polygon>` (diamond decision nodes); a label belongs to the innermost node holding its center or its anchored end, so a left- or right-anchored label that runs far past a narrow box is still caught. Curved, polygon, and rotated nodes are checked against their real outline, not their bounding box. A node drawn as `<path>` is not checked.
 - SVG text that spills outside the viewBox.
 - Free-floating label collisions.
+- `crosses connector`: a label runs across a stroked `<line>`, `<polyline>`, or `<path>`, or across an arrowhead drawn by `marker-start`/`marker-end`. Move the label beside its edge, not onto it. A label resting on the edge passes: the check ignores the empty em-box padding above and below the glyphs.
+- `crosses shape border`: a label runs across the outline of a shape that is not its own node, such as a dashed lane or group frame (`diagram-soft`) whose border cuts through an edge label.
+- Crossings hidden under an opaque node are skipped. For example, a connector drawn center-to-center before the nodes that cover it is not reported.
 - Text inside `<foreignObject>`, as `not measured (foreignObject)`: the script cannot measure HTML layout, so write figure labels as SVG `<text>`/`<tspan>`.
+
+`data-collision-ok` on a `<text>` exempts that label from collisions and from both crossing checks. Use it only after a screenshot shows the overlap is intended, as with a title set on a frame border or a value over a grid line. It does not exempt overflow. The script cannot tell whether a label sits next to the thing it names, so a label floating far from its edge passes. Screenshot inspection must catch that (Rule 4).
 
 Fix and rerun until the script reports:
 

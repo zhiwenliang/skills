@@ -1,6 +1,6 @@
 ---
 name: tech-tutorial
-description: Builds multi-chapter HTML tutorials (index, concept map, learning path, per-chapter self-checks) that teach a technology, framework, library, protocol, tool, or technical concept systematically. Use when the user wants to learn or teach a technical subject, or build a knowledge base of tutorials. Triggers include "teach me X", "I want to learn X", "help me understand X systematically", "give me a primer", "write a tutorial about X", "turn these docs into a tutorial", "系统学习 X", "教我 X", "写一套 X 教程", or requests for a structured learning path. Not for a single explanatory article (explain-article) or one standalone diagram (visual-explainer).
+description: Use when the user wants to learn, understand, or teach a technology, framework, library, protocol, tool, or technical concept, or build a knowledge base of tutorials. Produces English-first HTML tutorials, from a single-page primer to a multi-chapter course, with a concept map, learning path, and self-checks. Triggers include "teach me X", "I want to learn X", "help me understand X", "give me a primer", "write a tutorial about X", "turn these docs into a tutorial", "系统学习 X", "教我 X", "写一套 X 教程", or requests for a structured learning path. For a written explanatory article use explain-article; for one standalone diagram use visual-explainer.
 ---
 
 # Tech Tutorial Writer
@@ -21,7 +21,7 @@ Do not use it for:
 - One explanatory article about a single concept or mechanism, such as "write an article explaining why PKCE exists". Use `explain-article`.
 - One standalone diagram, such as "draw the TCP handshake". Use `visual-explainer`.
 
-If intent is ambiguous, ask one question: "Do you want me to build something with this technology, or teach the technology itself?" If the doubt is about form, ask instead: "Do you want a structured multi-chapter tutorial, or a single article or diagram?" A "why does X exist" question about one concept, with no mention of learning, a tutorial, or a course, goes to `explain-article`.
+If intent is ambiguous, ask one question: "Do you want me to build something with this technology, or teach the technology itself?" If the doubt is about form, ask instead: "Do you want a structured multi-chapter tutorial, or a single article or diagram?" A quick "why does X exist" question about one concept, with no request for a tutorial or study material, is better answered directly or, if the user wants a written article, with `explain-article`.
 
 Diataxis is the routing vocabulary: this skill owns the tutorial quadrant and study-oriented explanation delivered as a learning path. A single explanatory article belongs to `explain-article`. Route work-oriented how-to and reference requests away unless the user asks to turn them into a learning artifact.
 
@@ -37,7 +37,7 @@ Open the tutorial with visible headings in the output language and these semanti
 - `data-tech-tutorial="audience-not-for"`: readers who should take a different path.
 - `data-tech-tutorial="outcomes"`: concrete, verifiable capabilities.
 
-Do not try to serve novices and experts with the same explanation style. Expertise reversal makes that fail. Phase 1 sets a reader level, and the level changes the scaffolding, not only the audience text:
+Do not try to serve novices and experts with the same explanation style. Expertise reversal makes that fail. Phase 1 sets a reader level: novice if the reader is new to the surrounding field, intermediate if they know the neighborhood but not this topic, expert if they have used the topic itself in practice. The level changes the scaffolding, not only the audience text:
 
 | Scaffold | Novice | Intermediate | Expert |
 |---|---|---|---|
@@ -46,7 +46,7 @@ Do not try to serve novices and experts with the same explanation style. Experti
 | Mechanism depth | Surface model in `01-concepts`; mechanism in `02-principles` or a `<details class="under-the-hood">` block | Inline | Inline, with costs and failure boundaries up front |
 | Self-check | 3-4 focused questions per chapter | 2-3 | 2 hard questions, weighted to discrimination |
 
-The outcomes section opens with what the declared reader gains beyond the docs.
+Where a Phase 3 misconception applies, its prediction or counterexample comes before the mechanism at every level; that overrides the order row above. The outcomes section opens with what the declared reader gains beyond the docs.
 
 ### 2. Map Before Territory
 
@@ -80,7 +80,7 @@ Scale the worked-example ratio with reader level: novice-heavy tutorials use mor
 
 ### 5. Force Retrieval
 
-Every chapter ends with self-check questions (count by reader level, above), with answers hidden in a `<details>` inside the `.self-check` section. The tutorial has at least three predictions (`.predict` with a `<details>` reveal), each asked before the explanation it tests, not only before its answer. The first one sits in `index.html`, before the reader starts.
+Every chapter except `index.html` ends with self-check questions (count by reader level, above), with answers hidden in a `<details>` inside the `.self-check` section. The final `NN-self-check.html` is all questions and hides its answers in a final `<details>` instead; a single-file primer carries its `.self-check` in `index.html`. The tutorial has at least three predictions (`.predict` with a `<details>` reveal), each asked before the explanation it tests, not only before its answer. The first one sits in `index.html`, before the reader starts.
 
 Question quality depends on the layer:
 
@@ -97,7 +97,7 @@ Smooth reading is not durable learning. Add productive friction:
 
 ### 7. Interleave And Revisit
 
-Each chapter opens with a recall question about what the prior chapter contributed, answered in a `<details>` and followed by a one-line restatement. A recap the reader only re-reads does not count. Later examples reuse earlier concepts. The final self-check or capstone forces the reader to choose between approaches from at least two prior chapters. This revisit is cumulative within one reading; the final self-check ends with a short set of questions to redo two or three days later.
+Each topical chapter opens with a recall question about what the prior chapter contributed, answered in a `<details>` and followed by a one-line restatement. A recap the reader only re-reads does not count. Later examples reuse earlier concepts. The final self-check or capstone forces the reader to choose between approaches from at least two prior chapters. This revisit is cumulative within one reading; the final self-check ends with a short set of questions to redo two or three days later.
 
 Block early practice when the reader is acquiring brand-new syntax. Interleave after there are multiple concepts to discriminate.
 
@@ -107,7 +107,7 @@ The seven principles control how learning sticks. They do not guarantee depth. U
 
 - **One level below the docs**: "X does Y" becomes "X does Y by doing Z, which costs W and fails when V." A tutorial that stops at API surface is not finished. Every core concept gets there somewhere in the tutorial; for novice readers it can arrive in a later chapter or an "Under the hood" block (see the reader-level table).
 - **Misconceptions first**: readers who already hold a wrong model absorb the right one into it. For each threshold or core concept, state the misconception the declared reader likely holds (from Phase 2 surprises and pitfalls), let a prediction or counterexample break it, then give the mechanism. Use the Misconception snippet in [references/tutorial_template.md](references/tutorial_template.md).
-- **Current field state**: for non-frozen subjects, name what is stable, what changed in roughly the last 6-12 months, and what is superseded or deprecated. Date this framing.
+- **Current field state**: for non-frozen subjects, name what is stable, what changed in roughly the last 6-12 months, and what is superseded or deprecated. Date this framing. When the core is frozen but its ecosystem moves (a protocol from a paper, implementations that change), state the core as stable and date the ecosystem.
 
 Agent-internal moves:
 
@@ -157,7 +157,7 @@ Legitimate exceptions:
 - Explicit epistemic notes may say what was not verified.
 - Domain uncertainty can be stated precisely.
 
-Mark each of these with `<blockquote>`, `<q>`, or `data-prose-exempt="<reason>"` so the prose scan skips it (Phase 5).
+Mark each of these with `<blockquote>`, `<q>`, `<cite>`, or `data-prose-exempt="<reason>"` so the prose scan skips it (Phase 5). Titles in the Further Reading footer (`class="references"`) are skipped without marking.
 
 ## Output Format
 
@@ -215,6 +215,8 @@ Use current documentation lookup when available, then web/source research for de
 
 Scale the fan-out to the job. A primer uses the lead thread alone or at most two workers. A full tutorial with at least three independent research angles fans out to the workers in [references/research_workflow.md](references/research_workflow.md) ("Parallel Research Strategy"), which also defines the `## Surprises` and `## Terminology` sections every worker must return. For stable or academic topics (a protocol from a paper or RFC), the docs worker reads the primary source instead of product docs, and the frontier worker folds into the rationale worker. Give each worker the output contract from that section verbatim; workers do not see this file.
 
+Before synthesis, the lead thread re-checks every dated frontier claim and every claim only one worker reported against its primary source. Workers summarize; they are not sources.
+
 The lead thread synthesizes:
 
 - Concept dependency graph.
@@ -263,9 +265,10 @@ bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_prose.sh" <tutor
 
 This checks forbidden English voice phrases, first-person author narration, and pedagogy-jargon leaks while ignoring code and closed answer blocks (`verify_prose.sh` calls `strip_prose.py` to strip code and closed `<details>` before scanning; a `<details open>` is scanned). Every hit in reader-facing prose needs a fix or an explicit exception:
 
-- Quoted material in `<blockquote>` or `<q>` is exempt automatically.
+- Quoted material in `<blockquote>`, `<q>`, or `<cite>`, and the Further Reading footer (`class="references"`), is exempt automatically.
 - For domain uncertainty or an epistemic note, add `data-prose-exempt="<reason>"` to the element. An empty reason exempts nothing.
-- Each exemption prints as an `EXEMPT` line. Mention them in the delivery note.
+- Each exemption prints as an `EXEMPT` line. Summarize them in the delivery note.
+- A `data-prose-exempt` that hides no banned phrase fails the run as `UNUSED`. Remove it: a stale exemption would hide the next hit written inside it.
 
 The scans are English-only. A chapter whose `<html lang>` or prose is not English prints `NOT CHECKED`. For those chapters, add an equivalent voice review in the requested language.
 
@@ -275,14 +278,21 @@ Run terminology enumeration:
 python3 "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/extract_terms.py" <tutorial-dir>
 ```
 
-Judge each candidate against the Phase 2 term table. Verify suspects against official docs or web search. Replace coined labels with standard terms or plain descriptions.
+Candidates marked `prose xN` are noun phrases repeated in running text, where coined labels usually hide. Judge each candidate against the Phase 2 term table. Verify suspects against official docs or web search. Replace coined labels with standard terms or plain descriptions.
 
 For SVGs:
 
-1. Serve the tutorial folder locally.
-2. Open each chapter in a browser.
-3. Evaluate `"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/svg_overflow_check.js"` against the page. Read it from that path: the working directory is the tutorial folder, so a bare `scripts/...` path does not resolve. Fix each violation and re-run until it returns `OK: no SVG text defects`; a collision verified benign on a screenshot can be exempted with `data-collision-ok` on either `<text>`.
-4. Capture every figure as `<chapter>-figN.png`, numbered in page order from 1 (for example `01-concepts-fig2.png`), into a screenshot folder outside the tutorial, and inspect connector crossings, label collisions, arrow piercing, and cropping. If the browser tool saves screenshots under its own names or folder, copy and rename them into that folder. Take screenshots after the last HTML edit: the gate rejects screenshots older than the chapter.
+1. Serve the tutorial and this skill's scripts under one origin, so the page can fetch the checker:
+
+   ```bash
+   mkdir -p /tmp/tt-serve && ln -sfn "$(cd <tutorial-dir> && pwd)" /tmp/tt-serve/t \
+     && ln -sfn "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts" /tmp/tt-serve/s \
+     && python3 -m http.server 8765 --directory /tmp/tt-serve   # run in the background
+   ```
+
+2. Open each chapter at `http://localhost:8765/t/<chapter>.html`.
+3. Evaluate this in the page (Playwright `browser_evaluate`, chrome-devtools `evaluate_script`, or the DevTools console): `async () => (0, eval)(await (await fetch('/s/svg_overflow_check.js')).text())()`. Fix each violation and re-run until it returns `OK: no SVG text defects`; a collision verified benign on a screenshot can be exempted with `data-collision-ok` on either `<text>`.
+4. Capture every figure as `<chapter>-figN.png`, numbered in page order from 1 (for example `01-concepts-fig2.png`), into a screenshot folder outside the tutorial, and inspect connector crossings, label collisions, arrow piercing, cropping, and labels placed away from the element they name. The script cannot see the last one. If the browser tool saves screenshots under its own names or folder, copy and rename them into that folder. Take screenshots after the last HTML edit: the gate rejects screenshots older than the chapter.
 
 If no browser tool is available, skip steps 1-4, say in the delivery note that the SVGs were not render-checked, and do not claim that they pass.
 5. Re-run:

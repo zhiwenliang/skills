@@ -49,6 +49,7 @@ trap 'rm -rf "$work"' EXIT
 fail=0
 sources=()
 stripped=()
+metas=()
 unscanned=0
 not_checked=0
 for f in "${html_files[@]}"; do
@@ -57,6 +58,7 @@ for f in "${html_files[@]}"; do
   if python3 "$STRIP" "$f" --report "$meta" > "$out"; then
     sources+=("$f")
     stripped+=("$out")
+    metas+=("$meta")
     # Exemptions are allowed but never silent: list each one for review.
     while IFS=$'\t' read -r kind line what; do
       if [ "$kind" = exempt ]; then echo "EXEMPT  $f:$line: $what"; fi
@@ -117,5 +119,23 @@ scan() {
 scan "forbidden voice phrases" "$voice_pattern" -i
 scan "first-person author narration" "$first_person_pattern"
 scan "pedagogy-jargon leaks" "$jargon_pattern" -i
+
+# An exemption must hide at least one hit. One that hides nothing is stale, and
+# it would silently swallow the next banned phrase written inside it.
+unused=0
+for ((i = 0; i < ${#sources[@]}; i++)); do
+  while IFS=$'\t' read -r kind line text; do
+    [ "$kind" = exempt_text ] || continue
+    if ! grep -qiE "$voice_pattern" <<<"$text" && ! grep -qE "$first_person_pattern" <<<"$text" &&
+       ! grep -qiE "$jargon_pattern" <<<"$text"; then
+      echo "UNUSED  ${sources[$i]}:$line: data-prose-exempt hides no banned phrase; remove it" >&2
+      unused=$((unused + 1))
+    fi
+  done < "${metas[$i]}"
+done
+if [ "$unused" -gt 0 ]; then
+  echo "FAIL  unused exemptions: $unused" >&2
+  fail=1
+fi
 
 exit "$fail"

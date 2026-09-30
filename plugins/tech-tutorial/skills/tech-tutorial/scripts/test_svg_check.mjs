@@ -167,6 +167,115 @@ test('clean figures return OK (fitting labels, free labels, dots, rotated axis l
   assert.equal(res, 'OK: no SVG text defects');
 });
 
+test('edge label straddling a dashed frame border is crosses shape border', { skip }, async () => {
+  // The label hangs below the frame's bottom border: its center and both anchored ends
+  // are outside the frame, so the frame is not its container and 'past box border'
+  // cannot see it. The second figure adds a full-canvas background rect, which becomes
+  // the container instead and hid the frame in the shipped defect.
+  const frame = (label, bg) => svg(label, 400, 140, bg +
+    '<rect x="200" y="20" width="180" height="80" fill="none" stroke="#999" stroke-dasharray="3 3"/>' +
+    '<rect x="230" y="40" width="120" height="40" fill="#fff" stroke="#000"/>' +
+    '<text x="290" y="65" text-anchor="middle">Worker</text>' +
+    '<line x1="40" y1="60" x2="228" y2="60" stroke="#000"/>' +
+    '<text x="290" y="107" text-anchor="middle">command</text>');
+  const res = await check(frame('frame', '') +
+    frame('frame-bg', '<rect width="400" height="140" fill="#fff"/>'));
+  for (const fig of ['frame', 'frame-bg']) {
+    assert.equal(hits(res, fig, 'crosses shape border').length, 1, JSON.stringify(res));
+    assert.equal(hits(res, fig, 'past box border').length, 0, JSON.stringify(res));
+  }
+});
+
+test('label running across a straight <line> connector is crosses connector', { skip }, async () => {
+  const res = await check(svg('line-cross', 400, 120,
+    '<line x1="200" y1="10" x2="200" y2="110" stroke="#000" stroke-width="1.4"/>' +
+    '<text x="200" y="65" text-anchor="middle">no majority: cannot answer</text>'));
+  const v = hits(res, 'line-cross', 'crosses connector');
+  assert.equal(v.length, 1, JSON.stringify(res));
+  assert.match(v[0].text, /^no majority/);
+});
+
+test('label running across a curved <path> connector is crosses connector', { skip }, async () => {
+  // The S-curve passes (200,60); a straight chord or the path bbox would not locate it.
+  const res = await check(svg('curve', 400, 120,
+    '<path d="M 20 20 C 150 20, 250 100, 380 100" fill="none" stroke="#000"/>' +
+    '<text x="200" y="65" text-anchor="middle">retry</text>'));
+  assert.equal(hits(res, 'curve', 'crosses connector').length, 1, JSON.stringify(res));
+});
+
+test('label clipping only an arrowhead (not the shaft) is crosses connector', { skip }, async () => {
+  // Shaft at y=50 stops 5px above the label box; the 12x12 marker (x2 stroke) is
+  // 24px tall around the tip, so its back corners reach well into the label.
+  const res = await check(svg('arrowhead', 400, 120,
+    '<defs><marker id="ah1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="12" markerHeight="12" orient="auto">' +
+    '<path d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>' +
+    '<line x1="20" y1="50" x2="200" y2="50" stroke="#000" stroke-width="2" marker-end="url(#ah1)"/>' +
+    '<text x="195" y="68" text-anchor="middle">arrowhead clip</text>'));
+  assert.equal(hits(res, 'arrowhead', 'crosses connector').length, 1, JSON.stringify(res));
+});
+
+test('edge labels resting near connectors and labels inside frames return OK', { skip }, async () => {
+  const res = await check([
+    // edge label resting on a line (bbox bottom touches the stroke, ink does not),
+    // one clearly above, one beside a vertical line
+    svg('near-line', 400, 160,
+      '<line x1="20" y1="60" x2="380" y2="60" stroke="#000" stroke-width="1.4"/>' +
+      '<text x="120" y="57" text-anchor="middle">calls</text>' +
+      '<text x="280" y="52" text-anchor="middle">returns</text>' +
+      '<line x1="100" y1="80" x2="100" y2="150" stroke="#000"/>' +
+      '<text x="104" y="120">beside</text>'),
+    // label inside the bounding box of a curve but off the curve itself
+    svg('near-curve', 400, 120,
+      '<path d="M 20 20 C 150 20, 250 100, 380 100" fill="none" stroke="#000"/>' +
+      '<text x="90" y="95">note</text>'),
+    // dashed frame holding two nodes, an edge between them, its label, and a free note
+    svg('in-frame', 420, 160,
+      '<rect x="10" y="10" width="400" height="140" fill="none" stroke="#999" stroke-dasharray="3 3"/>' +
+      '<text x="20" y="30">Cluster</text>' +
+      '<rect x="30" y="60" width="120" height="44" fill="#fff" stroke="#000"/>' +
+      '<text x="90" y="87" text-anchor="middle">Leader</text>' +
+      '<rect x="270" y="60" width="120" height="44" fill="#fff" stroke="#000"/>' +
+      '<text x="330" y="87" text-anchor="middle">Follower</text>' +
+      '<line x1="150" y1="82" x2="268" y2="82" stroke="#000"/>' +
+      '<text x="209" y="76" text-anchor="middle">append</text>' +
+      '<text x="209" y="130" text-anchor="middle">term 3</text>'),
+    // connector drawn center-to-center UNDER opaque nodes, and a node drawn over a
+    // frame border: both crossings are hidden by the node's fill
+    svg('occluded', 420, 140,
+      '<rect x="200" y="10" width="200" height="120" fill="none" stroke="#999" stroke-dasharray="3 3"/>' +
+      '<line x1="90" y1="70" x2="330" y2="70" stroke="#000"/>' +
+      '<rect x="30" y="48" width="120" height="44" fill="#fff" stroke="#000"/>' +
+      '<text x="90" y="75" text-anchor="middle">Source</text>' +
+      '<rect x="150" y="48" width="100" height="44" fill="#fff" stroke="#000" transform="translate(120 0)"/>' +
+      '<text x="320" y="75" text-anchor="middle">Target</text>' +
+      '<rect x="160" y="100" width="90" height="26" fill="#fff" stroke="#000"/>' +
+      '<text x="205" y="118" text-anchor="middle">Gateway</text>'),
+  ].join(''));
+  assert.equal(res, 'OK: no SVG text defects');
+});
+
+test('diagram_guide.md example figures return OK under the real template CSS', { skip }, async () => {
+  const refs = join(here, '..', 'references');
+  const css = readFileSync(join(refs, 'layout-template.html'), 'utf8').match(/<style>([\s\S]*?)<\/style>/)[1];
+  const blocks = [...readFileSync(join(refs, 'diagram_guide.md'), 'utf8').matchAll(/```html\n([\s\S]*?)```/g)]
+    .map(m => m[1]).filter(b => /<svg[\s>]/.test(b));
+  assert.ok(blocks.length >= 4, `found ${blocks.length} SVG examples`);
+  await page.setContent(`<!doctype html><html><head><style>${css}</style></head><body>${blocks.join('')}</body></html>`);
+  assert.equal(await page.evaluate(`(${src})()`), 'OK: no SVG text defects');
+});
+
+test('data-collision-ok exempts connector and shape-border crossings', { skip }, async () => {
+  const fig = attr => svg('exempt', 400, 140,
+    '<rect x="200" y="20" width="180" height="80" fill="none" stroke="#999" stroke-dasharray="3 3"/>' +
+    `<text x="290" y="107" text-anchor="middle"${attr}>command</text>` +
+    '<line x1="80" y1="10" x2="80" y2="130" stroke="#000"/>' +
+    `<text x="80" y="110" text-anchor="middle"${attr}>crossing label</text>`);
+  const flagged = await check(fig(''));
+  assert.equal(hits(flagged, 'exempt', 'crosses shape border').length, 1, JSON.stringify(flagged));
+  assert.equal(hits(flagged, 'exempt', 'crosses connector').length, 1, JSON.stringify(flagged));
+  assert.equal(await check(fig(' data-collision-ok')), 'OK: no SVG text defects');
+});
+
 test('data-collision-ok still exempts a label collision', { skip }, async () => {
   const pair = attr => svg('pair', 300, 80,
     '<text x="20" y="40">Overlapping label</text>' +

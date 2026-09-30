@@ -13,13 +13,18 @@ Collects, from every top-level .html file:
   - <figcaption> text and <svg aria-label>   (figure titles)
   - SVG <text> labels                        (names given inside diagrams)
   - quoted spans in prose: "...", '...', their curly forms, and 「...」 『...』 《...》
+  - lowercase noun phrases in plain prose that end in a generic head noun
+    ("vote rule", "up-to-date check") and recur at least twice: a coined label
+    often lives in running text, where no tag marks it as a name
 
 Skips <pre>/<code>/<script>/<style> content and the layout template's numbering
 spans (<span class="num"> / <span class="fig-num">), so "1.1" is not glued onto a
 section title. A captured run longer than 40 chars is split into sentences
 (a long figcaption often names the figure in its first sentence) and sentences
 still longer than 40 chars are dropped (those are prose, not names), as are
-pure numbers and bare figure numbers ("Fig. 2."). Output is deduplicated by term, keeping the first
+pure numbers, bare figure numbers ("Fig. 2."), labels with fewer than two
+letters ("S1", "(a)"), and the layout template's own chrome ("Answers",
+"Reveal", "Predict", ...), which the author did not name. Output is deduplicated by term, keeping the first
 location seen.
 
 Usage:  python3 "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/extract_terms.py" <tutorial-dir>
@@ -52,6 +57,22 @@ QUOTE_RE = re.compile(
     r"|“([^”]{1,40})”|「([^」]{1,40})」|『([^』]{1,40})』|《([^》]{1,40})》"
 )
 MAX_LEN = 40
+CHROME = {
+    "answer", "answers", "check", "reveal", "hint", "previous", "next", "notice",
+    "predict", "challenge", "scenario", "failure mode", "why it exists",
+    "draw it yourself", "further reading", "self-check", "schema this chapter builds",
+    "concept layer", "mechanism layer", "discrimination layer", "under the hood",
+    "redo in two or three days", "who this is for", "who this is not for",
+    "what you can do after reading", "the core idea", "learning path",
+    "related tutorials", "analogy boundary", "tip", "warning", "example", "insight",
+}
+HEADS = ("rule|rules|check|checks|condition|pattern|loop|gate|window|funnel|pump|"
+         "ladder|budget|horizon|triad|model|principle|guarantee|invariant|"
+         "property|restriction|strategy|mechanism|phase|mode|path|barrier|fence")
+LEADING = {"the", "a", "an", "this", "that", "these", "those", "each", "every",
+           "its", "their", "our", "your", "same", "one", "no", "any", "of", "to",
+           "and", "or", "in", "on", "for", "by", "with", "is", "are", "was"}
+PHRASE_RE = re.compile(r"(?<![\w'’])((?:[a-z][a-z-]*\s+){1,2})(%s)\b" % HEADS)
 SENTENCE_END = re.compile(r"(?<=[.!?。！？])\s+(?=[A-Z\u4e00-\u9fff])")
 FIGURE_NUMBER = re.compile(r"^(Fig|Figure|Table)\.?\s*[\d.]+$", re.I)
 
@@ -108,7 +129,21 @@ class TermParser(HTMLParser):
 
 
 def is_candidate(term):
-    return 0 < len(term) <= MAX_LEN and not term.isdigit() and not FIGURE_NUMBER.match(term)
+    return (0 < len(term) <= MAX_LEN and not term.isdigit() and not FIGURE_NUMBER.match(term)
+            and sum(c.isalpha() for c in term) >= 2
+            and term.lower().rstrip(".:?!") not in CHROME)
+
+
+def repeated_phrases(text):
+    """Lowercase modifier + generic head nouns in prose, minus leading function words."""
+    found = []
+    for m in PHRASE_RE.finditer(text):
+        words = m.group(1).split()
+        while words and words[0] in LEADING:
+            words.pop(0)
+        if words:
+            found.append(" ".join(words + [m.group(2)]))
+    return found
 
 
 def candidates(term):
@@ -125,6 +160,7 @@ def main():
         sys.exit(2)
     sys.stdout.reconfigure(encoding="utf-8")
     seen = {}  # term -> first location
+    phrases = {}  # prose phrase -> [count, first file]
     for f in files:
         parser = TermParser()
         with open(f, encoding="utf-8") as fh:
@@ -141,6 +177,11 @@ def main():
             term = " ".join(next(g for g in m.groups() if g is not None).split())
             if is_candidate(term):
                 seen.setdefault(term, "%s:quoted" % base)
+        for phrase in repeated_phrases("\n".join(parser.prose)):
+            phrases.setdefault(phrase, [0, base])[0] += 1
+    for phrase, (count, base) in phrases.items():
+        if count >= 2 and is_candidate(phrase):
+            seen.setdefault(phrase, "%s:prose x%d" % (base, count))
     for term, where in seen.items():
         print("%s\t%s" % (term, where))
 

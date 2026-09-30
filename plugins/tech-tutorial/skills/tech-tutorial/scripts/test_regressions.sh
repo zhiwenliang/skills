@@ -397,4 +397,43 @@ for want in "task pump" "priority funnel" "State convergence triad" "Replay hori
   grep -qxF "$want" <<<"$terms" || fail_test "extract_terms missed '$want': $terms"
 done
 
+# A bibliography is not author voice: titles in a references block or <cite> are
+# skipped, reported once per block rather than once per title.
+d=$(prose_dir bibliography '<p>Paxos and Raft differ in leader handling.</p>
+<footer class="references"><h3>Further Reading</h3><ul>
+<li><a href="https://example.com/a">Paxos vs Raft: Have we reached consensus on distributed consensus?</a></li>
+<li><a href="https://example.com/b">How we probably should build it</a></li></ul></footer>
+<p>See <cite>Have we reached consensus?</cite> for the comparison.</p>')
+out=$(bash "$SCRIPTS/verify_prose.sh" "$d" 2>&1) || fail_test "a references block or <cite> title was flagged: $out"
+[ "$(grep -c '^EXEMPT' <<<"$out")" -eq 2 ] || fail_test "bibliography exemptions not one per block: $out"
+
+# An exemption that hides nothing is stale: it would silently swallow a future hit.
+d=$(prose_dir unused-exempt '<p data-prose-exempt="epistemic note">The follower rejects the entry.</p>')
+out=$(bash "$SCRIPTS/verify_prose.sh" "$d" 2>&1) && fail_test "an unused data-prose-exempt passed"
+grep -q "^FAIL  unused exemptions" <<<"$out" || fail_test "unused exemption not reported: $out"
+d=$(prose_dir used-exempt '<p data-prose-exempt="Bloom filter semantics">A hit means the key is probably in the set.</p>')
+bash "$SCRIPTS/verify_prose.sh" "$d" >/dev/null 2>&1 || fail_test "a used data-prose-exempt was reported as unused"
+
+# Template chrome and one-letter diagram labels are not terminology; coined noun
+# phrases repeated in plain prose are.
+terms_dir3="$tmp/terms-prose"
+mkdir "$terms_dir3"
+cat > "$terms_dir3/index.html" <<'HTML'
+<details><summary>Answers</summary><p>A</p></details>
+<div class="predict"><span class="question-label">Predict</span><details><summary>Reveal</summary><p>A</p></details></div>
+<figure><svg viewBox="0 0 1 1"><text>S1</text><text>(a)</text><text>×</text><text>Leader</text></svg></figure>
+<p>The vote rule blocks a stale candidate. A server applies the vote rule on every request.</p>
+<p>The up-to-date check compares terms. The up-to-date check runs before voting.</p>
+<p>Each server follows a safety rule here.</p>
+<p>Chapter 01's rule applies. It restates chapter 01’s rule.</p>
+<pre><code>the retry rule; the retry rule</code></pre>
+HTML
+terms=$(python3 "$SCRIPTS/extract_terms.py" "$terms_dir3" | cut -f1)
+for want in "vote rule" "up-to-date check" "Leader"; do
+  grep -qxF "$want" <<<"$terms" || fail_test "extract_terms missed '$want': $terms"
+done
+for noise in "Answers" "Reveal" "Predict" "S1" "(a)" "×" "safety rule" "retry rule" "s rule"; do
+  grep -qxF "$noise" <<<"$terms" && fail_test "extract_terms emitted noise '$noise': $terms"
+done
+
 echo "regression tests passed"

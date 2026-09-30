@@ -503,7 +503,7 @@ Checklist:
 - [ ] Concept map appears in `index.html`.
 - [ ] Learning path appears in `index.html` and each chapter.
 - [ ] Each chapter opens with a recall question about the prior chapter, answer hidden.
-- [ ] Each chapter has a schema panel.
+- [ ] Each topical chapter has a schema panel (the final self-check does not need one).
 - [ ] (auto) Multi-file output has exactly one final `*-self-check.html`.
 
 ### Diagrams

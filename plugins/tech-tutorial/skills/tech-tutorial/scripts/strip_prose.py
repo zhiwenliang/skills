@@ -16,9 +16,13 @@ Drops, using a real HTML parser rather than regexes:
     <details class="under-the-hood">, which holds mechanism prose, not answers.
   - <script> and <style> content, comments, and all markup — not reader prose.
   - exemptions (SKILL.md "Legitimate exceptions"), each listed by --report so a
-    reviewer can audit it: <blockquote> and <q> (quoted material keeps its
-    wording), and any element with a non-empty data-prose-exempt="<reason>"
-    (domain uncertainty, epistemic notes). An empty reason exempts nothing.
+    reviewer can audit it: <blockquote>, <q> and <cite> (quoted material and
+    titles keep their wording), a references block (class "references", the
+    template's Further Reading footer: a bibliography is not author voice), and
+    any element with a non-empty data-prose-exempt="<reason>" (domain
+    uncertainty, epistemic notes). An empty reason exempts nothing. The text a
+    data-prose-exempt element hides is reported too, so verify_prose.sh can flag
+    an exemption that hides no hit.
 Keeps all other text, with character references decoded (&rsquo; &#39; &nbsp;)
 so an encoded apostrophe or space cannot hide a banned phrase. A bare "<" in
 prose ("if n < 10") stays text instead of swallowing the words after it.
@@ -40,13 +44,14 @@ Usage: python3 "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/strip_prose.p
     lang     <html lang value, empty if unset>
     letters  <ASCII letters> <non-ASCII letters>   (in the kept prose)
     exempt   <source line> <what was exempted>
+    exempt_text <source line> <the hidden text, masked like the prose>  (data-prose-exempt only)
 """
 import re
 import sys
 from html.parser import HTMLParser
 
 SKIP = {"pre", "code", "script", "style"}  # never prose
-QUOTE = {"blockquote", "q"}                 # quoted material: exempt, reported
+QUOTE = {"blockquote", "q", "cite"}         # quoted material and titles: exempt, reported
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
         "meta", "source", "track", "wbr"}   # no end tag, so nothing to exempt
 
@@ -59,28 +64,35 @@ ROMAN_ONE = re.compile(r"\b((?:Type|Phase|Class|Level|Tier|Stage|Grade|Part|Gen)
 class ProseExtractor(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self.stack = []       # open tracked elements: (tag, hides its text)
+        self.stack = []       # open tracked elements: [tag, hides its text, exempt record or None]
         self.parts = []
         self.line = 1         # output line the next part starts on
         self.lang = ""
-        self.exempt = []      # (source line, description)
+        self.exempt = []      # dict(line, what, text): text collects for data-prose-exempt
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         if tag == "html":
             self.lang = (attrs.get("lang") or "").strip()
         reason = (attrs.get("data-prose-exempt") or "").strip()
+        classes = (attrs.get("class") or "").split()
         if tag in SKIP:
-            self.stack.append((tag, True))
+            self.stack.append([tag, True, None])
         elif tag == "details":
-            classes = (attrs.get("class") or "").split()
-            self.stack.append((tag, "open" not in attrs and "under-the-hood" not in classes))
-        elif tag in QUOTE or (reason and tag not in VOID):
-            hidden = self.hidden()
-            if not hidden:
-                what = tag if tag in QUOTE else "data-prose-exempt (%s)" % reason
-                self.exempt.append((self.getpos()[0], what))
-            self.stack.append((tag, True))
+            self.stack.append([tag, "open" not in attrs and "under-the-hood" not in classes, None])
+        elif tag in QUOTE or "references" in classes or (reason and tag not in VOID):
+            record = None
+            if not self.hidden():
+                if tag in QUOTE:
+                    what = tag
+                elif "references" in classes:
+                    what = "references block"
+                else:
+                    what = "data-prose-exempt (%s)" % reason
+                record = {"line": self.getpos()[0], "what": what,
+                          "text": [] if what.startswith("data-prose-exempt") else None}
+                self.exempt.append(record)
+            self.stack.append([tag, True, record])
         self.separate()
 
     def handle_startendtag(self, tag, attrs):
@@ -90,13 +102,13 @@ class ProseExtractor(HTMLParser):
         # Closing an element also closes unclosed tracked children, as a browser
         # does (<pre><code>...</pre>), so one missing </code> cannot hide the
         # rest of the chapter.
-        if any(t == tag for t, _ in self.stack):
+        if any(e[0] == tag for e in self.stack):
             while self.stack.pop()[0] != tag:
                 pass
         self.separate()
 
     def hidden(self):
-        return any(h for _, h in self.stack)
+        return any(e[1] for e in self.stack)
 
     def separate(self):
         if self.parts and not self.parts[-1][-1:].isspace():
@@ -104,6 +116,11 @@ class ProseExtractor(HTMLParser):
 
     def handle_data(self, data):
         if self.hidden():
+            # Collect what each open data-prose-exempt element hides, except code.
+            if not any(e[0] in SKIP for e in self.stack):
+                for e in self.stack:
+                    if e[2] and e[2]["text"] is not None:
+                        e[2]["text"].append(data)
             return
         line = self.getpos()[0]
         if line > self.line:
@@ -148,5 +165,8 @@ if __name__ == "__main__":
         with open(report, "w", encoding="utf-8") as fh:
             fh.write("lang\t%s\n" % parser.lang)
             fh.write("letters\t%d\t%d\n" % (ascii_letters, len(letters) - ascii_letters))
-            for line, what in parser.exempt:
-                fh.write("exempt\t%d\t%s\n" % (line, what))
+            for record in parser.exempt:
+                fh.write("exempt\t%d\t%s\n" % (record["line"], record["what"]))
+                if record["text"] is not None:
+                    text = mask(" ".join("".join(record["text"]).replace("\u00a0", " ").split()))
+                    fh.write("exempt_text\t%d\t%s\n" % (record["line"], text))
