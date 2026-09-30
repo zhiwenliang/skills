@@ -54,7 +54,10 @@
       "routes_away_non_learning_intent",
       "no_full_tutorial_for_debugging_request",
       "asks_build_vs_teach_or_redirects",
-      "honors_explicit_output_language"
+      "honors_explicit_output_language",
+      "routes_to_explain_article",
+      "routes_to_visual_explainer",
+      "no_multi_chapter_tutorial_for_article_request"
     ],
     "mixed": [
       "has_concept_map",
@@ -122,7 +125,7 @@
     {
       "id": 3,
       "name": "feature-deep-dive",
-      "prompt": "I do not understand why PKCE exists in OAuth 2.0. The docs show configuration steps but not the reason. Help me understand it.",
+      "prompt": "I do not understand why PKCE exists in OAuth 2.0. The docs show configuration steps but not the reason. Teach me PKCE properly: a short tutorial I can study, not just an answer.",
       "expected_output": "The tutorial centers on why, not configuration. It compares the older authorization-code flow, explains authorization-code interception, public-client secrets, mobile threat models, limitations, when not to use it, and includes a protocol flow diagram.",
       "baseline": "Without this skill: a PKCE setup how-to that stops at the API surface and omits design motivation, old-flow comparison, and protocol diagram.",
       "files": [],
@@ -222,7 +225,9 @@
       "prompt": "Add a multi-agent-patterns tutorial to my learning directory and connect it to the existing library. Update the homepage index and link related tutorials.",
       "expected_output": "If the target directory already has sibling tutorials and a root hub, the output creates the new tutorial, updates the root hub incrementally under the appropriate theme cluster, preserves existing entries, and adds a Related tutorials block only for verified sibling paths.",
       "baseline": "Without this skill: an isolated new tutorial folder with no hub update and no verified cross-links.",
-      "files": ["fixtures/learning-lib"],
+      "files": [
+        "fixtures/learning-lib"
+      ],
       "assertions": [
         "new_tutorial_created",
         "hub_index_updated_with_new_card",
@@ -307,6 +312,45 @@
         "has_dated_frontier_framing_or_chapter",
         "marks_current_vs_emerging_dated",
         "no_forbidden_voice_phrases"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "route-single-article-to-explain-article",
+      "prompt": "Write an article explaining why PKCE exists in OAuth 2.0.",
+      "expected_output": "A single explanatory article about one mechanism is explain-article's job. The skill should not trigger, or should hand off to explain-article, and must not produce a multi-chapter tutorial.",
+      "baseline": "Without the boundary: a multi-chapter HTML tutorial for a request that asked for one article.",
+      "files": [],
+      "assertions": [
+        "routes_to_explain_article",
+        "no_multi_chapter_tutorial_for_article_request"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "route-single-diagram-to-visual-explainer",
+      "prompt": "画一张图解释 TCP 三次握手。",
+      "expected_output": "One standalone diagram is visual-explainer's job. The skill should not trigger, or should hand off to visual-explainer, and must not produce a tutorial.",
+      "baseline": "Without the boundary: a tutorial site built around a request for one diagram.",
+      "files": [],
+      "assertions": [
+        "routes_to_visual_explainer",
+        "no_multi_chapter_tutorial_for_article_request"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "chinese-learning-trigger",
+      "prompt": "我想系统学习 Rust 的所有权和借用，给我写一套教程，用中文。",
+      "expected_output": "A Chinese learning request triggers the skill. It produces a multi-file tutorial in Chinese with <html lang> set to zh, keeps data-tech-tutorial markers, and keeps standard Rust terms (ownership, borrow checker, lifetime).",
+      "baseline": "Without Chinese triggers: the request is not routed to this skill, or the output ignores the requested language.",
+      "files": [],
+      "assertions": [
+        "has_entrypoint",
+        "multi_file_structure",
+        "honors_explicit_output_language",
+        "uses_standard_terminology",
+        "has_self_check"
       ]
     }
   ]

@@ -1,6 +1,6 @@
 ---
 name: tech-tutorial
-description: Use when the user wants to learn, understand, teach, or build a systematic knowledge base around a technology, framework, library, protocol, tool, or technical concept. Triggers include "teach me X", "I want to learn X", "help me understand X", "give me a primer", "write a tutorial about X", "turn these docs into a tutorial", or requests for a structured learning path.
+description: Builds multi-chapter HTML tutorials (index, concept map, learning path, per-chapter self-checks) that teach a technology, framework, library, protocol, tool, or technical concept systematically. Use when the user wants to learn or teach a technical subject, or build a knowledge base of tutorials. Triggers include "teach me X", "I want to learn X", "help me understand X systematically", "give me a primer", "write a tutorial about X", "turn these docs into a tutorial", "系统学习 X", "教我 X", "写一套 X 教程", or requests for a structured learning path. Not for a single explanatory article (explain-article) or one standalone diagram (visual-explainer).
 ---
 
 # Tech Tutorial Writer
@@ -17,11 +17,13 @@ Do not use it for:
 
 - Debugging an existing code problem. Use a debugging workflow.
 - One-shot reference answers such as "what does this API return?" Answer directly.
-- Building a product or code feature with a technology. Use the relevant implementation workflow.
+- Building a product or code feature where the deliverable is working code, not learning. Learning by building ("learn FastAPI by building a small service") is in scope through hands-on mode.
+- One explanatory article about a single concept or mechanism, such as "write an article explaining why PKCE exists". Use `explain-article`.
+- One standalone diagram, such as "draw the TCP handshake". Use `visual-explainer`.
 
-If intent is ambiguous, ask: "Do you want me to build something with this technology, or teach the technology itself?"
+If intent is ambiguous, ask one question: "Do you want me to build something with this technology, or teach the technology itself?" If the doubt is about form, ask instead: "Do you want a structured multi-chapter tutorial, or a single article or diagram?" A "why does X exist" question about one concept, with no mention of learning, a tutorial, or a course, goes to `explain-article`.
 
-Diataxis is the routing vocabulary: this skill owns study-oriented explanation and tutorial work. Route work-oriented how-to and reference requests away unless the user asks to turn them into a learning artifact.
+Diataxis is the routing vocabulary: this skill owns the tutorial quadrant and study-oriented explanation delivered as a learning path. A single explanatory article belongs to `explain-article`. Route work-oriented how-to and reference requests away unless the user asks to turn them into a learning artifact.
 
 ## Learning Principles
 
@@ -133,7 +135,7 @@ Forbidden reader-prose patterns:
 
 | Category | Ban | Replacement |
 |---|---|---|
-| Cheerleading | `let's`, `we'll`, `together`, `you'll discover` | State the task or behavior directly. |
+| Cheerleading | `let's`, `we'll`, "explore … together", `you'll discover` | State the task or behavior directly. |
 | Empty transitions | `now we are going to`, `next we will look at` | Let the structure carry sequence. |
 | Hedges | `maybe`, `probably`, `kind of`, `sort of`, unsupported `roughly` | Give the condition, range, or evidence. |
 | Anesthetic words | `obviously`, `trivially`, unnecessary `just` | State the required prerequisite or actual cost. |
@@ -148,6 +150,8 @@ Legitimate exceptions:
 - Hidden answer blocks can use expected-value wording.
 - Explicit epistemic notes may say what was not verified.
 - Domain uncertainty can be stated precisely.
+
+Mark each of these with `<blockquote>`, `<q>`, or `data-prose-exempt="<reason>"` so the prose scan skips it (Phase 5).
 
 ## Output Format
 
@@ -238,7 +242,9 @@ The lead thread synthesizes:
 
 ### Phase 3 - Outline Approval
 
-Before drafting, show the user one approval packet:
+Stop for approval only when all three hold: the session can take a reply (an interactive conversation, not a headless or scripted run); the output is a multi-file full tutorial or deep dive; and the scope is ambiguous or broad (more than about five topical chapters). Otherwise, including primers, single-file output, and a user who said to go ahead, do not stop. Put the packet into `index.html` (the outline in the learning path, the threshold concept in "The core idea", the frontier in the field-state block) and record the scope, depth, and mode you assumed in the `audience-for` section, then draft.
+
+When approval is due, show the user one approval packet:
 
 1. Flat chapter outline, one schema-building sentence per chapter.
 2. Concept map.
@@ -270,7 +276,13 @@ Then run prose checks over stripped prose:
 bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_prose.sh" <tutorial-dir>
 ```
 
-This checks forbidden English voice phrases, first-person author narration, and pedagogy-jargon leaks while ignoring code and hidden answer blocks (`verify_prose.sh` calls `strip_prose.py` to strip code and answer blocks before scanning). For explicit non-English output, run this script for any English prose that remains and add an equivalent language-specific voice review for the requested language. Every hit in reader-facing prose needs a fix or an explicit exception.
+This checks forbidden English voice phrases, first-person author narration, and pedagogy-jargon leaks while ignoring code and closed answer blocks (`verify_prose.sh` calls `strip_prose.py` to strip code and closed `<details>` before scanning; a `<details open>` is scanned). Every hit in reader-facing prose needs a fix or an explicit exception:
+
+- Quoted material in `<blockquote>` or `<q>` is exempt automatically.
+- For domain uncertainty or an epistemic note, add `data-prose-exempt="<reason>"` to the element. An empty reason exempts nothing.
+- Each exemption prints as an `EXEMPT` line. Mention them in the delivery note.
+
+The scans are English-only. A chapter whose `<html lang>` or prose is not English prints `NOT CHECKED`. For those chapters, add an equivalent voice review in the requested language.
 
 Run terminology enumeration:
 

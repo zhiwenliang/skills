@@ -9,7 +9,7 @@
       "name": "tech-tutorial",
       "source": "./plugins/tech-tutorial",
       "description": "Builds English-first, cognitive-science-aligned HTML tutorials for technical topics. Concept-focused by default (scenario walkthroughs for mental models), with an optional hands-on mode (runnable code progression). Structure is a scaffold: index first, self-check last, topical chapters in between sized by a concept dependency graph. Grounded in research on encoding, learning depth, and current field context.",
-      "version": "0.7.1",
+      "version": "0.8.0",
       "author": {
         "name": "Zhiwen Liang"
       },
@@ -45,7 +45,7 @@
       "name": "explain-article",
       "source": "./plugins/explain-article",
       "description": "Writes researched explanatory Markdown articles with reader fit, mechanisms, examples, Mermaid diagrams, boundaries, and understanding checks.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "Zhiwen Liang"
       },

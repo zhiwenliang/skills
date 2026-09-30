@@ -176,6 +176,64 @@ printf '<p>caf\xe9</p>\n' > "$tmp/unstrippable/index.html"
 out=$(bash "$SCRIPTS/verify_prose.sh" "$tmp/unstrippable" 2>/dev/null) && fail_test "unstrippable chapter passed"
 [ -z "$out" ] || fail_test "unstrippable chapter printed on stdout: $out"
 
+# Only a closed <details> hides an answer: an open one is visible prose, so
+# wrapping a chapter in <details open> must not hide it from the scans. A closed
+# <details> still hides everything inside, open children included.
+d=$(prose_dir details-open '<details open><summary>Overview</summary><p>We probably just retry.</p></details>')
+bash "$SCRIPTS/verify_prose.sh" "$d" >/dev/null 2>&1 && fail_test "prose inside <details open> was not scanned"
+d=$(prose_dir details-nested '<details><summary>Answer</summary><details open><p>A1</p></details><p>We probably just retry.</p></details>')
+bash "$SCRIPTS/verify_prose.sh" "$d" >/dev/null || fail_test "an open <details> inside a closed answer leaked the answer"
+
+# Quoted material and explicitly exempted elements keep their wording (SKILL.md
+# "Legitimate exceptions"), and every exemption is listed so a reviewer can audit it.
+d=$(prose_dir quoted '<blockquote><p>We propose a new consensus algorithm.</p></blockquote>
+<p>The paper states <q>we sought an algorithm</q> that is understandable.</p>
+<p data-prose-exempt="Bloom filter semantics">A hit means the key is probably in the set.</p>')
+out=$(bash "$SCRIPTS/verify_prose.sh" "$d" 2>&1) || fail_test "quoted or exempted prose was flagged: $out"
+[ "$(grep -c '^EXEMPT' <<<"$out")" -eq 3 ] || fail_test "exemptions were not listed one per element: $out"
+grep -q "index.html:6: data-prose-exempt (Bloom filter semantics)" <<<"$out" || fail_test "exemption not reported with line and reason: $out"
+d=$(prose_dir exempt-no-reason '<p data-prose-exempt="">A hit means the key is probably in the set.</p>')
+bash "$SCRIPTS/verify_prose.sh" "$d" >/dev/null 2>&1 && fail_test "data-prose-exempt without a reason exempted prose"
+
+# Standard technical usage is not a hedge or narration; the hedges still fail.
+d=$(prose_dir technical-usage '<p>A Deployment is one kind of workload controller in us-east-1.</p>
+<p>That sort of design trades latency for throughput; a Type I error is a false positive.</p>
+<p>Failover takes roughly 150-300 ms. Group related writes together. A split vote is improbably long.</p>')
+out=$(bash "$SCRIPTS/verify_prose.sh" "$d" 2>&1) || fail_test "standard technical usage was flagged: $out"
+n=0
+for body in '<p>The cache is kind of slow.</p>' '<p>Both paths cost roughly the same.</p>' \
+  '<p>Now explore the scheduler together.</p>' '<p>It sort of works.</p>'; do
+  n=$((n + 1))
+  d=$(prose_dir "hedge-$n" "$body")
+  bash "$SCRIPTS/verify_prose.sh" "$d" >/dev/null 2>&1 && fail_test "hedge or cheerleading passed: $body"
+done
+
+# The scans are English patterns: a non-English chapter must be reported as not
+# checked, never as a silent PASS — whether <html lang> says so or the prose does.
+mkdir "$tmp/zh" "$tmp/zh-mislabeled"
+printf '<!DOCTYPE html>\n<html lang="zh-CN">\n<body><p>让我们一起深入探索！显然，我们只需要记住认知负荷。</p></body>\n</html>\n' > "$tmp/zh/index.html"
+out=$(bash "$SCRIPTS/verify_prose.sh" "$tmp/zh" 2>&1) || fail_test "non-English chapter failed instead of being reported: $out"
+grep -q "^NOT CHECKED  .*/index.html: lang=zh-CN" <<<"$out" || fail_test "zh-CN chapter not reported as NOT CHECKED: $out"
+sed 's/lang="zh-CN"/lang="en"/' "$tmp/zh/index.html" > "$tmp/zh-mislabeled/index.html"
+out=$(bash "$SCRIPTS/verify_prose.sh" "$tmp/zh-mislabeled" 2>&1) || true
+grep -q "^NOT CHECKED  .*/index.html: .*mostly non-English" <<<"$out" || fail_test "lang=en chapter with Chinese prose not reported: $out"
+out=$(bash "$SCRIPTS/verify_prose.sh" "$clean_voice_dir" 2>&1)
+grep -q "NOT CHECKED" <<<"$out" && fail_test "English chapter reported as NOT CHECKED: $out"
+
+# Every eval assertion is classified in the legend, and eval ids are unique.
+python3 - "$ROOT/evals/evals.json" <<'PY' || fail_test "evals.json legend drifted from the assertions"
+import json, sys
+data = json.load(open(sys.argv[1], encoding="utf-8"))
+legend = {name for kind, names in data["_assertion_legend"].items() if not kind.startswith("_") for name in names}
+used = {a for case in data["evals"] for a in case["assertions"]}
+ids = [case["id"] for case in data["evals"]]
+problems = [f"unclassified: {sorted(used - legend)}"] if used - legend else []
+problems += [f"unused in legend: {sorted(legend - used)}"] if legend - used else []
+problems += ["duplicate eval ids"] if len(ids) != len(set(ids)) else []
+if problems:
+    sys.exit("; ".join(problems))
+PY
+
 # Multi-file tutorial: gate 6 counts figures, not lines; gate 5 needs a real prompt.
 multi="$tmp/multi"; shots="$tmp/shots"
 mkdir "$multi" "$shots"

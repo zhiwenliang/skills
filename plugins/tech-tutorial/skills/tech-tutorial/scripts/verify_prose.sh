@@ -27,12 +27,18 @@ fi
 # (^|[^[:alpha:]]) / ([^[:alpha:]]|$) are word boundaries: without them `let's`
 # also matches "servlet's", `kind of` matches "unkind of", and `just` matches
 # "adjust". `just` is not followed by "-", so "just-in-time" (JIT) passes.
+# `roughly` is a hedge only when no number follows ("roughly 150-300 ms" states a
+# range). `together` is cheerleading only after an exploring verb ("explore this
+# together"), not in "group related writes together". The noun "one kind of X"
+# arrives masked by strip_prose.py, so it does not match `kind of`.
 apos="('|’|‘)"
-voice_pattern="(^|[^[:alpha:]])let${apos}s|we${apos}ll|you${apos}ll discover|now we (are|${apos}re) going to|next we will look at|maybe|probably|(^|[^[:alpha:]])(kind|sort) of|(^|[^[:alpha:]])roughly([^[:alpha:]]|$)|obviously|trivially|(^|[^[:alpha:]])just([^[:alpha:]-]|$)|in today${apos}s fast-paced|deep dive journey|unlock the power of"
+together="(^|[^[:alpha:]])(explore|learn|build|walk|dive|look|work|go|step|discover)(s|ed|ing)?( +[[:alpha:]]+){0,3} +together([^[:alpha:]]|$)"
+voice_pattern="(^|[^[:alpha:]])let${apos}s|we${apos}ll|you${apos}ll discover|now we (are|${apos}re) going to|next we will look at|(^|[^[:alpha:]])(maybe|probably)|(^|[^[:alpha:]])(kind|sort) of|(^|[^[:alpha:]])roughly( *$| +[^0-9 ]|[^[:alpha:] ])|obviously|trivially|(^|[^[:alpha:]])just([^[:alpha:]-]|$)|in today${apos}s fast-paced|deep dive journey|unlock the power of|${together}"
 # Scanned case-sensitively: the pronoun is a capital I (not the "i" of "i.e." or
-# a loop index), and I/O is not narration; lowercase-initial or capitalized
-# we/our/us still match, while "US" (the country or a unit) does not.
-first_person_pattern="(^|[^[:alpha:]])(I([^[:alpha:]/]|$)|([Ww]e|[Oo]ur|[Uu]s)([^[:alpha:]]|$))"
+# a loop index, nor the roman numeral of "Type I", which strip_prose.py masks),
+# and I/O is not narration; lowercase-initial or capitalized we/our/us still
+# match, while "US" (the country or a unit) and "us-east-1" do not.
+first_person_pattern="(^|[^[:alpha:]])(I([^[:alpha:]/]|$)|([Ww]e|[Oo]ur)([^[:alpha:]]|$)|[Uu]s([^[:alpha:]-]|$))"
 jargon_pattern="cognitive load|intrinsic load|extraneous load|germane load|desirable difficulty|threshold concept|dual coding|retrieval practice|worked example effect|expertise reversal"
 
 # Strip every chapter once, up front. A chapter that fails to strip is reported
@@ -44,11 +50,32 @@ fail=0
 sources=()
 stripped=()
 unscanned=0
+not_checked=0
 for f in "${html_files[@]}"; do
   out="$work/${#sources[@]}.txt"
-  if python3 "$STRIP" "$f" > "$out"; then
+  meta="$out.meta"
+  if python3 "$STRIP" "$f" --report "$meta" > "$out"; then
     sources+=("$f")
     stripped+=("$out")
+    # Exemptions are allowed but never silent: list each one for review.
+    while IFS=$'\t' read -r kind line what; do
+      if [ "$kind" = exempt ]; then echo "EXEMPT  $f:$line: $what"; fi
+    done < "$meta"
+    # The patterns below are English. A chapter whose <html lang> or prose is not
+    # English is reported as not checked, so its PASS is never mistaken for a
+    # voice review (SKILL.md Phase 5 asks for a review in that language).
+    lang=$(awk -F'\t' '$1 == "lang" {print $2}' "$meta")
+    read -r ascii other < <(awk -F'\t' '$1 == "letters" {print $2, $3}' "$meta")
+    case "$lang" in
+      ""|[Ee][Nn]|[Ee][Nn]-*)
+        if [ "$other" -ge 20 ] && [ "$other" -gt "$ascii" ]; then
+          echo "NOT CHECKED  $f: lang=${lang:-unset} but the prose is mostly non-English; set <html lang> and review its voice in that language"
+          not_checked=$((not_checked + 1))
+        fi ;;
+      *)
+        echo "NOT CHECKED  $f: lang=$lang; these scans cover English only, so review its voice in that language"
+        not_checked=$((not_checked + 1)) ;;
+    esac
   else
     echo "verify_prose: strip_prose.py failed on $f; this chapter was NOT scanned" >&2
     unscanned=$((unscanned + 1))
@@ -80,6 +107,8 @@ scan() {
   elif [ "$unscanned" -gt 0 ]; then
     echo "FAIL  $label: $unscanned chapter(s) could not be stripped and were not scanned" >&2
     fail=1
+  elif [ "$not_checked" -gt 0 ]; then
+    echo "PASS  $label (English prose only; $not_checked chapter(s) NOT CHECKED above)"
   else
     echo "PASS  $label"
   fi

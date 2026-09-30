@@ -20,7 +20,7 @@ Do not use it for:
 - One standalone diagram without article prose. Route to `visual-explainer`.
 - Unresearched hot takes. Research first or state that the answer is a quick draft.
 
-Diataxis framing: this skill owns explanation. It answers "why", "how it works", "what changes what", "what people misunderstand", and "how to think about it".
+Diataxis framing: this skill owns explanation delivered as a single article; multi-chapter learning paths belong to `tech-tutorial`. It answers "why", "how it works", "what changes what", "what people misunderstand", and "how to think about it".
 
 ## Required Article Shape
 
