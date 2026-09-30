@@ -1,71 +1,75 @@
 # Cognitive Principles
 
-This reference gives the research basis behind the seven tutorial-design rules in `SKILL.md`. The skill body contains the operational workflow; this file explains why those rules exist.
+This reference gives the research basis behind the seven tutorial-design rules in `SKILL.md`. The rules themselves live only in `SKILL.md` ("Learning Principles" and "Depth And Currency"); each section here names the rule it supports and explains why it exists, so the two files cannot drift into conflicting instructions.
 
 ## 1. Target Reader And Expertise Reversal
 
-Instruction that helps novices can bore or slow experts, while expert-oriented material overwhelms novices. Kalyuga's expertise-reversal effect is strongest for complex, high-element-interactivity material.
+Supports: SKILL.md §1, the reader-level table.
 
-Operational rule: open with audience-fit sections for "who this is for", "who this is not for", and "what the reader can do after reading". In non-English output, localize the visible headings but keep stable semantic markers so validation remains language-independent.
+Instruction that helps novices can slow or even harm experts, while expert-oriented material overwhelms novices. Kalyuga's expertise-reversal effect (Kalyuga, Ayres, Chandler & Sweller, 2003) is strongest for complex, high-element-interactivity material: full worked examples and step-by-step guidance become redundant for readers who already hold the schema, and processing the redundant guidance costs them. Declaring the audience is not enough; the scaffolding has to change with the level. For experts, asking for a prediction or a solution first (Kalyuga's rapid-assessment approach) both checks what they know and activates it.
+
+Audience sections keep stable semantic markers so validation stays language-independent when the visible headings are localized.
 
 ## 2. Schema Anchoring
 
-Working memory starts with no domain structure. A concept map and learning-path breadcrumb give the reader a scaffold before details arrive.
+Supports: SKILL.md §2.
 
-Operational rule: show the concept map in `index.html`; show the learning path in every chapter with the current step highlighted.
+An advance organizer (Ausubel, 1960) helps only when it relates new material to something the reader already knows; a map made entirely of unfamiliar terms is a preview, not an anchor. Label concept-map nodes in plain words or tie them to the reader's existing background, and bring the map back at the end: redrawing it from memory in the final self-check turns the organizer into a retrieval target.
 
-## 3. Dual Coding And Split Attention
+## 3. Dual Coding, Split Attention, And Redundancy
 
-Paivio's dual-coding theory and Mayer's multimedia-learning work support combining verbal and visual channels when the visual material carries structure. The benefit collapses when the reader must search between prose and diagram labels.
+Supports: SKILL.md §3.
 
-Operational rules:
+Paivio's dual-coding theory and Mayer's multimedia-learning work support combining verbal and visual channels when the visual carries structure. The benefit collapses when the reader must search between prose and diagram labels (split attention, contiguity principle), and when decoration competes with content (coherence principle).
 
-- Use diagrams for structure, flow, state, hierarchy, and comparison.
-- Put labels directly on diagram elements.
-- Delete decorative images.
-- Ask the reader to sketch at least one key structure from memory.
+Multiple representations help transfer (Ainsworth, 2006) when each adds information: a different scenario, view, or boundary case. The redundancy effect (Chandler & Sweller, 1991; Kalyuga, Chandler & Sweller, 1998) applies to self-contained repetition of the same information, such as prose that re-reads a figure's labels, and it hurts experts more than novices. That is why the rule says "complementary representations", not "the same idea three times".
 
-## 4. Worked Example Effect
+Drawing a structure from memory (generative drawing) adds a retrieval and construction step on top of viewing.
 
-Sweller's cognitive-load work shows that novices learn better from worked examples before open problem solving. Open exercises too early force the learner to spend working memory on search rather than schema construction.
+## 4. Worked Examples And Fading
 
-Operational rule: teach new concepts with worked examples first. In hands-on mode, use worked -> partial -> open progression.
+Supports: SKILL.md §4.
 
-## 5. Retrieval Practice
+Sweller's cognitive-load work shows that novices learn better from worked examples before open problem solving; open exercises too early spend working memory on search rather than schema construction. The worked -> partial -> open progression is the fading or completion-problem approach (Renkl & Atkinson, 2003; van Merriënboer, 1990): remove steps gradually as the schema forms. The same effect reverses for experts (see §1), which is why the worked-example ratio scales with reader level.
 
-Roediger and Karpicke (2006) showed that retrieval improves retention compared with re-reading. The first retrieval attempt matters, and repeated retrieval improves durability further.
+## 5. Retrieval Practice And Pretesting
 
-Operational rules:
+Supports: SKILL.md §5 and §6.
 
-- End every chapter with self-check questions.
-- Hide answers in `<details>` or a separate answer section.
-- Use predictive questions before reveals.
-- Keep questions focused, precise, consistent, tractable, and effortful.
+Roediger and Karpicke (2006) showed that retrieval improves retention compared with re-reading; Dunlosky et al. (2013) rate practice testing among the highest-utility study techniques. The first retrieval attempt matters, and repeated retrieval improves durability further. Hidden answers keep the attempt honest.
 
-## 6. Desirable Difficulty
+Answering before instruction also helps: pretesting improves later learning of the tested material even when the first answer is wrong (Richland, Kornell & Kao, 2009). A prediction placed before the explanation it tests gets this benefit, while one placed after the explanation only checks recall.
 
-Bjork's desirable-difficulty work distinguishes short-term fluency from durable learning. Easy reading can feel like mastery while leaving the reader unable to transfer.
+The concept-layer question standard (focused, precise, consistent, tractable, effortful) comes from Andy Matuschak's "How to write good prompts", written for spaced-repetition cards. It fits atomic recall questions. Mechanism and discrimination questions target Bloom's apply/analyze/evaluate levels and SOLO's relational level (see Depth Orientation), where good answers vary in wording, so they are judged by the reasoning they contain instead of consistency.
 
-Operational rules:
+## 6. Desirable Difficulty And Fluency
 
-- Add one challenge per chapter.
-- Vary examples across contexts.
-- Delay answer reveal.
-- Warn the reader that fluency is not mastery.
-- Delete language that shames confusion, such as `obviously` or `trivially`.
+Supports: SKILL.md §6.
 
-## 7. Spacing And Interleaving
+Bjork's desirable-difficulty work distinguishes short-term fluency from durable learning: easy reading can feel like mastery while leaving the reader unable to transfer. Telling learners that fluency is misleading changes their behavior little (Yan, Bjork & Bjork, 2016); letting them experience a failed prediction does more. Challenges slightly beyond the chapter and delayed reveals keep effort in the reading.
 
-Knowledge becomes durable when it is reactivated in new contexts. Interleaving trains discrimination: choosing which concept applies, not merely recalling one concept in isolation.
+Banning words such as `obviously` and `trivially` is a separate matter: those words shame confusion and hide prerequisites (SKILL.md "Voice And Terminology"), which is not a difficulty design choice.
 
-Operational rules:
+## 7. Cumulative Revisit, Spacing, And Interleaving
 
-- Each chapter recalls the prior chapter's contribution.
-- Later examples reuse earlier concepts.
-- The final self-check or capstone forces choices between approaches from multiple chapters.
-- Block early syntax acquisition; interleave once there are multiple concepts to compare.
+Supports: SKILL.md §7.
+
+Knowledge becomes durable when it is reactivated in new contexts. Two different effects are at work, and a tutorial read in one sitting gets only part of them:
+
+- Spacing needs time between sessions to pay off (Cepeda et al., 2008). Revisiting earlier chapters within one reading is cumulative retrieval, not spacing. Only questions the reader returns to on a later day, such as the redo list at the end of the final self-check, create spacing.
+- Interleaving trains discrimination: choosing which concept applies, not merely recalling one concept in isolation (Rohrer & Taylor, 2007). It helps once there are several concepts to tell apart; block practice while the reader is still acquiring brand-new syntax.
+
+A chapter-opening recap that the author writes and the reader re-reads is re-reading. A recall question answered before the recap is retrieval.
+
+## Misconceptions And Conceptual Change
+
+Supports: SKILL.md "Depth And Currency", misconceptions first.
+
+Learners with an existing wrong model tend to assimilate the correct explanation into it instead of replacing it (Posner, Strike, Hewson & Gertzog, 1982). Refutation text, which states the common belief, shows why it fails, and then gives the correct account, changes misconceptions more reliably than exposition alone (Tippett, 2010). A prediction that the wrong model gets wrong makes the conflict concrete.
 
 ## Depth Orientation
+
+Supports: SKILL.md "Depth And Currency".
 
 Learning structure can still be shallow. Four frameworks keep the tutorial oriented toward depth:
 
@@ -74,10 +78,11 @@ Learning structure can still be shallow. Four frameworks keep the tutorial orien
 - SOLO taxonomy: the target is relational understanding, not a bag of facts.
 - Meyer and Land: threshold concepts change how the learner sees the domain.
 
-Operational lenses:
+Adding mechanism, cost, and failure boundary at once raises element interactivity; for novices, layering depth across chapters keeps intrinsic load manageable (§1).
 
-- **One level below docs**: explain the mechanism, cost, and failure boundary behind API statements.
-- **Current field state**: for moving subjects, state what is stable, in flux, and superseded with dates.
+## Voice Tradeoff
+
+Mayer's personalization principle finds a small advantage for conversational style, mostly for novices on short lessons. The skill keeps second-person address and imperatives ("you", "run this") but bans author-first-person narration ("we", "let's"): those words carry little information in professional prose and blur who is claiming what. This is a deliberate tradeoff, not an oversight.
 
 ## Authoring Caveat
 

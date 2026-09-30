@@ -1,7 +1,7 @@
 {
   "skill_name": "tech-tutorial",
   "_assertion_legend": {
-    "_comment": "No automated runner ships yet. This classifies how each assertion should be verified by a future grader. Mechanical assertions mirror SKILL.md Phase 5 gates plus bundled scripts; qualitative assertions need an LLM or human judge.",
+    "_comment": "No automated runner ships yet. This classifies how each assertion should be verified by a future grader. manual-grep assertions have a concrete rule in _checks (a bundled script line or a file test); qualitative assertions need an LLM or human judge; mixed assertions start from a mechanical probe and end in judgment.",
     "manual-grep": [
       "has_entrypoint",
       "multi_file_structure",
@@ -16,11 +16,12 @@
       "sections_are_h2_not_separate_files",
       "no_separate_chapter_files",
       "output_is_markdown",
-      "assumptions_block_present",
       "related_tutorials_block_present",
       "hub_index_updated_with_new_card",
       "at_least_three_figures",
-      "has_learning_path"
+      "has_learning_path",
+      "structure_gates_pass",
+      "prose_gates_pass"
     ],
     "manual-qualitative": [
       "uses_existing_background_analogy",
@@ -57,7 +58,8 @@
       "honors_explicit_output_language",
       "routes_to_explain_article",
       "routes_to_visual_explainer",
-      "no_multi_chapter_tutorial_for_article_request"
+      "no_multi_chapter_tutorial_for_article_request",
+      "voice_reviewed_in_output_language"
     ],
     "mixed": [
       "has_concept_map",
@@ -75,8 +77,30 @@
       "has_next_steps",
       "has_dated_frontier_framing_or_chapter",
       "has_further_reading",
-      "has_sources"
-    ]
+      "has_sources",
+      "assumptions_block_present"
+    ],
+    "_checks": {
+      "has_entrypoint": "<dir>/index.html exists",
+      "multi_file_structure": "<dir> holds index.html plus >=2 NN-*.html chapters",
+      "every_chapter_has_figure": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh\" <dir> -> PASS  figure coverage",
+      "self_check_named_with_suffix": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh\" <dir> -> PASS  self-check naming + position",
+      "self_check_is_last_chapter": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh\" <dir> -> PASS  self-check naming + position",
+      "scaffold_index_first_selfcheck_last": "index.html exists and bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh\" <dir> -> PASS  self-check naming + position",
+      "audience_sections_present": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh\" <dir> -> PASS  audience-fit sections",
+      "no_pedagogy_jargon_in_prose": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_prose.sh\" <dir> -> PASS  pedagogy-jargon leaks",
+      "no_forbidden_voice_phrases": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_prose.sh\" <dir> -> PASS  forbidden voice phrases (English output only)",
+      "output_is_single_file": "<dir> holds exactly one .html file, index.html",
+      "sections_are_h2_not_separate_files": "index.html has >=3 <h2> sections and no NN-*.html siblings",
+      "no_separate_chapter_files": "no NN-*.html files next to index.html",
+      "output_is_markdown": "output is .md files and no .html files",
+      "related_tutorials_block_present": "the new index.html has <section class=\"related-tutorials\"> whose local links resolve",
+      "hub_index_updated_with_new_card": "the hub index.html has a .tutorial-cards link to the new tutorial's index.html",
+      "at_least_three_figures": "index.html has >=3 non-empty <figure> elements",
+      "has_learning_path": "every .html has a .learning-path element",
+      "structure_gates_pass": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh\" <dir> exits 0",
+      "prose_gates_pass": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_prose.sh\" <dir> exits 0; any EXEMPT lines are justified in the delivery note"
+    }
   },
   "evals": [
     {
@@ -99,7 +123,9 @@
         "has_next_steps",
         "no_forbidden_voice_phrases",
         "no_cheerleader_first_person",
-        "self_check_five_properties"
+        "self_check_five_properties",
+        "structure_gates_pass",
+        "prose_gates_pass"
       ]
     },
     {
@@ -196,7 +222,8 @@
         "has_tradeoffs",
         "has_discrimination_scenarios",
         "every_chapter_has_figure",
-        "self_check_named_with_suffix"
+        "self_check_named_with_suffix",
+        "structure_gates_pass"
       ]
     },
     {
@@ -216,7 +243,9 @@
         "self_check_is_last_chapter",
         "every_chapter_has_figure",
         "no_forbidden_voice_phrases",
-        "no_cheerleader_first_person"
+        "no_cheerleader_first_person",
+        "structure_gates_pass",
+        "prose_gates_pass"
       ]
     },
     {
@@ -266,7 +295,8 @@
         "no_separate_chapter_files",
         "has_concept_map",
         "has_self_check",
-        "at_least_three_figures"
+        "at_least_three_figures",
+        "structure_gates_pass"
       ]
     },
     {
@@ -281,7 +311,8 @@
         "assumptions_block_present",
         "primer_depth_or_single_file",
         "has_self_check",
-        "has_concept_map"
+        "has_concept_map",
+        "structure_gates_pass"
       ]
     },
     {
@@ -311,7 +342,7 @@
         "no_invented_concept_labels",
         "has_dated_frontier_framing_or_chapter",
         "marks_current_vs_emerging_dated",
-        "no_forbidden_voice_phrases"
+        "voice_reviewed_in_output_language"
       ]
     },
     {

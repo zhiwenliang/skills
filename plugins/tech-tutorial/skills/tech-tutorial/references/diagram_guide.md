@@ -203,9 +203,10 @@ Run both automated and visual checks.
 
 Serve the tutorial and evaluate `"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/svg_overflow_check.js"` in the page context (the working directory is the tutorial folder, so a bare `scripts/...` path does not resolve). It reports:
 
-- SVG text that spills outside its node.
+- SVG text that spills outside its node. Nodes are `<rect>`, `<ellipse>`, `<circle>`, and `<polygon>` (diamond decision nodes); a label belongs to the innermost node holding its center or its anchored end, so a left- or right-anchored label that runs far past a narrow box is still caught. Curved, polygon, and rotated nodes are checked against their real outline, not their bounding box. A node drawn as `<path>` is not checked.
 - SVG text that spills outside the viewBox.
 - Free-floating label collisions.
+- Text inside `<foreignObject>`, as `not measured (foreignObject)`: the script cannot measure HTML layout, so write figure labels as SVG `<text>`/`<tspan>`.
 
 Fix and rerun until the script reports:
 

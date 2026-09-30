@@ -4,20 +4,26 @@
 # for a tech-tutorial output directory into a single run, so the author runs ONE command
 # instead of hand-pasting five separate greps (which invites fatigue / skipped checks).
 #
-# WHAT IT CHECKS (the five static, table-independent gates):
-#   1. self-check naming     — exactly one *-self-check.html, and it is the LAST chapter
-#                              (skipped in single-file primer mode, see MODES below)
-#   2. audience-fit sections — index.html has semantic markers or English headings
-#                              for audience-for, audience-not-for, and outcomes
-#   3. figure coverage       — every chapter .html has >=1 <figure> (code-blocks/tables don't count)
-#   4. SVG-utility-CSS        — every .html <style> includes .diagram-ink (else node-fill rects
-#                              render as solid black when the utility CSS is missing)
-#   5. reader-drawing prompt  — >=1 explicit "draw it yourself" prompt across the tutorial
+# WHAT IT CHECKS:
+#   1. self-check naming     — exactly one *-self-check.html (any case), and it is the LAST
+#                              chapter by numeric prefix (skipped in single-file primer mode)
+#   2. audience-fit sections — index.html has elements marked data-tech-tutorial=audience-for,
+#                              audience-not-for, and outcomes, each with text
+#   3. figure coverage       — every chapter .html has >=1 non-empty <figure> (svg, img, table, pre)
+#   4. SVG-utility-CSS        — every .html defines a .diagram-ink rule, inline or in a linked
+#                              stylesheet (else node-fill rects render as solid black)
+#   5. reader-drawing prompt  — >=1 element marked data-tech-tutorial="reader-drawing"
+#   7. retrieval             — every chapter has self-check questions with <details> answers,
+#                              and the tutorial has >=3 predictions with <details> reveals
+#   8. integrity             — no {{placeholders}}, broken relative links or #anchors,
+#                              duplicate ids, or missing <html lang>
+#   Gates 2-5, 7 and 8 parse the HTML (check_structure.py, next to this script), so a
+#   marker in a comment, a CSS rule in a CSS comment, or an empty <figure> does not count.
 #
 # OPTIONAL GATE (runs only when a screenshot dir is passed as the 2nd argument):
-#   6. screenshot coverage   — for every chapter, the screenshot dir holds >= as many
-#                              files named <chapter>-fig*.png/.jpg/.jpeg as the chapter has
-#                              <figure> elements, AND each is NEWER than the chapter .html
+#   6. screenshot coverage   — for every chapter with n <figure> elements, the screenshot dir
+#                              holds <chapter>-fig1..figN (.png/.jpg/.jpeg), each NEWER than
+#                              the chapter .html
 #                              (a screenshot taken before the last edit proves nothing).
 #                              This mechanizes "screenshot every figure, no exceptions" —
 #                              a real 2026-06 incident shipped a label collision in the one
@@ -26,12 +32,12 @@
 #                              then run this script with the dir to prove coverage.
 #
 # MODES
-#   multi-file (default)     — all five gates run.
+#   multi-file (default)     — every gate runs.
 #   single-file quick primer — auto-detected (the dir holds exactly one .html and it is
 #                              index.html). Gate 1 is skipped: the self-check lives as an
-#                              inline section, which naming can't verify — check it by eye.
+#                              inline section, which gate 7 checks in index.html instead.
 #   Markdown fallback        — no .html files: the gates don't apply; exit 2 with a note.
-#                              Hand-check the same five rules against the .md output.
+#                              Hand-check gates 2, 3, 5 and 7 against the .md output.
 #
 # WHAT IT DOES NOT CHECK (separate SKILL.md Phase 5 steps):
 #   - prose checks — run verify_prose.sh (next to this script) for forbidden English voice phrases,
@@ -50,7 +56,7 @@
 # EXIT CODE: 0 if every gate passes, 1 if any gate fails, 2 on usage errors
 # (not a directory / no .html files). Prints PASS/FAIL per gate with details.
 #
-# Locale: every pattern here is ASCII, so the checks run with byte semantics
+# Locale: every pattern in this file is ASCII, so the checks run with byte semantics
 # (LC_ALL=C, present on every system) and never depend on an installed locale.
 
 export LC_ALL=C
@@ -79,9 +85,13 @@ while IFS= read -r f; do html_files+=("$f"); done < <(find "$DIR" -maxdepth 1 -t
 
 if [ "${#html_files[@]}" -eq 0 ]; then
   echo "verify_structure: no .html files in '$DIR' — these gates apply to HTML output only." >&2
-  echo "If this is a Markdown-fallback tutorial, hand-check the same five rules instead (SKILL.md Phase 5)." >&2
+  echo "If this is a Markdown-fallback tutorial, hand-check gates 2, 3, 5 and 7 (listed at the top of this script) instead." >&2
   exit 2
 fi
+
+for f in $(find "$DIR" -maxdepth 1 -type f -iname '*.htm' ! -name '.*' | sort); do
+  echo "NOTE  ${f##*/} is ignored: chapters must use the .html extension"
+done
 
 single_file=0
 if [ "${#html_files[@]}" -eq 1 ] && [ "${html_files[0]##*/}" = "index.html" ]; then
@@ -96,13 +106,13 @@ if [ "$single_file" -eq 1 ]; then
   skip_line "self-check naming: single-file primer — self-check is an inline section; verify it by eye"
 else
   sc=()
-  while IFS= read -r f; do sc+=("$f"); done < <(find "$DIR" -maxdepth 1 -type f -name '*-self-check.html' ! -name '.*' | sort)
+  while IFS= read -r f; do sc+=("$f"); done < <(find "$DIR" -maxdepth 1 -type f -iname '*-self-check.html' ! -name '.*' | sort)
   if [ "${#sc[@]}" -eq 1 ]; then
-    # html_files is sorted, so the last NN- prefixed entry is the last chapter.
-    last_chapter=""
+    # The last chapter has the highest numeric prefix (9-x comes before 10-self-check).
+    last_chapter="" last_num=-1
     for f in "${html_files[@]}"; do
-      b="${f##*/}"
-      case "$b" in [0-9]*) last_chapter="$b" ;; esac
+      b="${f##*/}"; num="${b%%[!0-9]*}"
+      if [ -n "$num" ] && [ $((10#$num)) -gt "$last_num" ]; then last_num=$((10#$num)); last_chapter="$b"; fi
     done
     sc_base="${sc[0]##*/}"
     if [ -n "$last_chapter" ] && [ "$last_chapter" != "$sc_base" ]; then
@@ -118,75 +128,28 @@ else
   fi
 fi
 
-# --- Gate 2: audience-fit sections (index.html) -------------------------------
-idx="$DIR/index.html"
-if [ ! -f "$idx" ]; then
-  fail_line "audience-fit sections: index.html not found"
-else
-  for_count=$(grep -iEo "data-tech-tutorial=[\"']audience-for[\"']|Who this is for" "$idx" | wc -l | tr -d ' ')
-  not_count=$(grep -iEo "data-tech-tutorial=[\"']audience-not-for[\"']|Who this is not for" "$idx" | wc -l | tr -d ' ')
-  can_count=$(grep -iEo "data-tech-tutorial=[\"']outcomes[\"']|What you can do after reading" "$idx" | wc -l | tr -d ' ')
-  if [ "$for_count" -ge 1 ] && [ "$not_count" -ge 1 ] && [ "$can_count" -ge 1 ]; then
-    pass_line "audience-fit sections: audience-for + audience-not-for + outcomes all present"
-  else
-    fail_line "audience-fit sections incomplete in index.html (for=$for_count not_for=$not_count outcomes=$can_count)"
-    [ "$for_count" -lt 1 ] && note "missing audience-for section (English heading or data-tech-tutorial marker)"
-    [ "$not_count" -lt 1 ] && note "missing audience-not-for section (English heading or data-tech-tutorial marker)"
-    [ "$can_count" -lt 1 ] && note "missing outcomes section (English heading or data-tech-tutorial marker)"
-  fi
-fi
+# --- Gates 2-5, 7, 8: parsed HTML (check_structure.py) -------------------------
+rc=0
+python3 "$(dirname "${BASH_SOURCE[0]}")/check_structure.py" "$DIR" "$single_file" "${html_files[@]}" || rc=$?
+case "$rc" in
+  0) ;;
+  1) fail=1 ;;
+  *) fail_line "parsed gates: check_structure.py could not run (exit $rc); gates 2-5, 7 and 8 were NOT checked" ;;
+esac
 
-# --- Gate 3: figure coverage (every chapter file has >=1 <figure>) ------------
-# Counts <figure> occurrences, not matching lines: compact or minified markup can
-# put several figures on one line, and gate 6 needs the true per-chapter total.
+# Gate 6 counts every <figure> tag, empty or not: each one needs a screenshot.
 count_figures() { grep -aoE '<figure([[:space:]>]|$)' "$1" | wc -l | tr -d ' '; }
 
-missing_fig=()
-for f in "${html_files[@]}"; do
-  n=$(count_figures "$f")
-  [ "$n" -lt 1 ] && missing_fig+=("${f##*/}")
-done
-if [ "${#missing_fig[@]}" -eq 0 ]; then
-  pass_line "figure coverage: every chapter has >=1 <figure>"
-else
-  fail_line "figure coverage: ${#missing_fig[@]} file(s) with no <figure>"
-  for f in "${missing_fig[@]}"; do note "$f — add a figure (every chapter has a figure-worthy shape)"; done
-fi
-
-# --- Gate 4: SVG-utility-CSS presence (.diagram-ink in every file) ------------
-# Match the CSS rule (".diagram-ink {"), not the bare name: the Diagram snippet's
-# own comment mentions ".diagram-ink," and would pass a chapter with no utility CSS.
-missing_css=()
-for f in "${html_files[@]}"; do
-  grep -q '\.diagram-ink[[:space:]]*{' "$f" || missing_css+=("${f##*/}")
-done
-if [ "${#missing_css[@]}" -eq 0 ]; then
-  pass_line "SVG utility CSS: .diagram-ink present in every file"
-else
-  fail_line "SVG utility CSS: ${#missing_css[@]} file(s) missing .diagram-ink (rects will render solid black)"
-  for f in "${missing_css[@]}"; do note "$f — paste the canonical SVG utility block from references/layout-template.html"; done
-fi
-
-# --- Gate 5: reader-drawing prompt (>=1 across the tutorial) ------------------
-# (^|[^[:alpha:]]) keeps "withdraw the" / "redraw the" from counting as a drawing prompt.
-draw=$(grep -liE "data-tech-tutorial=[\"']reader-drawing[\"']|(^|[^[:alpha:]])(draw it yourself|draw from memory|draw the)|sketch .*from memory|close the .*sketch" "${html_files[@]}" 2>/dev/null | head -n1)
-if [ -n "$draw" ]; then
-  pass_line "reader-drawing prompt: found in ${draw##*/}"
-else
-  fail_line "reader-drawing prompt: none found (dual coding stays one-way)"
-  note "add a 'Draw it yourself' prompt or data-tech-tutorial=\"reader-drawing\", typically in *-self-check.html (or capstone for hands-on)"
-fi
-
 # --- Gate 6 (optional): screenshot coverage per figure ------------------------
-# Distinct figure numbers N among <chapter>-figN.{png,jpg,jpeg} in the screenshot
+# Distinct figure numbers 1..n among <chapter>-figN.{png,jpg,jpeg} in the screenshot
 # dir; extra find args (e.g. -newer FILE) narrow the set. Numbers, not files:
 # fig1.png plus fig1.jpg (or a retake) is still one figure and must not stand in
-# for an uncaptured fig2.
+# for an uncaptured fig2, and fig7 is no screenshot of a chapter's fig1.
 shot_figures() {
-  local base="$1"; shift
+  local base="$1" n="$2"; shift 2
   find "$SHOT_DIR" -maxdepth 1 \( -name "${base}-fig*.png" -o -name "${base}-fig*.jpg" -o -name "${base}-fig*.jpeg" \) "$@" |
     while IFS= read -r p; do p="${p##*/}"; p="${p#"$base-fig"}"; printf '%s\n' "${p%%[!0-9]*}"; done |
-    grep '^[0-9]' | sort -u | wc -l | tr -d ' '
+    grep '^[0-9]' | awk -v n="$n" '$1 + 0 >= 1 && $1 + 0 <= n { print $1 + 0 }' | sort -u | wc -l | tr -d ' '
 }
 if [ -n "$SHOT_DIR" ]; then
   shot_bad=()
@@ -194,8 +157,8 @@ if [ -n "$SHOT_DIR" ]; then
     b="${f##*/}"; base="${b%.html}"
     n=$(count_figures "$f")
     [ "$n" -lt 1 ] && continue  # gate 3 already reports figure-less chapters
-    fresh=$(shot_figures "$base" -newer "$f")
-    total=$(shot_figures "$base")
+    fresh=$(shot_figures "$base" "$n" -newer "$f")
+    total=$(shot_figures "$base" "$n")
     if [ "$fresh" -lt "$n" ]; then
       shot_bad+=("$b — figures=$n, fresh screenshots=$fresh (total=$total$([ "$total" -gt "$fresh" ] && echo ', some STALER than the html'))")
     fi

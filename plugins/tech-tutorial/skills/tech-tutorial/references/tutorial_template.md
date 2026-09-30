@@ -19,7 +19,13 @@ Structure is a scaffold, not a fixed chapter count:
   <header class="chapter-opener">
     <p class="chapter-label">Chapter {{NN}}</p>
     <h1>{{chapter title}}</h1>
-    <p class="recap">The previous chapter established {{prior schema}}. This chapter explains {{current role}}.</p>
+    <div class="recap">
+      <p>Before reading on: {{recall question about what the previous chapter established}}</p>
+      <details>
+        <summary>Check</summary>
+        <p>{{answer}}. This chapter uses it to explain {{current role}}.</p>
+      </details>
+    </div>
   </header>
 
   <section class="schema-panel">
@@ -141,6 +147,23 @@ Escape `<`, `>`, and `&` inside `<pre><code>`. Prism handles syntax tokens; do n
 </div>
 ```
 
+### Misconception
+
+Use before the mechanism of each threshold or core concept whose Phase 3 misconception the reader likely holds. The prediction must be one the wrong model gets wrong.
+
+```html
+<div class="predict">
+  <span class="question-label">Predict</span>
+  <p>Many engineers expect {{common belief}}. Given {{concrete situation}}, what happens?</p>
+  <details>
+    <summary>Reveal</summary>
+    <p>{{what actually happens}}. The belief fails because {{mechanism it misses}}.</p>
+  </details>
+</div>
+```
+
+Then state the correct mechanism in the section body.
+
 ### Diagram
 
 ```html
@@ -232,24 +255,24 @@ Required sections:
 |---|---|---|
 | Who this is for | `<section data-tech-tutorial="audience-for">` | Required background, tooling, versions, assumptions. Localize visible heading when requested. |
 | Who this is not for | `<section data-tech-tutorial="audience-not-for">` | Route readers to a better path. Localize visible heading when requested. |
-| What you can do after reading | `<section data-tech-tutorial="outcomes">` | Start with the insight-check sentence, then 3-5 measurable capabilities. Localize visible heading when requested. |
+| What you can do after reading | `<section data-tech-tutorial="outcomes">` | Start with what the declared reader gains beyond the docs, then 3-5 measurable capabilities. Localize visible heading when requested. |
 | The core idea | `<section class="schema-panel">` | Phase 3 threshold concept as a sentence, not a coined label. |
 | Field state as of `<date>` | `<div class="callout">` or `<section>` | Stable, in flux, superseded. If frozen, say so explicitly. |
 | Concept map | `<figure>` | 5-10 nodes, labeled edges. |
 | Learning path | `.learning-path` | Same breadcrumb appears in each chapter. |
-| Fluency warning | `.callout.warning` | Warn that smooth reading is not mastery. |
+| Opening prediction | `.predict` with `<details>` | A question the reader answers before chapter 1; the first of the tutorial's three predictions. A one-line fluency note is optional. |
 | Further reading | `<footer>` | Official docs plus design sources. |
 | Related tutorials | `<section class="related-tutorials">` | Only for verified sibling tutorials. |
 
 Index checklist:
 
-- [ ] The three audience sections exist.
-- [ ] "What you can do after reading" starts with the insight-check sentence.
+- [ ] (auto) The three audience sections exist.
+- [ ] The outcomes section starts with what the declared reader gains beyond the docs.
 - [ ] "The core idea" exists and contains the approved threshold concept.
 - [ ] "Field state as of ..." exists and is dated, unless the topic is explicitly stable.
 - [ ] The concept map exists and has labeled edges.
 - [ ] The learning path exists.
-- [ ] The fluency warning exists.
+- [ ] The opening prediction exists and is answerable before reading.
 
 ## Related Tutorials Block
 
@@ -363,7 +386,7 @@ Include:
 - Migration notes for superseded approaches.
 - Explicit uncertainty boundaries.
 
-### `03-practice.html` (Hands-on Only)
+### `NN-practice.html` (Hands-on Only)
 
 Include:
 
@@ -373,7 +396,7 @@ Include:
 
 The blanks must be design decisions, not trivial variable names.
 
-### `04-pitfalls.html` (Hands-on Only)
+### `NN-pitfalls.html` (Hands-on Only)
 
 Include at least five specific failure modes:
 
@@ -385,7 +408,7 @@ Include at least five specific failure modes:
 
 Use "failure mode", "common mistake", or "pitfall" in prose. Avoid casual slang.
 
-### `05-capstone.html` (Hands-on Only)
+### `NN-capstone.html` (Hands-on Only)
 
 Purpose: force transfer across chapters.
 
@@ -433,18 +456,24 @@ Skeleton:
     </ol>
   </section>
 
-  <figure>
-    <!-- Difficulty gradient or scenario map (Diagram snippet above). Every chapter,
-         this one included, needs at least one <figure>. -->
-  </figure>
-
   <div class="predict" data-tech-tutorial="reader-drawing">
     <span class="question-label">Draw it yourself</span>
-    <p>Close the tutorial and sketch {{key structure}} from memory.</p>
+    <p>Close the tutorial and sketch {{key structure, usually the index concept map}} from memory.</p>
   </div>
+
+  <section>
+    <h2>Redo in two or three days</h2>
+    <ol>
+      <li>{{three to five questions drawn from across the chapters}}</li>
+    </ol>
+  </section>
 
   <details>
     <summary>Answers</summary>
+    <figure>
+      <!-- Reference answer for the drawing prompt: the Diagram snippet above,
+           filled in. This is the chapter's required figure. -->
+    </figure>
     <h3>Concept layer</h3>
     <p>{{answers}}</p>
     <h3>Mechanism layer</h3>
@@ -460,31 +489,32 @@ Checklist:
 - [ ] Concept, mechanism, and discrimination layers exist.
 - [ ] Concept-focused mode has at least three cross-chapter discrimination scenarios.
 - [ ] Hands-on mode has at least one or two reinforcement discrimination scenarios.
-- [ ] At least one reader-drawing prompt exists here or in capstone.
-- [ ] Answers are hidden in a final `<details>` block.
-- [ ] Questions are focused, precise, consistent, tractable, and effortful.
+- [ ] (auto) At least one reader-drawing prompt exists here or in capstone.
+- [ ] (auto) Answers are hidden in a final `<details>` block.
+- [ ] The drawing prompt's reference figure sits inside the answers.
+- [ ] Concept-layer questions are focused, precise, consistent, tractable, and effortful; mechanism and discrimination answers give reasoning points.
 
 ## Full Tutorial Checklist
 
 ### Structure
 
 - [ ] `index.html` lets the reader judge fit quickly.
-- [ ] Audience sections exist, either with English headings or stable `data-tech-tutorial` markers.
+- [ ] (auto) Audience sections carry `data-tech-tutorial` markers; visible headings may be localized.
 - [ ] Concept map appears in `index.html`.
 - [ ] Learning path appears in `index.html` and each chapter.
-- [ ] Each chapter opens with a prior-chapter recall sentence.
+- [ ] Each chapter opens with a recall question about the prior chapter, answer hidden.
 - [ ] Each chapter has a schema panel.
-- [ ] Multi-file output has exactly one final `*-self-check.html`.
+- [ ] (auto) Multi-file output has exactly one final `*-self-check.html`.
 
 ### Diagrams
 
-- [ ] Every chapter has at least one `<figure>`.
+- [ ] (auto) Every chapter has at least one non-empty `<figure>`.
 - [ ] Every figure adds information.
 - [ ] Labels sit on diagram elements.
 - [ ] No decorative images.
-- [ ] At least one reader-drawing prompt exists.
-- [ ] SVG utility CSS exists in every HTML file.
-- [ ] Every figure was rendered and inspected.
+- [ ] (auto) At least one reader-drawing prompt exists.
+- [ ] (auto) SVG utility CSS exists in every HTML file.
+- [ ] (auto, with a screenshot dir) Every figure was rendered and inspected.
 
 ### Examples
 
@@ -494,31 +524,32 @@ Checklist:
 
 ### Retrieval
 
-- [ ] Every chapter has self-check questions.
-- [ ] Answers are hidden from prompts.
-- [ ] At least three predictive questions exist across the tutorial.
+- [ ] (auto) Every chapter has self-check questions with hidden answers.
+- [ ] (auto) At least three predictive questions exist across the tutorial.
+- [ ] Predictions come before the explanations they test.
+- [ ] Each Phase 3 misconception is broken by a prediction or counterexample.
 - [ ] Final discrimination scenarios force choice between prior concepts.
 
 ### Voice
 
-- [ ] No cheerleading.
-- [ ] No empty transition prose.
-- [ ] No unsupported hedges.
-- [ ] No anesthetic words.
-- [ ] No marketing filler.
-- [ ] No first-person author narration except explicit epistemic notes.
-- [ ] No pedagogy jargon leaks into reader prose.
+- [ ] (auto, English) No cheerleading.
+- [ ] (auto, English) No empty transition prose.
+- [ ] (auto, English) No unsupported hedges.
+- [ ] (auto, English) No anesthetic words.
+- [ ] (auto, English) No marketing filler.
+- [ ] (auto, English) No first-person author narration except explicit epistemic notes.
+- [ ] (auto, English) No pedagogy jargon leaks into reader prose.
 
 ### Depth And Currency
 
-- [ ] Each core concept goes one level below docs.
+- [ ] Each core concept goes one level below docs somewhere in the tutorial.
 - [ ] `index.html` has dated field-state framing or an explicit stable note.
 - [ ] Fast-moving topics use recent primary sources.
-- [ ] The insight-check sentence names what an experienced engineer gains beyond docs.
+- [ ] The outcomes section names what the declared reader gains beyond the docs.
 
 ### Completeness
 
 - [ ] Further reading appears in each chapter.
 - [ ] Code examples run, or unverified code is clearly marked.
-- [ ] Links point to real files or URLs.
+- [ ] (auto for local files) Links point to real files or URLs.
 - [ ] Knowledge-library hub and related links are updated only when appropriate.

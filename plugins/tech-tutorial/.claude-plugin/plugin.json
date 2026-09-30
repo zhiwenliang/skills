@@ -1,6 +1,6 @@
 {
   "name": "tech-tutorial",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Builds English-first, cognitive-science-aligned HTML tutorials for technical topics. Concept-focused by default (scenario walkthroughs for mental models), with an optional hands-on mode (runnable code progression). Structure is a scaffold: index first, self-check last, topical chapters in between sized by a concept dependency graph. Grounded in research on encoding, learning depth, and current field context.",
   "author": {
     "name": "Zhiwen Liang"

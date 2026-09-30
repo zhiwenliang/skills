@@ -23,6 +23,9 @@ make_base_html() {
 <article>
 $body
 <figure><svg viewBox="0 0 200 80" role="img" aria-label="example"><text x="20" y="40">Example</text></svg><figcaption>Fig. 1. Example.</figcaption></figure>
+<div class="predict"><p>Predict 1</p><details><summary>Reveal</summary><p>A</p></details></div>
+<div class="predict"><p>Predict 2</p><details><summary>Reveal</summary><p>A</p></details></div>
+<div class="predict"><p>Predict 3</p><details><summary>Reveal</summary><p>A</p></details></div>
 </article>
 </body>
 </html>
@@ -35,7 +38,7 @@ make_base_html "$english_dir/index.html" '
 <section data-tech-tutorial="audience-for"><h2>Who this is for</h2><p>Engineers learning the topic.</p></section>
 <section data-tech-tutorial="audience-not-for"><h2>Who this is not for</h2><p>Readers who need debugging help.</p></section>
 <section data-tech-tutorial="outcomes"><h2>What you can do after reading</h2><p>Explain the core mechanism.</p></section>
-<section class="self-check"><h2>Self-check</h2><p data-tech-tutorial="reader-drawing">Sketch the flow from memory.</p></section>
+<section class="self-check"><h2>Self-check</h2><p data-tech-tutorial="reader-drawing">Sketch the flow from memory.</p><details><summary>Answers</summary><p>A1</p></details></section>
 '
 bash "$SCRIPTS/verify_structure.sh" "$english_dir" >/dev/null
 
@@ -45,7 +48,7 @@ make_base_html "$non_english_dir/index.html" '
 <section data-tech-tutorial="audience-for"><h2>适合谁</h2><p>工程师。</p></section>
 <section data-tech-tutorial="audience-not-for"><h2>不适合谁</h2><p>只想调试的人。</p></section>
 <section data-tech-tutorial="outcomes"><h2>读完之后你能做到什么</h2><p>解释核心机制。</p></section>
-<section class="self-check"><h2>自测</h2><p data-tech-tutorial="reader-drawing">合上教程，亲手画一张流程图。</p></section>
+<section class="self-check"><h2>自测</h2><p data-tech-tutorial="reader-drawing">合上教程，亲手画一张流程图。</p><details><summary>答案</summary><p>A1</p></details></section>
 '
 bash "$SCRIPTS/verify_structure.sh" "$non_english_dir" >/dev/null
 
@@ -183,6 +186,9 @@ d=$(prose_dir details-open '<details open><summary>Overview</summary><p>We proba
 bash "$SCRIPTS/verify_prose.sh" "$d" >/dev/null 2>&1 && fail_test "prose inside <details open> was not scanned"
 d=$(prose_dir details-nested '<details><summary>Answer</summary><details open><p>A1</p></details><p>We probably just retry.</p></details>')
 bash "$SCRIPTS/verify_prose.sh" "$d" >/dev/null || fail_test "an open <details> inside a closed answer leaked the answer"
+# An "Under the hood" block is collapsed mechanism prose, not an answer: it is scanned.
+d=$(prose_dir under-the-hood '<details class="under-the-hood"><summary>Under the hood</summary><p>We probably just retry.</p></details>')
+bash "$SCRIPTS/verify_prose.sh" "$d" >/dev/null 2>&1 && fail_test "prose inside a collapsed under-the-hood block was not scanned"
 
 # Quoted material and explicitly exempted elements keep their wording (SKILL.md
 # "Legitimate exceptions"), and every exemption is listed so a reviewer can audit it.
@@ -230,6 +236,10 @@ ids = [case["id"] for case in data["evals"]]
 problems = [f"unclassified: {sorted(used - legend)}"] if used - legend else []
 problems += [f"unused in legend: {sorted(legend - used)}"] if legend - used else []
 problems += ["duplicate eval ids"] if len(ids) != len(set(ids)) else []
+checks = data["_assertion_legend"].get("_checks", {})
+mechanical = set(data["_assertion_legend"]["manual-grep"])
+problems += [f"manual-grep assertions without a check rule: {sorted(mechanical - set(checks))}"] if mechanical - set(checks) else []
+problems += [f"check rules for unknown assertions: {sorted(set(checks) - legend)}"] if set(checks) - legend else []
 if problems:
     sys.exit("; ".join(problems))
 PY
@@ -237,11 +247,14 @@ PY
 # Multi-file tutorial: gate 6 counts figures, not lines; gate 5 needs a real prompt.
 multi="$tmp/multi"; shots="$tmp/shots"
 mkdir "$multi" "$shots"
-page() { printf '<html><head><style>.diagram-ink{}</style></head><body>%s</body></html>\n' "$2" > "$multi/$1"; }
+page() { printf '<html lang="en"><head><style>.diagram-ink{}</style></head><body>%s</body></html>\n' "$2" > "$multi/$1"; }
 fig='<figure><svg viewBox="0 0 10 10"></svg></figure>'
-page index.html "<section data-tech-tutorial=\"audience-for\"></section><section data-tech-tutorial=\"audience-not-for\"></section><section data-tech-tutorial=\"outcomes\"></section>$fig"
-page 01-concepts.html "$fig$fig<p>Withdraw the request before retrying.</p>"
-page 02-self-check.html "$fig"
+sc='<section class="self-check"><ol><li>Q</li></ol><details><summary>Answers</summary><p>A</p></details></section>'
+pred='<div class="predict"><p>Q</p><details><summary>Reveal</summary><p>A</p></details></div>'
+aud='<section data-tech-tutorial="audience-for">Engineers.</section><section data-tech-tutorial="audience-not-for">Debuggers.</section><section data-tech-tutorial="outcomes">Explain it.</section>'
+page index.html "$aud$fig$pred$pred$pred"
+page 01-concepts.html "$fig$fig<p>Withdraw the request before retrying.</p>$sc"
+page 02-self-check.html "$fig<details><summary>Answers</summary><p>A</p></details>"
 touch -t 202001010000 "$multi"/*.html
 touch "$shots/index-fig1.png" "$shots/01-concepts-fig1.png" "$shots/02-self-check-fig1.png"
 out=$(bash "$SCRIPTS/verify_structure.sh" "$multi" "$shots") && fail_test "structure gates passed with an uncaptured figure and no drawing prompt"
@@ -250,17 +263,97 @@ grep -q "FAIL  reader-drawing prompt" <<<"$out" || fail_test "'Withdraw the' cou
 touch "$shots/01-concepts-fig1.jpg"  # a second format of fig1 is not a screenshot of fig2
 out=$(bash "$SCRIPTS/verify_structure.sh" "$multi" "$shots") && fail_test "fig1.png + fig1.jpg passed for two figures"
 grep -q "01-concepts.html — figures=2, fresh screenshots=1" <<<"$out" || fail_test "gate 6 counted a duplicate screenshot of fig1: $out"
-page 02-self-check.html "$fig<p data-tech-tutorial=\"reader-drawing\">Draw it yourself.</p>"
+page 02-self-check.html "$fig<p data-tech-tutorial=\"reader-drawing\">Draw it yourself.</p><details><summary>Answers</summary><p>A</p></details>"
 touch -t 202001010000 "$multi/02-self-check.html"
 touch "$shots/01-concepts-fig2.png"
 bash "$SCRIPTS/verify_structure.sh" "$multi" "$shots" >/dev/null || fail_test "complete multi-file tutorial failed the structure gates"
 
 # Gate 4 needs the utility CSS rule, not the snippet comment that names the class.
-page 03-extra.html "$fig"
+page 03-extra.html "$fig$sc"
 sed -i.bak 's#<style>.diagram-ink{}</style>#<style>body{margin:0}</style>#; s#<svg viewBox="0 0 10 10">#&<!-- Use .diagram-ink, .diagram-accent, .node-fill, .node-label, .edge-label. -->#' "$multi/03-extra.html"
 rm -f "$multi/03-extra.html.bak"
 out=$(bash "$SCRIPTS/verify_structure.sh" "$multi") && fail_test "gate 4 passed a chapter without the utility CSS"
 grep -q "03-extra.html — paste the canonical SVG utility block" <<<"$out" || fail_test "gate 4 did not name 03-extra.html: $out"
+
+# --- Structural gates that parse HTML instead of grepping it -------------------
+# good_tutorial <dir>: a small tutorial that passes every structural gate; each
+# case below breaks exactly one thing in a copy of it.
+good_tutorial() {
+  mkdir -p "$1"
+  local head='<!DOCTYPE html><html lang="en"><head><style>/* utility */ .diagram-ink { stroke: #000 } .node-fill { fill: #fff }</style></head><body>'
+  local fig='<figure><svg viewBox="0 0 10 10"><text x="1" y="5">A</text></svg></figure>'
+  local nav='<nav class="learning-path"><a href="index.html">Index</a> <a href="01-concepts.html#self-check">01</a> <a href="02-self-check.html">Self-check</a></nav>'
+  local pred='<div class="predict"><p>Predict</p><details><summary>Reveal</summary><p>A</p></details></div>'
+  printf '%s\n' "$head$nav" '<section id="for" data-tech-tutorial="audience-for"><h2>Who</h2><p>Engineers.</p></section>' \
+    '<section id="not-for" data-tech-tutorial="audience-not-for"><p>Debuggers.</p></section>' \
+    '<section id="outcomes" data-tech-tutorial="outcomes"><p>Explain the mechanism.</p></section>' \
+    "$fig$pred$pred$pred</body></html>" > "$1/index.html"
+  printf '%s\n' "$head$nav" "$fig" '<p>See <a href="https://example.com/docs">the docs</a> and <a href="#self-check">below</a>.</p>' \
+    '<section class="self-check" id="self-check"><ol><li>Q</li></ol><details><summary>Answers</summary><p>A</p></details></section></body></html>' > "$1/01-concepts.html"
+  printf '%s\n' "$head$nav" '<section><ol><li>Q</li></ol></section>' '<p data-tech-tutorial="reader-drawing">Close the tutorial and sketch the flow from memory.</p>' \
+    "<details><summary>Answers</summary><p>A</p>$fig</details></body></html>" > "$1/02-self-check.html"
+}
+# mutate <file> <old> <new>: replace one literal occurrence, failing loudly if absent.
+mutate() {
+  python3 -c '
+import sys
+path, old, new = sys.argv[1:4]
+text = open(path, encoding="utf-8").read()
+if old not in text:
+    sys.exit("mutate: %r not in %s" % (old, path))
+open(path, "w", encoding="utf-8").write(text.replace(old, new, 1))
+' "$@"
+}
+structure_case() {  # structure_case <name> <expected FAIL-line substring> <file> <old> <new>
+  local d="$tmp/sg-$1" out
+  good_tutorial "$d"
+  mutate "$d/$3" "$4" "$5"
+  out=$(bash "$SCRIPTS/verify_structure.sh" "$d") && fail_test "structure case '$1' passed"
+  grep -q "FAIL  $2" <<<"$out" || fail_test "structure case '$1' did not fail on '$2': $out"
+}
+good_tutorial "$tmp/sg-good"
+out=$(bash "$SCRIPTS/verify_structure.sh" "$tmp/sg-good") || fail_test "a complete tutorial failed the structure gates: $out"
+
+structure_case marker-in-comment "audience-fit" index.html '<section id="for" data-tech-tutorial="audience-for">' '<!-- data-tech-tutorial="audience-for" --><section id="for">'
+structure_case english-heading-only "audience-fit" index.html '<section id="for" data-tech-tutorial="audience-for"><h2>Who</h2>' '<section id="for"><h2>Who this is for</h2>'
+structure_case empty-marker "audience-fit" index.html '<p>Debuggers.</p>' ''
+structure_case empty-figure "figure coverage" 01-concepts.html '<figure><svg viewBox="0 0 10 10"><text x="1" y="5">A</text></svg></figure>' '<figure></figure>'
+structure_case css-in-comment "SVG utility CSS" 01-concepts.html '.diagram-ink { stroke: #000 }' 'svg { stroke: #000 } /* see .diagram-ink { } */'
+structure_case draw-the-conclusion "reader-drawing prompt" 02-self-check.html '<p data-tech-tutorial="reader-drawing">Close the tutorial and sketch the flow from memory.</p>' '<p>Draw the conclusion yourself.</p>'
+structure_case no-hidden-answers "retrieval" 01-concepts.html '<details><summary>Answers</summary><p>A</p></details>' '<p>A</p>'
+structure_case few-predictions "retrieval" index.html '<div class="predict"><p>Predict</p><details><summary>Reveal</summary><p>A</p></details></div>' ''
+structure_case placeholder "integrity" 01-concepts.html '<p>See' '<p>{{CHAPTER TITLE}}</p><p>See'
+structure_case broken-file-link "integrity" 01-concepts.html 'href="02-self-check.html"' 'href="03-self-check.html"'
+structure_case broken-anchor "integrity" 01-concepts.html 'href="#self-check"' 'href="#self-chek"'
+structure_case duplicate-id "integrity" index.html 'id="not-for"' 'id="for"'
+structure_case missing-lang "integrity" 01-concepts.html '<html lang="en">' '<html>'
+
+# A shared stylesheet satisfies the utility-CSS gate, so chapters need not inline it.
+d="$tmp/sg-shared-css"; good_tutorial "$d"
+printf '/* shared */\n.diagram-ink { stroke: #000 }\n' > "$d/tutorial.css"
+for f in "$d"/*.html; do mutate "$f" '<style>/* utility */ .diagram-ink { stroke: #000 } .node-fill { fill: #fff }</style>' '<link rel="stylesheet" href="tutorial.css">'; done
+out=$(bash "$SCRIPTS/verify_structure.sh" "$d") || fail_test "a linked shared stylesheet failed the utility-CSS gate: $out"
+
+# Chapter order is numeric, and the self-check suffix is matched case-insensitively.
+d="$tmp/sg-numeric"; good_tutorial "$d"
+for n in 2 3 4 5 6 7 8 9; do cp "$d/01-concepts.html" "$d/$n-topic.html"; done
+mv "$d/01-concepts.html" "$d/1-concepts.html"; mv "$d/02-self-check.html" "$d/10-Self-Check.html"
+out=$(bash "$SCRIPTS/verify_structure.sh" "$d") || true
+grep -q "PASS  self-check naming + position: 10-Self-Check.html" <<<"$out" || fail_test "numeric order or case-insensitive self-check misjudged: $out"
+
+# Gate 6 needs screenshots numbered 1..n: fig7 + fig8 do not cover a two-figure chapter.
+d="$tmp/sg-shots"; good_tutorial "$d"; mkdir "$d-shots"
+mutate "$d/01-concepts.html" '</figure>' '</figure><figure><table><tr><td>x</td></tr></table></figure>'
+touch -t 202001010000 "$d"/*.html
+for f in index-fig1 01-concepts-fig7 01-concepts-fig8 02-self-check-fig1; do touch "$d-shots/$f.png"; done
+out=$(bash "$SCRIPTS/verify_structure.sh" "$d" "$d-shots") && fail_test "fig7 + fig8 covered a two-figure chapter"
+grep -q "01-concepts.html — figures=2, fresh screenshots=0" <<<"$out" || fail_test "gate 6 counted out-of-range figure numbers: $out"
+
+# A chapter the parser cannot read fails loudly as "could not run", never as a gate verdict.
+d="$tmp/sg-unreadable"; good_tutorial "$d"
+printf '<p>caf\xe9</p>\n' >> "$d/01-concepts.html"
+out=$(bash "$SCRIPTS/verify_structure.sh" "$d" 2>/dev/null) && fail_test "an unreadable chapter passed the structure gates"
+grep -q "FAIL  parsed gates: check_structure.py could not run" <<<"$out" || fail_test "parser crash not reported as could-not-run: $out"
 
 # A macOS "._index.html" sidecar is not a chapter: the primer stays in single-file mode.
 printf '\000\005\026\007Mac OS X sidecar' > "$english_dir/._index.html"
@@ -287,5 +380,21 @@ for want in "Event loop" "task pump" "execution funnel" "state triad" "leader’
   grep -qxF "$want" <<<"$terms" || fail_test "extract_terms missed '$want': $terms"
 done
 [ "$(wc -l <<<"$terms" | tr -d ' ')" -eq 7 ] || fail_test "extract_terms emitted bogus candidates: $terms"
+
+# Coined labels also hide in emphasis, tables, callout labels, and long captions.
+terms_dir2="$tmp/terms-more"
+mkdir "$terms_dir2"
+cat > "$terms_dir2/index.html" <<'HTML'
+<p>The <em>task pump</em> feeds the <i>priority funnel</i>.</p>
+<table><caption>State convergence triad</caption><tr><th>Replay horizon</th></tr></table>
+<div class="callout"><span class="label">Drift budget</span><p>Text.</p></div>
+<h5>Lease ladder</h5>
+<details><summary>Commit ratchet</summary><p>A</p></details>
+<figure><svg viewBox="0 0 1 1"></svg><figcaption>Fig. 2. The dispatch prism. Requests enter on the left and leave sorted by priority on the right.</figcaption></figure>
+HTML
+terms=$(python3 "$SCRIPTS/extract_terms.py" "$terms_dir2" | cut -f1)
+for want in "task pump" "priority funnel" "State convergence triad" "Replay horizon" "Drift budget" "Lease ladder" "Commit ratchet" "The dispatch prism."; do
+  grep -qxF "$want" <<<"$terms" || fail_test "extract_terms missed '$want': $terms"
+done
 
 echo "regression tests passed"

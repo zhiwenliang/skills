@@ -69,7 +69,7 @@ If a claim feels repeated but unsourced, stop and verify it. Tutorials spread er
 
 ## Parallel Research Strategy
 
-Use parallel workers when the environment supports them and the topic has multiple independent research angles.
+Use parallel workers when the environment supports them and the topic has multiple independent research angles. Primers use at most two workers. For stable or academic topics, the official-docs worker reads the primary source (paper, RFC, specification) and the frontier worker folds into the rationale worker.
 
 | Worker | Goal |
 |---|---|

@@ -12,7 +12,8 @@ Drops, using a real HTML parser rather than regexes:
   - closed <details> content, including anything nested in it — answer blocks:
     expected-value hedges ("the expected answer is X") are answers, not
     commitments-to-the-reader. A <details open> is visible prose and is scanned,
-    so wrapping a chapter in one cannot hide it.
+    so wrapping a chapter in one cannot hide it, and so is a collapsed
+    <details class="under-the-hood">, which holds mechanism prose, not answers.
   - <script> and <style> content, comments, and all markup — not reader prose.
   - exemptions (SKILL.md "Legitimate exceptions"), each listed by --report so a
     reviewer can audit it: <blockquote> and <q> (quoted material keeps its
@@ -72,7 +73,8 @@ class ProseExtractor(HTMLParser):
         if tag in SKIP:
             self.stack.append((tag, True))
         elif tag == "details":
-            self.stack.append((tag, "open" not in attrs))
+            classes = (attrs.get("class") or "").split()
+            self.stack.append((tag, "open" not in attrs and "under-the-hood" not in classes))
         elif tag in QUOTE or (reason and tag not in VOID):
             hidden = self.hidden()
             if not hidden:

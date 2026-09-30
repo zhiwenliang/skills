@@ -5,7 +5,7 @@ description: Builds multi-chapter HTML tutorials (index, concept map, learning p
 
 # Tech Tutorial Writer
 
-A tutorial that does not build a mental model is a long paraphrase of the docs. This skill produces professional, English-first technical tutorials that teach durable understanding: low extraneous load, diagrams that carry structure, worked examples, retrieval practice, spaced revisit, interleaving, mechanism depth, and current field context.
+A tutorial that does not build a mental model is a long paraphrase of the docs. This skill produces professional, English-first technical tutorials that teach durable understanding: low extraneous load, diagrams that carry structure, worked examples, retrieval practice, cumulative revisit, interleaving, mechanism depth, and current field context.
 
 Default output language is English. If the user explicitly requests another language, keep the same structure and verification intent. Localize visible headings and set `<html lang>` to the output language (the layout template ships `lang="en"`), but preserve stable `data-tech-tutorial` markers for structural gates.
 
@@ -37,7 +37,16 @@ Open the tutorial with visible headings in the output language and these semanti
 - `data-tech-tutorial="audience-not-for"`: readers who should take a different path.
 - `data-tech-tutorial="outcomes"`: concrete, verifiable capabilities.
 
-Do not try to serve novices and experts with the same explanation style. Expertise reversal makes that fail.
+Do not try to serve novices and experts with the same explanation style. Expertise reversal makes that fail. Phase 1 sets a reader level, and the level changes the scaffolding, not only the audience text:
+
+| Scaffold | Novice | Intermediate | Expert |
+|---|---|---|---|
+| Worked examples | One per core concept, before any question | For new mechanisms only | Only for the hardest one or two mechanisms |
+| Order within a section | Example, then explanation, then question | Explanation, then example | Prediction first, then explanation |
+| Mechanism depth | Surface model in `01-concepts`; mechanism in `02-principles` or a `<details class="under-the-hood">` block | Inline | Inline, with costs and failure boundaries up front |
+| Self-check | 3-4 focused questions per chapter | 2-3 | 2 hard questions, weighted to discrimination |
+
+The outcomes section opens with what the declared reader gains beyond the docs.
 
 ### 2. Map Before Territory
 
@@ -49,10 +58,11 @@ Each major section needs at least one information-carrying diagram when spatial 
 
 Rules:
 
-- At least one `<figure>` per chapter.
+- At least one non-empty `<figure>` per chapter. In the final self-check, the figure is the reference answer to the reader-drawing prompt, inside the answer `<details>`, not a decorative difficulty map.
 - Labels live on the diagram elements, not in distant prose.
 - Decorative images are deleted.
-- At least one reader-drawing prompt exists in the tutorial, usually in self-check or capstone, marked with `data-tech-tutorial="reader-drawing"` when the visible prompt is not English.
+- Show important concepts in 2-3 complementary representations, such as a diagram, a scenario walkthrough, and a contrasting case. Each one adds information. Do not restate a figure's labels in the prose next to it.
+- At least one reader-drawing prompt exists in the tutorial, usually in self-check or capstone, always marked with `data-tech-tutorial="reader-drawing"`.
 
 Use [references/diagram_guide.md](references/diagram_guide.md) for diagram selection and SVG verification rules.
 
@@ -70,29 +80,24 @@ Scale the worked-example ratio with reader level: novice-heavy tutorials use mor
 
 ### 5. Force Retrieval
 
-Every chapter ends with 2-4 self-check questions, with answers hidden in `<details>` or a separate answer section. Predictive questions in prose must appear before the reveal.
+Every chapter ends with self-check questions (count by reader level, above), with answers hidden in a `<details>` inside the `.self-check` section. The tutorial has at least three predictions (`.predict` with a `<details>` reveal), each asked before the explanation it tests, not only before its answer. The first one sits in `index.html`, before the reader starts.
 
-Question quality:
+Question quality depends on the layer:
 
-- Focused: one fact or decision per question.
-- Precise: no ambiguous wording.
-- Consistent: the answer does not change between readings.
-- Tractable: the target reader can usually answer it.
-- Effortful: requires retrieval, not copying words from the prompt.
+- Concept-layer questions are focused (one fact or decision), precise, consistent (the answer does not change between readings), tractable, and effortful (retrieval, not copying words from the prompt).
+- Mechanism and discrimination questions ask the reader to justify a choice. Their hidden answers give the reasoning points a good answer covers, not a single phrase.
 
 ### 6. Engineer Desirable Difficulty
 
 Smooth reading is not durable learning. Add productive friction:
 
-- Show important concepts in 2-3 shapes.
 - Include one "just out of reach" challenge per chapter.
-- Delay answer reveal with `<details>` or a separate section.
-- Warn the reader in `index.html` that fluency is not mastery.
-- Ban anesthetic words such as `obviously`, `trivially`, and `just`.
+- Ask before telling: the predictions above make the reader commit to an answer before the explanation arrives, so a wrong guess exposes the gap that smooth reading hides.
+- A one-line note in `index.html` that fluent reading is not mastery is optional; the index prediction does that work.
 
 ### 7. Interleave And Revisit
 
-Each chapter opens by recalling what the prior chapter contributed to the current one. Later examples reuse earlier concepts. The final self-check or capstone forces the reader to choose between approaches from at least two prior chapters.
+Each chapter opens with a recall question about what the prior chapter contributed, answered in a `<details>` and followed by a one-line restatement. A recap the reader only re-reads does not count. Later examples reuse earlier concepts. The final self-check or capstone forces the reader to choose between approaches from at least two prior chapters. This revisit is cumulative within one reading; the final self-check ends with a short set of questions to redo two or three days later.
 
 Block early practice when the reader is acquiring brand-new syntax. Interleave after there are multiple concepts to discriminate.
 
@@ -100,7 +105,8 @@ Block early practice when the reader is acquiring brand-new syntax. Interleave a
 
 The seven principles control how learning sticks. They do not guarantee depth. Use these lenses while researching and writing:
 
-- **One level below the docs**: "X does Y" becomes "X does Y by doing Z, which costs W and fails when V." A tutorial that stops at API surface is not finished.
+- **One level below the docs**: "X does Y" becomes "X does Y by doing Z, which costs W and fails when V." A tutorial that stops at API surface is not finished. Every core concept gets there somewhere in the tutorial; for novice readers it can arrive in a later chapter or an "Under the hood" block (see the reader-level table).
+- **Misconceptions first**: readers who already hold a wrong model absorb the right one into it. For each threshold or core concept, state the misconception the declared reader likely holds (from Phase 2 surprises and pitfalls), let a prediction or counterexample break it, then give the mechanism. Use the Misconception snippet in [references/tutorial_template.md](references/tutorial_template.md).
 - **Current field state**: for non-frozen subjects, name what is stable, what changed in roughly the last 6-12 months, and what is superseded or deprecated. Date this framing.
 
 Agent-internal moves:
@@ -170,22 +176,22 @@ Read and copy [references/layout-template.html](references/layout-template.html)
 
 ## File Scaffold
 
-Two files are invariant in multi-file HTML output:
+`index.html` and exactly one final `NN-self-check.html` are invariant in multi-file HTML output. `01-concepts` and `02-principles` are the default first chapters:
 
 ```
 <tech-name>/
 ├── index.html
 ├── 01-concepts.html
 ├── 02-principles.html
-├── 0N-<topic>.html
-└── 0X-self-check.html
+├── NN-<topic>.html
+└── NN-self-check.html
 ```
 
-The chapters between `index.html` and `*-self-check.html` come from the concept dependency graph. Do not pad to a fixed count.
+The chapters between `index.html` and `*-self-check.html` come from the concept dependency graph. Do not pad to a fixed count. Number chapters with two digits.
 
-Quick primer mode can be a single `index.html` with sections, concept map, worked example, and self-check inline.
+Quick primer mode is a single `index.html` with `<h2>` sections, a concept map, a worked example, at least three figures, three predictions, and an inline `.self-check` with hidden answers.
 
-Hands-on mode adds practice, pitfalls, and capstone chapters when the user asks for runnable code progression.
+Hands-on mode adds `NN-practice`, `NN-pitfalls`, and `NN-capstone` chapters, numbered after the topical chapters and before the self-check, when the user asks for runnable code progression.
 
 ## Workflow
 
@@ -197,7 +203,7 @@ Extract what the prompt already gives. Ask only what is genuinely missing:
 |---|---|
 | What exactly is the topic? | Sets boundary and chapter graph. |
 | Why now? | Evaluation, building, interview prep, and curiosity need different emphasis. |
-| What background should be assumed? | Calibrates expertise reversal. |
+| What background should be assumed? | Sets the reader level (novice, intermediate, expert) that scales scaffolding. |
 | Concept-focused or hands-on? | Selects scenario walkthroughs vs runnable progression. |
 | How deep and broad? | Primer, full tutorial, or deep dive. |
 
@@ -207,29 +213,7 @@ For a minimal one-shot request such as "give me a primer on Redux", make defensi
 
 Use current documentation lookup when available, then web/source research for design rationale, pitfalls, alternatives, and frontier state. See [references/research_workflow.md](references/research_workflow.md).
 
-When the research surface has at least three independent angles, fan out:
-
-| Worker | Focus |
-|---|---|
-| Official docs | API surface, examples, version notes, canonical terms. |
-| Design rationale + mechanism | Why the design exists and how it works below the API surface. |
-| Pitfalls + production experience | Specific failure modes, not generic warnings. |
-| Alternatives | Competing approaches and discrimination context. |
-| Frontier | Recent changes, emerging work, deprecations, each dated. |
-
-Every worker summary must end with:
-
-```
-## Surprises
-- ...
-```
-
-The official-docs worker also ends with:
-
-```
-## Terminology
-- <concept> | <canonical term> | <language handling> | <plain gloss>
-```
+Scale the fan-out to the job. A primer uses the lead thread alone or at most two workers. A full tutorial with at least three independent research angles fans out to the workers in [references/research_workflow.md](references/research_workflow.md) ("Parallel Research Strategy"), which also defines the `## Surprises` and `## Terminology` sections every worker must return. For stable or academic topics (a protocol from a paper or RFC), the docs worker reads the primary source instead of product docs, and the frontier worker folds into the rationale worker. Give each worker the output contract from that section verbatim; workers do not see this file.
 
 The lead thread synthesizes:
 
@@ -251,6 +235,7 @@ When approval is due, show the user one approval packet:
 3. Learning-path breadcrumb.
 4. Threshold concept as a plain-language claim built from standard terms.
 5. Dated frontier framing, or explicit note that the topic is stable.
+6. The two or three misconceptions the declared reader most likely holds.
 
 Do not coin a name for the threshold concept. Use a sentence about how the system works.
 
@@ -260,11 +245,11 @@ Use [references/tutorial_template.md](references/tutorial_template.md).
 
 Before each concept introduction, perform the Feynman test in scratch space: explain it in 50 jargon-free words. If that stalls, return to sources before writing.
 
-Parallelize independent chapter drafts only after the outline and dependency graph are locked. Give every chapter worker the Phase 2 term table, so drafts name concepts with standard terms instead of coining labels. The lead thread owns the coherence merge: breadcrumb, cross-chapter callbacks, term consistency, and duplicate-definition cleanup.
+Parallelize independent chapter drafts only after the outline and dependency graph are locked. Give every chapter worker the Phase 2 term table, so drafts name concepts with standard terms instead of coining labels. Workers and reference files do not expand `${CLAUDE_PLUGIN_ROOT}`, so pass them absolute paths to the layout template and scripts, resolved from the paths in this file. The lead thread owns the coherence merge: breadcrumb, cross-chapter callbacks, term consistency, and duplicate-definition cleanup.
 
 ### Phase 5 - Verify
 
-Run the structural script:
+Run the structural script. It parses the HTML and checks the self-check chapter's name and position, audience markers, non-empty figures, SVG utility CSS, the reader-drawing marker, retrieval (hidden-answer self-checks in every chapter and at least three predictions), and integrity (no leftover `{{placeholders}}`, broken relative links or anchors, duplicate ids, or missing `<html lang>`):
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh" <tutorial-dir>
@@ -297,23 +282,27 @@ For SVGs:
 1. Serve the tutorial folder locally.
 2. Open each chapter in a browser.
 3. Evaluate `"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/svg_overflow_check.js"` against the page. Read it from that path: the working directory is the tutorial folder, so a bare `scripts/...` path does not resolve. Fix each violation and re-run until it returns `OK: no SVG text defects`; a collision verified benign on a screenshot can be exempted with `data-collision-ok` on either `<text>`.
-4. Capture every figure as `<chapter>-figN.png` (for example `01-concepts-fig2.png`) into a screenshot folder outside the tutorial, and inspect connector crossings, label collisions, arrow piercing, and cropping.
+4. Capture every figure as `<chapter>-figN.png`, numbered in page order from 1 (for example `01-concepts-fig2.png`), into a screenshot folder outside the tutorial, and inspect connector crossings, label collisions, arrow piercing, and cropping. If the browser tool saves screenshots under its own names or folder, copy and rename them into that folder. Take screenshots after the last HTML edit: the gate rejects screenshots older than the chapter.
+
+If no browser tool is available, skip steps 1-4, say in the delivery note that the SVGs were not render-checked, and do not claim that they pass.
 5. Re-run:
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh" <tutorial-dir> <screenshot-dir>
 ```
 
-Also verify:
+The scripts cannot judge the rest. Check these by reading, and cite a file and line for each in the delivery note:
 
-- Answers are hidden from prompts.
-- Discrimination scenarios exist.
-- Code examples run, or the tutorial clearly states what was not run.
-- Further reading links are real.
-- The insight-check sentence (what an experienced engineer gains beyond the docs) exists in "What you can do after reading".
-- Every core concept goes one level below docs.
+- The outcomes section (`data-tech-tutorial="outcomes"`) opens with what the declared reader gains beyond the docs.
+- Every core concept goes one level below the docs somewhere in the tutorial.
+- Each misconception from Phase 3 is broken by a prediction or counterexample before the mechanism is stated.
+- Discrimination scenarios force a choice between concepts from different chapters.
+- Scaffolding matches the reader level.
 - Frontier framing is dated where the field is moving.
-- The checklists in [references/tutorial_template.md](references/tutorial_template.md) pass: the Index checklist, each chapter type's checklist, and the Full Tutorial Checklist.
+- Code examples run, or the tutorial clearly states what was not run.
+- External further-reading links are real.
+
+Then walk the judgment items in the checklists in [references/tutorial_template.md](references/tutorial_template.md). Items marked (auto) are already covered by the scripts.
 
 ## Knowledge Libraries
 

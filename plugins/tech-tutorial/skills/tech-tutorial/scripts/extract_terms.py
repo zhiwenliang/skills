@@ -7,16 +7,19 @@ was given — so the standard-or-coined judgment runs over a complete, determini
 list instead of whatever the auditor's eye happens to catch.
 
 Collects, from every top-level .html file:
-  - <strong> / <b> / <dfn> text              (emphasized or defined concept names)
-  - <h1>-<h4> text                           (section titles)
+  - <strong> / <b> / <em> / <i> / <dfn> text (emphasized or defined concept names)
+  - <h1>-<h6> text, <summary> text           (section and disclosure titles)
+  - table <caption> / <th> text and callout <span class="label"> text
   - <figcaption> text and <svg aria-label>   (figure titles)
   - SVG <text> labels                        (names given inside diagrams)
   - quoted spans in prose: "...", '...', their curly forms, and 「...」 『...』 《...》
 
 Skips <pre>/<code>/<script>/<style> content and the layout template's numbering
 spans (<span class="num"> / <span class="fig-num">), so "1.1" is not glued onto a
-section title. Candidates longer than 40 chars are dropped (those are sentences,
-not names), as are pure numbers. Output is deduplicated by term, keeping the first
+section title. A captured run longer than 40 chars is split into sentences
+(a long figcaption often names the figure in its first sentence) and sentences
+still longer than 40 chars are dropped (those are prose, not names), as are
+pure numbers and bare figure numbers ("Fig. 2."). Output is deduplicated by term, keeping the first
 location seen.
 
 Usage:  python3 "${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/extract_terms.py" <tutorial-dir>
@@ -30,7 +33,8 @@ import re
 import sys
 from html.parser import HTMLParser
 
-CAPTURE = {"strong", "b", "dfn", "h1", "h2", "h3", "h4", "figcaption", "text"}
+CAPTURE = {"strong", "b", "em", "i", "dfn", "h1", "h2", "h3", "h4", "h5", "h6",
+           "summary", "caption", "th", "figcaption", "text"}
 SKIP = {"pre", "code", "script", "style"}
 NUMBERING = {"num", "fig-num"}  # layout-template classes for "1.1", "§", "Fig. 1.1"
 # Straight quotes double as apostrophes (don't, users') and inch marks (3.5"), and
@@ -48,13 +52,15 @@ QUOTE_RE = re.compile(
     r"|“([^”]{1,40})”|「([^」]{1,40})」|『([^』]{1,40})』|《([^》]{1,40})》"
 )
 MAX_LEN = 40
+SENTENCE_END = re.compile(r"(?<=[.!?。！？])\s+(?=[A-Z\u4e00-\u9fff])")
+FIGURE_NUMBER = re.compile(r"^(Fig|Figure|Table)\.?\s*[\d.]+$", re.I)
 
 
 class TermParser(HTMLParser):
     def __init__(self):
         super().__init__()
         self.skip_depth = 0
-        self.spans = []    # open <span>s: True when it is a numbering span
+        self.spans = []    # open <span>s: (numbering span?, callout label?)
         self.frames = []   # open capture frames: [tag, text-parts]
         self.terms = []    # (term, where)
         self.prose = []    # text outside skip tags, scanned for quoted spans
@@ -64,7 +70,10 @@ class TermParser(HTMLParser):
             self.skip_depth += 1
         elif tag == "span":
             classes = (dict(attrs).get("class") or "").split()
-            self.spans.append(bool(NUMBERING.intersection(classes)))
+            label = "label" in classes
+            self.spans.append((bool(NUMBERING.intersection(classes)), label))
+            if label:
+                self.frames.append(["span", []])
         elif tag in CAPTURE:
             self.frames.append([tag, []])
         if tag == "svg":
@@ -76,19 +85,22 @@ class TermParser(HTMLParser):
         if tag in SKIP:
             self.skip_depth = max(0, self.skip_depth - 1)
         elif tag == "span":
-            if self.spans:
-                self.spans.pop()
+            if self.spans and self.spans.pop()[1]:
+                self.close_frame("span", "span.label")
         elif tag in CAPTURE:
-            for i in range(len(self.frames) - 1, -1, -1):
-                if self.frames[i][0] == tag:
-                    text = " ".join("".join(self.frames[i][1]).split())
-                    if text:
-                        self.terms.append((text, "<%s>" % tag))
-                    del self.frames[i]
-                    break
+            self.close_frame(tag, "<%s>" % tag)
+
+    def close_frame(self, tag, where):
+        for i in range(len(self.frames) - 1, -1, -1):
+            if self.frames[i][0] == tag:
+                text = " ".join("".join(self.frames[i][1]).split())
+                if text:
+                    self.terms.append((text, where))
+                del self.frames[i]
+                break
 
     def handle_data(self, data):
-        if self.skip_depth or any(self.spans):
+        if self.skip_depth or any(numbering for numbering, _ in self.spans):
             return
         for frame in self.frames:
             frame[1].append(data)
@@ -96,7 +108,13 @@ class TermParser(HTMLParser):
 
 
 def is_candidate(term):
-    return 0 < len(term) <= MAX_LEN and not term.isdigit()
+    return 0 < len(term) <= MAX_LEN and not term.isdigit() and not FIGURE_NUMBER.match(term)
+
+
+def candidates(term):
+    if len(term) <= MAX_LEN:
+        return [term]
+    return [t for t in SENTENCE_END.split(term) if len(t) <= MAX_LEN]
 
 
 def main():
@@ -114,9 +132,9 @@ def main():
         parser.close()
         base = os.path.basename(f)
         for term, where in parser.terms:
-            term = " ".join(term.split())
-            if is_candidate(term):
-                seen.setdefault(term, "%s:%s" % (base, where))
+            for term in candidates(" ".join(term.split())):
+                if is_candidate(term):
+                    seen.setdefault(term, "%s:%s" % (base, where))
         # Tags separate text runs, so join runs with a newline: gluing them would
         # hide the non-word character a straight quote needs before it to open.
         for m in QUOTE_RE.finditer("\n".join(parser.prose)):
