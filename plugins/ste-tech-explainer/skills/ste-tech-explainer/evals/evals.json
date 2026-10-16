@@ -1,0 +1,87 @@
+{
+  "skill_name": "ste-tech-explainer",
+  "evaluation_note": "Manual behavioral checks. Judge factual correctness, causal continuity, reader fit, and explicit user constraints; do not grade by fixed headings or wording. Passing these cases does not establish human learning gains.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "novice-dns",
+      "prompt": "我完全不懂网络，只知道在浏览器里输入网址就能打开网页。请解释 DNS：它解决什么问题，从输入网址到找到服务器发生了什么？先让我弄懂这一件事，暂时不要展开各种记录类型和配置方法。",
+      "expected_output": "围绕域名如何得到地址解释DNS；明确缓存会改变查找过程，区分找到地址与取得网页。",
+      "assertions": [
+        "为新手就地解释必要术语，主体与步骤能追踪。",
+        "不展开记录类型或配置方法，不把每次访问写成必然完整查找。"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "experienced-rust-reader",
+      "prompt": "我是 Java 后端工程师，熟悉线程、锁和数据库事务。请解释 Rust 的 lifetime annotation 到底约束了什么，重点说明它与“延长对象存活时间”有何区别，以及为什么只在某些函数签名中需要显式标注。不要从变量、函数和内存的基本概念讲起，不要给完整入门课程。",
+      "expected_output": "直接解释lifetime标注的编译期约束及省略规则，与延长对象存活区分。",
+      "assertions": [
+        "利用已有编程背景，不重讲变量或函数基础。",
+        "若使用代码，例子能够区分签名约束与实际对象存活，且验证声明如实。"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "concise-idempotency",
+      "prompt": "我知道 HTTP 请求是什么。用不超过 100 个汉字解释“幂等性”，给一个一句话例子。不要代码、表格、图、自测题或延伸阅读。",
+      "expected_output": "100个汉字以内解释重复请求的预期效果，并给一句话例子。",
+      "assertions": [
+        "不把幂等性解释成只能执行一次或响应必须相同。",
+        "不输出用户排除的代码、表格、图、自测或延伸阅读。"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "postgresql-implementation-boundary",
+      "prompt": "只要使用可重复读，事务就不会有任何并发异常，对吧？我正在用 PostgreSQL 18。请解释这个结论，并说明这是不是所有数据库里的可重复读都保证的事情。只讨论这个判断，不用写代码。",
+      "expected_output": "纠正可重复读消除所有并发异常的前提，并区分PostgreSQL18和其他实现。",
+      "assertions": [
+        "用一个足够小的场景说明稳定视图与共同提交结果的差别。",
+        "核实目标版本的一手资料，不把产品实现泛化为所有数据库，不写代码。"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "python-execution-evidence",
+      "prompt": "我懂 Python 的 list 和函数。请解释为什么浅拷贝后，修改嵌套列表还可能影响原列表。给一个不超过 15 行、只用标准库的最小例子，写出预期输出。若你能在当前环境运行，就运行这个例子，并区分实际输出与解释；若不能运行，就明确标为推演。不要改我的文件。",
+      "expected_output": "用不超过15行的标准库或内置功能示例说明浅拷贝的内外层对象关系。",
+      "assertions": [
+        "展示代码和预期输出；能运行时实际运行并区分观察与推演。",
+        "若不能运行明确说明；不修改用户文件，不引入无关依赖。"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "concurrency-order-preservation",
+      "prompt": "请解释并发和并行的区别。假设程序要发出两个互不依赖的网络请求 A 和 B，每个请求都要等待响应。用这个场景说明哪些动作可以重叠，哪些动作必须有先后关系，以及“两个请求一起等”是否就意味着 CPU 在两个核心上同时执行它们。只用文字或一张小图，不写代码。",
+      "expected_output": "在两个独立网络请求的同一场景中解释并发、并行、重叠与必要顺序。",
+      "assertions": [
+        "不把等待响应等同于占用两个CPU核心。",
+        "保留每个请求内部及结果依赖的顺序，独立请求不被误写成必须串行。",
+        "只用文字或一张小图，不写代码。"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "condition-and-permission",
+      "prompt": "请解释“只有通过校验，系统才允许导入”与“通过校验后，系统就会导入”是否等价。只分析条件逻辑，别补造产品行为。",
+      "expected_output": "区分必要条件、充分条件，以及允许导入和实际执行导入。",
+      "assertions": [
+        "条件方向和语气保真；不把只有改成如果或把允许改成必然执行。",
+        "不补造产品行为。"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "explain-a-failure-phenomenon",
+      "prompt": "我会线程和锁。请解释死锁为什么形成，用两个线程和两把锁的过程讲清楚；不用讲预防方案，不要代码或自测。",
+      "expected_output": "沿两个线程与两把锁的状态变化解释死锁形成的因果。",
+      "assertions": [
+        "明确必要假设，说明等待环何时形成及为何不能继续。",
+        "不强加解决方案的引入目的，不展开预防、代码或自测。"
+      ]
+    }
+  ]
+}

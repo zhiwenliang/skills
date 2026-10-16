@@ -1,0 +1,17 @@
+{
+  "name": "ste-tech-explainer",
+  "version": "0.1.0",
+  "description": "Explains technical concepts in Chinese with STE-inspired terminology, explicit conditions, causal examples, and scoped claims. Adapts depth to reader background and requested length.",
+  "author": {
+    "name": "Zhiwen Liang"
+  },
+  "repository": "https://github.com/zhiwenliang/skills",
+  "license": "MIT",
+  "keywords": [
+    "technical-explanation",
+    "simplified-technical-english",
+    "chinese",
+    "learning",
+    "documentation"
+  ]
+}

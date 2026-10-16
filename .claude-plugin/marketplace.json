@@ -52,6 +52,24 @@
       "repository": "https://github.com/zhiwenliang/skills",
       "keywords": ["article", "explanation", "writing", "mermaid", "learning"],
       "category": "learning"
+    },
+    {
+      "name": "ste-tech-explainer",
+      "source": "./plugins/ste-tech-explainer",
+      "description": "Explains technical concepts in Chinese with STE-inspired terminology, explicit conditions, causal examples, and scoped claims. Adapts depth to reader background and requested length.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Zhiwen Liang"
+      },
+      "repository": "https://github.com/zhiwenliang/skills",
+      "keywords": [
+        "technical-explanation",
+        "simplified-technical-english",
+        "chinese",
+        "learning",
+        "documentation"
+      ],
+      "category": "learning"
     }
   ]
 }

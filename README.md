@@ -12,6 +12,7 @@ In Claude Code:
 /plugin install visual-explainer@zhiwen-skills
 /plugin install book-to-skill@zhiwen-skills
 /plugin install explain-article@zhiwen-skills
+/plugin install ste-tech-explainer@zhiwen-skills
 ```
 
 `/plugin marketplace update` refreshes after upstream changes.
@@ -41,6 +42,12 @@ Transforms book-like sources into focused agent skills with source maps, eval pr
 Writes researched explanatory Markdown articles that combine reader assumptions, causal mechanisms, concrete examples, default Mermaid diagrams, boundaries, and understanding checks.
 
 [`plugins/explain-article/`](./plugins/explain-article)
+
+### `ste-tech-explainer`
+
+Explains technical concepts in Chinese with STE-inspired terminology, explicit conditions, causal examples, and scoped claims. Adapts depth to reader background and requested length. Designed for focused conversational explanations, with optional code, diagrams, and self-checks when they help the requested task.
+
+[`plugins/ste-tech-explainer/`](./plugins/ste-tech-explainer)
 
 ## Repository structure
 
