@@ -133,6 +133,30 @@ print(parse("5").value)  # 5
 
 Escape `<`, `>`, and `&` inside `<pre><code>`. Prism handles syntax tokens; do not wrap tokens manually.
 
+### Hands-on Procedure And Result
+
+Use for a meaningful runnable step, not every sentence in a conceptual explanation. Keep long rationale and alternative approaches outside the numbered steps. Fill only the setup details this example needs; adapt the labels to the output language.
+
+```html
+<section>
+  <h2>{{task with an observable outcome}}</h2>
+  <p>{{required environment/version, working directory, dependencies,
+       initial input state, and material side effects}}</p>
+  <p>{{complete program or fragment; if a fragment, what supplies its context}}</p>
+  <ol>
+    <li>
+      <p>{{applicable condition or goal}}: {{imperative action and explicit object}}.</p>
+      <pre><code>{{command or invocation}}</code></pre>
+      <p>Expected result: {{observable output or state, and what it establishes}}.</p>
+      <p>{{likely wrong-path symptom, if useful}}: {{targeted recovery check}}.</p>
+    </li>
+  </ol>
+  <p>{{validation status: actual environment and observed result, or explicitly not run}}</p>
+</section>
+```
+
+Optional work must remain optional, and required simultaneous actions must remain simultaneous. Expected output is not evidence of execution. A snippet that writes files or starts a service must disclose that effect before the command.
+
 ### Predictive Question
 
 ```html
@@ -519,8 +543,12 @@ Checklist:
 ### Examples
 
 - [ ] Each new concept has a worked example or scenario walkthrough.
+- [ ] A coherent scenario connects related mechanisms; contrasting cases vary a relevant condition and later transfer tasks use fresh situations.
 - [ ] Hands-on practice uses worked -> partial -> open progression.
 - [ ] Partial examples leave meaningful decisions blank.
+- [ ] A worked decision asks why the step is valid; its answer names the governing principle or condition.
+- [ ] Runnable examples state required setup, execution context, invocation, and observable results; fragments identify missing context.
+- [ ] Teaching assumptions, expected results, and observed outputs are distinguished, with a recovery check where a wrong turn is likely.
 
 ### Retrieval
 
@@ -539,6 +567,15 @@ Checklist:
 - [ ] (auto, English) No marketing filler.
 - [ ] (auto, English) No first-person author narration except explicit epistemic notes.
 - [ ] (auto, English) No pedagogy jargon leaks into reader prose.
+
+### Meaning And Terminology (Manual)
+
+- [ ] A canonical term and any defined short form stay consistent across prose, code explanations, diagram labels, and hidden answers.
+- [ ] New terms are defined near use; ambiguous pronouns name the object explicitly.
+- [ ] Revisions retain necessary versus sufficient conditions, permission versus obligation, negation, quantifiers, concurrent actions, and uncertainty.
+- [ ] Short sentences form connected reasoning; simplification preserves causal mechanisms, version scope, and failure boundaries.
+- [ ] Chinese applies clarity principles without an invented character cap or a formal STE compliance claim.
+- [ ] Supported uncertainty survives any prose-scan fix; justified exemptions are narrow and used only for actual scan hits.
 
 ### Depth And Currency
 

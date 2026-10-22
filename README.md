@@ -21,7 +21,7 @@ In Claude Code:
 
 ### `tech-tutorial`
 
-Builds English-first, cognitive-science-aligned HTML tutorials for technical topics. Concept-focused by default (scenario walkthroughs that build mental models), with an optional hands-on mode (runnable code progression). The structure is a scaffold — index first, self-check last, and topical chapters in between sized by a concept dependency graph rather than a fixed count. Grounded in research on encoding, learning depth, and current field context.
+Builds English-first HTML tutorials with cognitive-science learning design and STE-inspired clarity, including Chinese adaptation when requested. Concept-focused by default, with optional runnable hands-on progression. Chapters follow concept dependencies and preserve mechanisms, conditions, terminology, and verification limits.
 
 [`plugins/tech-tutorial/`](./plugins/tech-tutorial)
 

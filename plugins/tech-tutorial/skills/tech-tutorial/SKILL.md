@@ -1,11 +1,11 @@
 ---
 name: tech-tutorial
-description: Use when the user wants to learn, understand, or teach a technology, framework, library, protocol, tool, or technical concept, or build a knowledge base of tutorials. Produces English-first HTML tutorials, from a single-page primer to a multi-chapter course, with a concept map, learning path, and self-checks. Triggers include "teach me X", "I want to learn X", "help me understand X", "give me a primer", "write a tutorial about X", "turn these docs into a tutorial", "系统学习 X", "教我 X", "写一套 X 教程", or requests for a structured learning path. For a written explanatory article use explain-article; for one standalone diagram use visual-explainer.
+description: Use when the user wants a structured technical learning path, from a primer to a multi-chapter course, or a knowledge base of tutorials. Triggers include "teach me X", "I want to learn X", "give me a primer", "write a tutorial", "turn these docs into a tutorial", "系统学习 X", "教我 X", or "写一套 X 教程". For a written explanatory article use explain-article; for one standalone diagram use visual-explainer.
 ---
 
 # Tech Tutorial Writer
 
-A tutorial that does not build a mental model is a long paraphrase of the docs. This skill produces professional, English-first technical tutorials that teach durable understanding: low extraneous load, diagrams that carry structure, worked examples, retrieval practice, cumulative revisit, interleaving, mechanism depth, and current field context.
+A tutorial that does not build a mental model is a long paraphrase of the docs. This skill produces professional, English-first technical tutorials that teach durable understanding: clear technical language, diagrams that carry structure, worked examples, retrieval practice, cumulative revisit, interleaving, mechanism depth, and current field context.
 
 Default output language is English. If the user explicitly requests another language, keep the same structure and verification intent. Localize visible headings and set `<html lang>` to the output language (the layout template ships `lang="en"`), but preserve stable `data-tech-tutorial` markers for structural gates.
 
@@ -23,7 +23,7 @@ Do not use it for:
 
 If intent is ambiguous, ask one question: "Do you want me to build something with this technology, or teach the technology itself?" If the doubt is about form, ask instead: "Do you want a structured multi-chapter tutorial, or a single article or diagram?" A quick "why does X exist" question about one concept, with no request for a tutorial or study material, is better answered directly or, if the user wants a written article, with `explain-article`.
 
-Diataxis is the routing vocabulary: this skill owns the tutorial quadrant and study-oriented explanation delivered as a learning path. A single explanatory article belongs to `explain-article`. Route work-oriented how-to and reference requests away unless the user asks to turn them into a learning artifact.
+Diátaxis supplies the routing vocabulary: distinguish learning from completing a work task, and practical instruction from explanation. Hands-on mode follows its practical tutorial guidance. Concept-focused mode combines explanation and practice in a study path; it is this skill's adaptation, not a strict Diátaxis tutorial. A single explanatory article belongs to `explain-article`. Route work-oriented how-to and reference requests away unless the user asks to turn them into a learning artifact.
 
 ## Learning Principles
 
@@ -78,6 +78,8 @@ For a new concept, lead with a worked example before asking the reader to solve.
 
 Scale the worked-example ratio with reader level: novice-heavy tutorials use more worked examples; expert tutorials can shift faster to open practice.
 
+Reuse one coherent scenario while it still explains the mechanisms; change one condition to expose a boundary before switching domains. At a meaningful worked-example decision, ask why the step is valid under the stated conditions. The hidden answer names the governing principle, not a paraphrase of the code.
+
 ### 5. Force Retrieval
 
 Every chapter except `index.html` ends with self-check questions (count by reader level, above), with answers hidden in a `<details>` inside the `.self-check` section. The final `NN-self-check.html` is all questions and hides its answers in a final `<details>` instead; a single-file primer carries its `.self-check` in `index.html`. The tutorial has at least three predictions (`.predict` with a `<details>` reveal), each asked before the explanation it tests, not only before its answer. The first one sits in `index.html`, before the reader starts.
@@ -89,7 +91,7 @@ Question quality depends on the layer:
 
 ### 6. Engineer Desirable Difficulty
 
-Smooth reading is not durable learning. Add productive friction:
+Smooth reading alone does not establish durable learning. Add productive friction:
 
 - Include one "just out of reach" challenge per chapter.
 - Ask before telling: the predictions above make the reader commit to an answer before the explanation arrives, so a wrong guess exposes the gap that smooth reading hides.
@@ -120,20 +122,26 @@ Agent-internal moves:
 
 Write for working professionals.
 
-Hard rules:
+Use the STE-inspired practices below. This skill does not perform formal ASD-STE100 compliance checking. For Chinese, borrow its clarity principles; do not apply English word limits as character limits. Read [references/clear_technical_writing.md](references/clear_technical_writing.md) when drafting or revising prose, conditions, or procedures; it contains bilingual examples, the research comparison, and source-access limits.
 
-- Use active voice and present tense.
+Writing rules:
+
+- Prefer active voice with an explicit actor. Use present tense for current behavior; preserve tense when reporting history, predictions, or actual test results.
 - Use imperative mood for instructions.
-- Put one concept in one sentence when the topic is new.
-- Prefer specific names, numbers, versions, and conditions over hedges.
+- Give a sentence one main teaching point. Keep necessary causal and conditional clauses; connect short sentences into paragraphs that explain how the result follows.
+- Put applicability conditions before the action. State the actor, object, and result; replace a pronoun when it could refer to more than one object.
+- Preserve negation, quantifiers, condition direction, permissions, and timing. “Only if” is not “if”; “may” is not “must”; simultaneous actions must remain simultaneous.
+- Prefer specific names, numbers, versions, and conditions over unsupported hedges. Keep supported uncertainty and unverified limits; never make a claim certain to satisfy a prose scan.
 - Use the field's standard terms. Do not invent labels.
 - Keep pedagogy vocabulary out of reader-facing prose unless the tutorial subject itself is pedagogy.
 
 Terminology discipline:
 
 - Naming is precise and standard.
+- Use one canonical term per concept. Define any accepted short form once; do not alternate synonyms for variety or collapse distinct concepts into one name.
 - Explanation is plain and concrete.
 - If the community keeps an English term, keep it.
+- On first use, give an unfamiliar term a plain definition or link to its definition. Keep terminology aligned across prose, code identifiers, diagram labels, and hidden answers; identifiers retain their exact spelling.
 - If no standard term exists, describe the thing in plain words instead of coining a noun.
 - Analogies are temporary teaching aids. Do not reuse an analogy as if it were an established term.
 
@@ -157,7 +165,7 @@ Legitimate exceptions:
 - Explicit epistemic notes may say what was not verified.
 - Domain uncertainty can be stated precisely.
 
-Mark each of these with `<blockquote>`, `<q>`, `<cite>`, or `data-prose-exempt="<reason>"` so the prose scan skips it (Phase 5). Titles in the Further Reading footer (`class="references"`) are skipped without marking.
+Quoted material uses `<blockquote>`, `<q>`, or `<cite>`; code uses code elements. For a justified epistemic or domain-language hit, use a narrowly scoped `data-prose-exempt="<reason>"` (Phase 5). Add it only if the scan flags the wording. Hidden answers and titles in the Further Reading footer (`class="references"`) are skipped automatically. These are scan exceptions, not exceptions to accuracy or terminology review.
 
 ## Output Format
 
@@ -226,6 +234,8 @@ The lead thread synthesizes:
 - Term table.
 - Frontier map: stable, in flux, superseded.
 
+Keep the term table in authoring notes: canonical term, chosen output-language form, accepted short form, first-use definition, and source. Include easily confused neighbors. Introduce terms near use instead of placing an exhaustive glossary before the first example. Track implementation/version scope and verification status for material claims in the source log; do not silently turn a teaching assumption or expected result into an observed fact.
+
 ### Phase 3 - Outline Approval
 
 Stop for approval only when all three hold: the session can take a reply (an interactive conversation, not a headless or scripted run); the output is a multi-file full tutorial or deep dive; and the scope is ambiguous or broad (more than about five topical chapters). Otherwise, including primers, single-file output, and a user who said to go ahead, do not stop. Put the packet into `index.html` (the outline in the learning path, the threshold concept in "The core idea", the frontier in the field-state block) and record the scope, depth, and mode you assumed in the `audience-for` section, then draft.
@@ -246,6 +256,10 @@ Do not coin a name for the threshold concept. Use a sentence about how the syste
 Use [references/tutorial_template.md](references/tutorial_template.md).
 
 Before each concept introduction, perform the Feynman test in scratch space: explain it in 50 jargon-free words. If that stalls, return to sources before writing.
+
+Treat 50 words as an authoring prompt, not a scientific threshold or a reader-facing limit. Keep essential technical terms and explain them when replacing them would make the mechanism less accurate. Apply the same test qualitatively in Chinese, without converting the number into a character cap.
+
+For hands-on examples, state prerequisites and execution context before commands, identify complete programs versus fragments, and give the invocation and expected observable result. Add a likely wrong-path signal and a relevant recovery check when needed. Label results as observed or expected, and disclose what was not run. Put extended rationale outside the numbered procedure so the learner can follow one supported path. Use the procedure snippet in [references/tutorial_template.md](references/tutorial_template.md).
 
 Parallelize independent chapter drafts only after the outline and dependency graph are locked. Give every chapter worker the Phase 2 term table, so drafts name concepts with standard terms instead of coining labels. Workers and reference files do not expand `${CLAUDE_PLUGIN_ROOT}`, so pass them absolute paths to the layout template and scripts, resolved from the paths in this file. The lead thread owns the coherence merge: breadcrumb, cross-chapter callbacks, term consistency, and duplicate-definition cleanup.
 
@@ -270,7 +284,7 @@ This checks forbidden English voice phrases, first-person author narration, and 
 - Each exemption prints as an `EXEMPT` line. Summarize them in the delivery note.
 - A `data-prose-exempt` that hides no banned phrase fails the run as `UNUSED`. Remove it: a stale exemption would hide the next hit written inside it.
 
-The scans are English-only. A chapter whose `<html lang>` or prose is not English prints `NOT CHECKED`. For those chapters, add an equivalent voice review in the requested language.
+The scans are English-only and are not an ASD-STE100 checker. A chapter whose `<html lang>` or prose is not English prints `NOT CHECKED`. For those chapters, add an equivalent voice review in the requested language. A scan pass proves none of technical accuracy, semantic preservation, or learning effectiveness.
 
 Run terminology enumeration:
 
@@ -310,6 +324,9 @@ The scripts cannot judge the rest. Check these by reading, and cite a file and l
 - Scaffolding matches the reader level.
 - Frontier framing is dated where the field is moving.
 - Code examples run, or the tutorial clearly states what was not run.
+- Hands-on examples give prerequisites, execution context, invocation, and observable results; teaching assumptions and expected results are distinct from observed behavior.
+- The clarity pass preserves conditions, permission versus obligation, concurrency, negation, uncertainty, and version scope. Review hidden answers, diagrams, and code explanations too; the prose scan skips some of these.
+- Canonical terms and accepted short forms stay consistent across chapters. Simpler wording retains the causal chain and the reader-level mechanism depth.
 - External further-reading links are real.
 
 Then walk the judgment items in the checklists in [references/tutorial_template.md](references/tutorial_template.md). Items marked (auto) are already covered by the scripts.
@@ -329,6 +346,7 @@ Skip this for one-off tutorials or when the host system has its own navigation.
 ## What To Read Next
 
 - [references/cognitive_principles.md](references/cognitive_principles.md) - research basis for the learning principles.
+- [references/clear_technical_writing.md](references/clear_technical_writing.md) - STE-inspired expression rules, bilingual examples, related frameworks, and evidence limits.
 - [references/tutorial_template.md](references/tutorial_template.md) - chapter templates and completeness checklist.
 - [references/research_workflow.md](references/research_workflow.md) - source strategy and current-docs workflow.
 - [references/diagram_guide.md](references/diagram_guide.md) - diagram selection and SVG verification.

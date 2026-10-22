@@ -102,6 +102,8 @@ The official-docs worker also returns:
 
 `language handling` means how to render the term in the requested tutorial language. For English output, this is usually `standard English term`. For another requested language, record whether the field uses a local translation or keeps the English term.
 
+The lead thread enriches this into the authoring term table: chosen form, accepted short form, first-use definition, and supporting source. Include easily confused concepts; a naming choice must not merge different mechanisms. Keep code identifiers exact and make diagram labels recognizable as the same concepts.
+
 The lead thread extracts these sections mechanically. If a required header is missing, re-prompt the worker.
 
 ## Source Log
@@ -113,9 +115,14 @@ Keep a scratch `sources.md` while researching:
   trust: high|medium|low
   used_for: <section>
   key_claim: <one-line summary>
+  scope: <implementation, version, and applicability conditions>
+  evidence: <directly checked text | indexed excerpt | abstract only | unavailable>
+  example_status: <observed in stated environment | expected from source | teaching assumption | not applicable>
 ```
 
 This makes chapter "Further reading" sections fast and auditable.
+
+For a material claim, the linked passage must support that claim and its scope. Record an access gap instead of treating a search snippet as the whole standard, an abstract as a full study, or a planned command as a completed test. Distinguish source-backed facts from invented teaching data and outputs that have not been run. When simplifying source wording, preserve permissions, condition direction, timing, negation, and uncertainty.
 
 ## Stop Criteria
 

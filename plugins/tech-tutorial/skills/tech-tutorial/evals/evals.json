@@ -59,7 +59,16 @@
       "routes_to_explain_article",
       "routes_to_visual_explainer",
       "no_multi_chapter_tutorial_for_article_request",
-      "voice_reviewed_in_output_language"
+      "voice_reviewed_in_output_language",
+      "chinese_ste_adaptation_has_no_compliance_claim_or_character_cap",
+      "preserves_causal_chain_and_boundaries",
+      "preserves_modality_conditions_and_uncertainty",
+      "preserves_temporal_and_parallel_relations",
+      "procedure_establishes_environment_and_working_directory",
+      "actions_have_observable_results_and_wrong_path_checks",
+      "distinguishes_expected_from_observed_results",
+      "adapts_scaffolding_without_removing_mechanism_or_boundaries",
+      "keeps_necessary_established_technical_terms"
     ],
     "mixed": [
       "has_concept_map",
@@ -100,6 +109,18 @@
       "has_learning_path": "every .html has a .learning-path element",
       "structure_gates_pass": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_structure.sh\" <dir> exits 0",
       "prose_gates_pass": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/tech-tutorial/scripts/verify_prose.sh\" <dir> exits 0; any EXEMPT lines are justified in the delivery note"
+    },
+    "_qualitative_checks": {
+      "_comment": "These rubrics apply to cases 17-20. Judge meaning and usable reader behavior, not exact wording. A listed assertion passes only when its semantic requirements hold; a material contradiction or omission fails it. No behavioral baseline or candidate output has been measured merely by adding these cases.",
+      "chinese_ste_adaptation_has_no_compliance_claim_or_character_cap": "Uses clear Chinese as an adaptation of STE principles. Fails if it claims formal Chinese ASD-STE100 compliance, converts English word limits into a Chinese character limit, or imposes an unsupported fixed character cap.",
+      "preserves_causal_chain_and_boundaries": "Explains the supplied cause, intervening mechanism, result, and applicable boundary without replacing them with slogans or unexplained labels. Fails if simplification changes why the result occurs or extends a guarantee beyond its stated conditions.",
+      "preserves_modality_conditions_and_uncertainty": "Preserves permission versus obligation, every material prerequisite, version scope, conditional benefit, and unverified status. Fails if may becomes must or will, an optional action becomes mandatory, or an unverified result becomes a confirmed claim.",
+      "preserves_temporal_and_parallel_relations": "Keeps only-after as a prerequisite and preserves actions that occur concurrently. Fails if sequencing words reverse the dependency or turn simultaneous actions into consecutive steps.",
+      "procedure_establishes_environment_and_working_directory": "Names the supplied shell/runtime assumptions, establishes a working directory, creates needed inputs, and makes relative paths resolvable from the stated location. Fails if a reader starting elsewhere must guess setup, file contents, or the command's working directory.",
+      "actions_have_observable_results_and_wrong_path_checks": "Pairs material actions with a visible result or a concrete verification command, identifies what the reader should notice, and gives an actionable check for a plausible failure. Fails if success is asserted without something observable or troubleshooting only says to try again.",
+      "distinguishes_expected_from_observed_results": "Clearly presents unexecuted commands and their results as expected, and states that execution was not performed. Fails if it invents terminal output, screenshots, successful tests, or observed files from an unrun procedure.",
+      "adapts_scaffolding_without_removing_mechanism_or_boundaries": "Gives novices a concrete worked situation and defined terms; lets experts reach the mechanism and tradeoffs directly. Both versions preserve the supplied mechanism, conditions, and failure boundary. Fails if the versions differ only in length or the easier version loses a material condition.",
+      "keeps_necessary_established_technical_terms": "Uses the domain's established terms consistently and explains unfamiliar ones for the declared reader. Fails if technical terms are rejected merely because they are absent from a controlled-language dictionary, replaced by invented labels, or removed along with the concept they name."
     }
   },
   "evals": [
@@ -383,6 +404,94 @@
         "uses_standard_terminology",
         "has_self_check"
       ]
+    },
+    {
+      "id": 17,
+      "name": "chinese-ste-inspired-conceptual-learning",
+      "prompt": "用中文写一个单页 HTML 教程，教一个有 Python 基础、刚接触并发的读者理解互斥锁。借鉴 ASD-STE100，让句子直接、结构清楚。保留互斥锁、临界区、竞争条件这些已有术语。核心例子是：两个线程分别读取同一个计数器的旧值，各自加一，再写回；如果两个线程都先读到 0，最后可能只得到 1。解释互斥锁怎样让使用同一把锁的线程依次进入临界区，也说明进程内的一把锁不会自动协调多个服务进程。不要写成 API 名词清单。",
+      "expected_output": "A Chinese conceptual primer teaches the concrete interleaving before or alongside the mechanism. It connects the shared read-modify-write sequence to the lost update, then explains how the same mutex serializes participating threads and where that guarantee stops. Established Chinese terms stay stable and receive plain explanations. STE is identified, if discussed, as an inspiration for Chinese writing; no formal Chinese compliance or invented character ceiling is claimed.",
+      "baseline": "Expected failure modes, not a measured baseline: a rigid Chinese character cap, an unsupported STE-compliance claim, euphemisms replacing established terms, or a short explanation that omits the same-lock or process boundary.",
+      "files": [],
+      "assertions": [
+        "honors_explicit_output_language",
+        "uses_standard_terminology",
+        "chinese_ste_adaptation_has_no_compliance_claim_or_character_cap",
+        "preserves_causal_chain_and_boundaries",
+        "keeps_necessary_established_technical_terms"
+      ],
+      "grading_rubric": {
+        "pass": "The reader can trace a specific lost-update schedule, explain the mutex's role, and identify the same-lock and process limits in clear Chinese.",
+        "fail_if": [
+          "The result is presented as always 1, or the explanation attributes the lost update to the mutex.",
+          "The tutorial implies that a mutex coordinates code that does not use it or automatically coordinates separate service processes.",
+          "The author claims Chinese ASD-STE100 compliance or imposes a fixed Chinese character limit as an STE requirement."
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "name": "concise-tutorial-rewrite-preserves-source-semantics",
+      "prompt": "Replace the operational-behavior paragraph in my fictional Relay v2 tutorial. Make it short and decisive; prefer direct wording and remove any unnecessary hedging. I need the replacement paragraph now, without a scope interview or a full new tutorial. Source: Only after the operator approves the maintenance window may the controller restart the worker. Approval permits a restart; it does not require one. During a restart, the controller records events while the monitor checks worker health; these actions run concurrently. In v2, enabling the cache may reduce repeated reads, but the benefit depends on the cache hit rate. This procedure has not been verified for v3.",
+      "expected_output": "A concise replacement preserves the source's facts despite the pressure for decisive language: operator approval is a prerequisite, restarting remains optional, recording and health checking remain concurrent, cache benefit is conditional on hit rate and scoped to v2, and v3 remains unverified. The output does not turn permissions or predictions into commands or guarantees.",
+      "baseline": "Expected failure modes, not a measured baseline: changing may to must or will, dropping the only-after condition, making parallel actions sequential, promising cache improvement, or extending the procedure to unverified v3.",
+      "files": [],
+      "assertions": [
+        "preserves_modality_conditions_and_uncertainty",
+        "preserves_temporal_and_parallel_relations",
+        "scope_constrained"
+      ],
+      "grading_rubric": {
+        "pass": "All five invariants survive: prior approval, optional restart, concurrent actions, conditional v2 cache benefit, and unverified v3. Concision is judged only after semantic preservation.",
+        "fail_if": [
+          "Restarting becomes mandatory after approval, is allowed before approval, or the operator's role disappears.",
+          "Recording is described as occurring before or after health checking instead of concurrently.",
+          "The cache is guaranteed to reduce reads, its hit-rate condition or v2 scope disappears, or v3 is described as supported or tested."
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "name": "english-local-hands-on-observable-procedure",
+      "prompt": "Write a single-file English hands-on tutorial called PulseLab that teaches a Python beginner how the working directory affects relative input and output paths. Use only Bash and Python 3.11+ standard-library commands. The shell may initially be in any directory. Create a fresh local pulse-lab directory with config/input.json containing {\"service\":\"pulse\",\"enabled\":true}, then use python3 -m json.tool config/input.json formatted.json to create readable JSON in formatted.json. Explain what the learner should observe and how to diagnose a missing-input-path error. Do not execute the commands in this evaluation; provide the tutorial only.",
+      "expected_output": "The tutorial states the supplied environment assumptions, establishes and identifies a writable lab directory, creates the required JSON input, and makes each relative path's base clear. Material steps include observable checkpoints: directory and input existence, successful formatting, and inspecting formatted.json. A wrong-path check helps the learner distinguish an incorrect working directory from a missing input file. All command outcomes are labeled as expected because execution was explicitly excluded.",
+      "baseline": "Expected failure modes, not a measured baseline: commands assume an unstated working directory, the input file or setup is missing, expected output is confused with stdout when the formatter writes a file, or unexecuted results are reported as observed success.",
+      "files": [],
+      "assertions": [
+        "honors_explicit_output_language",
+        "procedure_establishes_environment_and_working_directory",
+        "actions_have_observable_results_and_wrong_path_checks",
+        "distinguishes_expected_from_observed_results"
+      ],
+      "grading_rubric": {
+        "pass": "A reader starting in another directory can establish the lab, create valid input, run the formatter from the stated location, inspect its file output, and diagnose the supplied path error without guessing.",
+        "fail_if": [
+          "Setup does not establish the current directory or fails to create config/input.json before it is used.",
+          "The tutorial claims the successful formatter invocation prints the formatted JSON to stdout despite the output-file argument, or gives no way to inspect formatted.json.",
+          "The wrong-path advice has no concrete directory or file check, or the delivery claims that commands or checks were executed."
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "name": "reader-level-simplification-retains-technical-meaning",
+      "prompt": "For a hash-table tutorial, draft two short versions of the same teaching section: one for a novice programmer and one for an engineer who already implements data structures. Use clear professional English and STE-inspired writing where useful. Work from this supplied model rather than researching a different implementation: a hash function chooses a bucket; separate chaining stores colliding entries in that bucket; lookup traverses that bucket. With a suitable hash function and a bounded load factor, expected lookup is O(1), but worst-case lookup is O(n). Resizing rehashes entries and can cost O(n) for one operation; expected amortized insertion can still be O(1). This is not a bound on every operation's latency. Make the novice version easy to follow and the expert version direct.",
+      "expected_output": "Both versions preserve the supplied hash-to-bucket and chaining mechanism and distinguish expected, worst-case, and amortized claims. The novice version explains established terms through a concrete worked situation; the expert version reaches assumptions, costs, and the latency boundary promptly. Necessary terms such as separate chaining, load factor, and amortized remain available and consistent rather than being removed through a dictionary ban or replaced with coined labels.",
+      "baseline": "Expected failure modes, not a measured baseline: a novice slogan that hash tables are always O(1), omission of a resize cost or latency boundary, identical scaffolding for both audiences, or removal of necessary technical terms to imitate a controlled-language dictionary.",
+      "files": [],
+      "assertions": [
+        "preserves_causal_chain_and_boundaries",
+        "adapts_scaffolding_without_removing_mechanism_or_boundaries",
+        "keeps_necessary_established_technical_terms",
+        "no_invented_concept_labels"
+      ],
+      "grading_rubric": {
+        "pass": "The versions differ in scaffolding while preserving the mechanism, hash/load assumptions, expected versus worst-case lookup, single-resize cost, and amortized versus per-operation latency distinction.",
+        "fail_if": [
+          "Either version converts an expected or amortized bound into a guarantee for every operation.",
+          "Either version omits the bucket traversal mechanism, suitability/load-factor assumptions, or the resize and latency boundary.",
+          "The novice gets unexplained jargon with no concrete worked situation, the expert gets the same novice scaffolding, or necessary terms are rejected solely as non-dictionary words."
+        ]
+      }
     }
   ]
 }

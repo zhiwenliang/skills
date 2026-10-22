@@ -8,8 +8,8 @@
     {
       "name": "tech-tutorial",
       "source": "./plugins/tech-tutorial",
-      "description": "Builds English-first, cognitive-science-aligned HTML tutorials for technical topics. Concept-focused by default (scenario walkthroughs for mental models), with an optional hands-on mode (runnable code progression). Structure is a scaffold: index first, self-check last, topical chapters in between sized by a concept dependency graph. Grounded in research on encoding, learning depth, and current field context.",
-      "version": "0.9.1",
+      "description": "Builds English-first HTML tutorials with cognitive-science learning design and STE-inspired clarity, including Chinese adaptation when requested. Concept-focused by default, with optional runnable hands-on progression. Chapters follow concept dependencies and preserve mechanisms, conditions, terminology, and verification limits.",
+      "version": "0.10.0",
       "author": {
         "name": "Zhiwen Liang"
       },

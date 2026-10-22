@@ -26,11 +26,15 @@ Multiple representations help transfer (Ainsworth, 2006) when each adds informat
 
 Drawing a structure from memory (generative drawing) adds a retrieval and construction step on top of viewing.
 
+Do not infer that every way of splitting content improves learning. In an Excel video study, adding automatic pauses did not improve performance or reduce reported effort compared with the available alternatives; ordinary video already allowed pause and replay ([Garrett, author's 2020 account](https://www.bera.ac.uk/blog/does-breaking-up-a-video-into-parts-improve-learning), linked study DOI: 10.1111/bjet.13000). This does not settle all segmentation questions, but it prevents treating forced pagination of self-paced HTML as an evidence-based requirement. Use meaningful section boundaries and navigation; chapter counts follow dependencies, not a universal segment size.
+
 ## 4. Worked Examples And Fading
 
 Supports: SKILL.md §4.
 
 Sweller's cognitive-load work shows that novices learn better from worked examples before open problem solving; open exercises too early spend working memory on search rather than schema construction. The worked -> partial -> open progression is the fading or completion-problem approach (Renkl & Atkinson, 2003; van Merriënboer, 1990): remove steps gradually as the schema forms. The same effect reverses for experts (see §1), which is why the worked-example ratio scales with reader level.
+
+Fading can also include a targeted self-explanation prompt: ask which principle makes a consequential step valid. Atkinson, Renkl & Merrill (2003) combined fading with principle-identification prompts in two experiments and reported improved near and far transfer ([author's institutional abstract](https://experts.azregents.edu/en/publications/transitioning-from-studying-examples-to-solving-problems-effects-/), DOI: 10.1037/0022-0663.95.4.774). The abstract was checked on 2026-10-22; the full article was not reviewed. This supports a relevant why-question at a worked decision, not a guarantee that arbitrary prompts or a fixed number of them improve transfer. Keep the reader-level ordering in SKILL.md.
 
 ## 5. Retrieval Practice And Pretesting
 
@@ -87,3 +91,5 @@ Mayer's personalization principle finds a small advantage for conversational sty
 ## Authoring Caveat
 
 These cognitive-science terms are author tools. Do not leak them into reader-facing prose unless the tutorial subject itself is learning science. The reader should see domain concepts, examples, diagrams, and questions, not the scaffolding vocabulary used to design them.
+
+The skill's exact counts for figures, predictions, questions, and the 50-word Feynman prompt are local authoring conventions. The cited research does not establish those numbers as universal learning thresholds or validate equivalent Chinese character counts. A readable tutorial and passing script checks are not measurements of human understanding, retention, or transfer. Chinese application and the choice to combine these methods are design adaptations, not separately validated experimental results.
